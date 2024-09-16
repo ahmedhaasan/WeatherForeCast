@@ -1,13 +1,13 @@
-package com.example.weatherforecast
+package com.example.weatherforecast.view
 
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
+import com.example.weatherforecast.R
 import com.example.weatherforecast.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -39,7 +39,10 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(binding.navHostFragment.id) as NavHostFragment // Use binding to access navHostFragment
         navController = navHostFragment.navController
-        NavigationUI.setupWithNavController(binding.navView, navController) // Use binding to access NavigationView
+        NavigationUI.setupWithNavController(
+            binding.navView,
+            navController
+        ) // Use binding to access NavigationView
 
         val actionBar = supportActionBar
         actionBar?.setHomeAsUpIndicator(R.drawable.menu)

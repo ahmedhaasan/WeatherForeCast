@@ -7,22 +7,22 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.weatherforecast.HomeFragment"
+        android:name="com.example.weatherforecast.view.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/favoriteFragment"
-        android:name="com.example.weatherforecast.FavoriteFragment"
+        android:name="com.example.weatherforecast.view.FavoriteFragment"
         android:label="fragment_favorite"
         tools:layout="@layout/fragment_favorite" />
     <fragment
         android:id="@+id/alertFragment"
-        android:name="com.example.weatherforecast.AlertFragment"
+        android:name="com.example.weatherforecast.view.AlertFragment"
         android:label="fragment_alert"
         tools:layout="@layout/fragment_alert" />
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.example.weatherforecast.SettingFragment"
+        android:name="com.example.weatherforecast.view.SettingFragment"
         android:label="fragment_setting"
         tools:layout="@layout/fragment_setting" />
 </navigation>
