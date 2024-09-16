@@ -2,7 +2,6 @@ package com.example.weatherforecast.model.reposiatory
 
 import WeatherResponse
 import com.example.weatherforecast.model.local.LocalDataSourceImp
-import com.example.weatherforecast.model.remote.RemoteDataSourceContract
 import com.example.weatherforecast.model.remote.RemoteDataSourceImp
 
 class ReposiatoryImp(
