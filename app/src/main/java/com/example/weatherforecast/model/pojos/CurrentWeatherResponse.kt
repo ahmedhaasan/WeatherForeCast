@@ -1,6 +1,8 @@
+import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
 
-data class WheatherResponse(
+@Entity(tableName = "currentWeather")
+data class WeatherResponse(
     val coord: Coord,
     val weather: List<Weather>,
     val base: String,

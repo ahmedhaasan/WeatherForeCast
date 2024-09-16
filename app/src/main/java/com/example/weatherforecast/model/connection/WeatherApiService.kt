@@ -1,6 +1,6 @@
-package com.example.weatherforecast.network
+package com.example.weatherforecast.model.connection
 
-import WheatherResponse
+import WeatherResponse
 import com.example.weatherforecast.Constants
 import retrofit2.Response
 import retrofit2.http.GET
@@ -22,6 +22,6 @@ interface WeatherApiService {
         @Query("lon") longitude: Double,
         @Query("units") units: String,
         @Query("appid") apiKey: String = Constants.API_KEY
-    ): Response<WheatherResponse>
+    ): Response<WeatherResponse>
 
 }

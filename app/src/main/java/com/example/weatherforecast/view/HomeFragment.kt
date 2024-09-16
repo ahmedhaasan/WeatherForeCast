@@ -1,6 +1,6 @@
 package com.example.weatherforecast.view
 
-import WheatherResponse
+import WeatherResponse
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,9 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.example.weatherforecast.R
 import com.example.weatherforecast.databinding.FragmentHomeBinding
-import com.example.weatherforecast.network.RetrofitHelper
+import com.example.weatherforecast.model.connection.RetrofitHelper
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
@@ -31,7 +30,7 @@ class HomeFragment : Fragment() {
             try {
                 val result = RetrofitHelper.service.getCurrentWeather(44.34, 10.99, "metric")
                 if (result.isSuccessful) {
-                    val apiResult: WheatherResponse? = result.body()
+                    val apiResult: WeatherResponse? = result.body()
                     Log.i("Result", apiResult?.main?.temp.toString() ?: "No temperature data")
                 } else {
                     Log.e("Error", "Response code: ${result.code()}")
