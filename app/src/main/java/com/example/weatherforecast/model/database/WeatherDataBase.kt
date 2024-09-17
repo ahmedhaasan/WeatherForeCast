@@ -4,11 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.example.weatherforecast.model.pojos.WeatherEntity
-import com.example.weatherforecast.model.pojos.WeatherResponse
+import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 
-@Database(entities = arrayOf(WeatherEntity::class), version = 1 ,exportSchema = false)
+@Database(entities = arrayOf(CurrentWeatherEntity::class), version = 1 ,exportSchema = false)
 abstract class WeatherDataBase : RoomDatabase() {
     abstract fun getWeatherDao(): WeatherDao
 

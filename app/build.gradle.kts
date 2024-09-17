@@ -88,4 +88,8 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
 
+    // matirial card view
+    implementation ("com.google.android.material:material:1.9.0")
+
+
 }

@@ -1,5 +1,6 @@
 package com.example.weatherforecast.view
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,8 +20,11 @@ import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import com.example.weatherforecast.model.view_model.WeatherViewModel
 import com.example.weatherforecast.model.view_model.WeatherViewModelFactory
 import com.example.weatherforecast.setIcon
+import java.text.DecimalFormat
 import java.time.Instant
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class HomeFragment : Fragment() {
 
@@ -34,6 +38,7 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("SetTextI18n")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,7 +52,7 @@ class HomeFragment : Fragment() {
         val db = WeatherDataBase.getInstance(requireContext())
         val dao = db.getWeatherDao()
         // 2 create instance of reposiatory
-        val repo =ReposiatoryImp(RemoteDataSourceImp(), LocalDataSourceImp(dao))
+        val repo = ReposiatoryImp(RemoteDataSourceImp(), LocalDataSourceImp(dao))
 
         // 3 create instance of factory
         val factory = WeatherViewModelFactory(repo)
@@ -55,28 +60,45 @@ class HomeFragment : Fragment() {
         val viewModel = ViewModelProvider(this, factory).get(WeatherViewModel::class.java)
 
         // fetch the current weather remotly
-        viewModel.getCurrentWeatherRemotly(30.013056,31.208853,Constants.METRIC_UNIT)
+        viewModel.getCurrentWeatherRemotly(30.013056, 31.208853, Constants.METRIC_UNIT)
         // Observe changes to the Weather list
         viewModel.currentWeather.observe(viewLifecycleOwner, Observer { weather ->
             if (weather != null) {
 
-                binding.tvLocationName.text = weather.name.toString()
-                val dateTime = Instant.ofEpochSecond(weather.dt.toLong()).atZone(ZoneId.systemDefault()).toLocalDateTime()
-                binding.tvCurrentDate.text = dateTime.toString()
-                binding.tvWeatherStatus.text = weather.weather[0].main
-                binding.tvCurrentDegree.text = weather.main.temp.toString()
-                /**
-                 * // calling a method to change the icon based on the code
-                 * exists in file ((formats ))
-                 */
-                setIcon(weather.weather[0].icon, binding.ivWeatherIcon)
+                // Formatting for temperature, pressure, etc.
+                val decimalFormat =
+                    DecimalFormat("#.##") // For formatting numbers with two decimal places
 
+                binding.tvLocationName.text = weather.city
 
+                val dateTime = Instant.ofEpochSecond(weather.date.toLong())
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime()
 
+                val dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM yyyy", Locale.ENGLISH)
+                binding.tvCurrentDate.text = dateTime.format(dateFormatter)
+                binding.tvWeatherStatus.text = weather.weatherStatus
+                binding.tvCurrentDegree.text = "${decimalFormat.format(weather.temperature)}°C"
+                setIcon(weather.weatherIcon, binding.ivWeatherIcon)
+                binding.presser.text =
+                    "${decimalFormat.format(weather.pressure)} hPa"  // Format pressure ( "1000 hPa")
+                binding.humidity.text =
+                    "${weather.humidity}%"  // Humidity in percentage ("77%")
+                binding.wind.text
+                "${decimalFormat.format(weather.windSpeed)} m/s"  // Wind speed (e.g., "2.06 m/s")
+                binding.clouds.text =
+                    "${weather.clouds}%"  // Cloud coverage in percentage ("0%")
+                binding.visability.text =
+                    "${decimalFormat.format(weather.visibility / 1000)} km"  // Visibility in kilometers ( "6.0 km")
             } else {
-                Toast.makeText(requireContext(), "No products available", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "No currentWeatherAvilable available",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         })
 
     }
+
 }

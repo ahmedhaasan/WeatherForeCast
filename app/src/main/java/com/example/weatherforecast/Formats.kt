@@ -1,7 +1,7 @@
 package com.example.weatherforecast
 
 import android.widget.ImageView
-import com.example.weatherforecast.model.pojos.WeatherEntity
+import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.WeatherResponse
 
 fun setIcon(id: String, iv: ImageView) {
@@ -30,8 +30,8 @@ fun setIcon(id: String, iv: ImageView) {
 
 
 /// here map the current weather format in this function to what i need only
-fun mapWeatherResponseToEntity(response: WeatherResponse): WeatherEntity {
-    return WeatherEntity(
+fun mapWeatherResponseToEntity(response: WeatherResponse): CurrentWeatherEntity {
+    return CurrentWeatherEntity(
         city = response.name,                          // city name
         temperature = response.main.temp,              // current temperature
         weatherStatus = response.weather[0].main,      // weather status (e.g., Rain)
