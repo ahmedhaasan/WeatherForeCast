@@ -3,6 +3,7 @@ package com.example.weatherforecast.view
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -96,6 +97,17 @@ class HomeFragment : Fragment() {
                     "No currentWeatherAvilable available",
                     Toast.LENGTH_SHORT
                 ).show()
+            }
+        })
+
+        // try observe on hourly data
+        viewModel.getHourlyWeather(30.013056, 31.208853, Constants.METRIC_UNIT)
+        viewModel.hourlyWeather.observe(viewLifecycleOwner, Observer { hourlyWeather ->
+            if (hourlyWeather != null){
+                Log.i(Constants.SUCCESS,"HOURLY FETCHED successfuly $hourlyWeather")
+            }else{
+                Log.i(Constants.ERROR,"Error fetch Hourly")
+
             }
         })
 

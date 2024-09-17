@@ -2,6 +2,8 @@ package com.example.weatherforecast
 
 import android.widget.ImageView
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
+import com.example.weatherforecast.model.pojos.FiveDayResponse
+import com.example.weatherforecast.model.pojos.HourlyWeatherEntity
 import com.example.weatherforecast.model.pojos.WeatherResponse
 
 fun setIcon(id: String, iv: ImageView) {
@@ -45,4 +47,15 @@ fun mapWeatherResponseToEntity(response: WeatherResponse): CurrentWeatherEntity 
         clouds = response.clouds.all,                  // cloudiness percentage
         visibility = response.visibility               // visibility
     )
+}
+
+// fun to map data into hourly data
+fun mapWeatherResponseToHourly(response: FiveDayResponse): List<HourlyWeatherEntity> {
+    return response.list.map { item ->
+        HourlyWeatherEntity(
+            hour = item.dt,
+            icon = item.weather.firstOrNull()?.icon ?: "", // Safe access for icon
+            temperature = item.main.temp
+        )
+    }
 }

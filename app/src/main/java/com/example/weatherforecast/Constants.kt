@@ -6,6 +6,8 @@ object Constants {
     const val  METRIC_UNIT:String = "metric"
     const val  STANDARD_UNIT:String = "standard"
     const val  IMPERIAL_UNIT:String = "imperial "
+    const val   ERROR :String = "error"
+    const val   SUCCESS :String = "SUCCESS"
 
 
 

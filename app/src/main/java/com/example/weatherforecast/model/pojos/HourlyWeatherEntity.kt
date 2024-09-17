@@ -1,4 +1,8 @@
 package com.example.weatherforecast.model.pojos
 
-class HourlyWeatherEntity {
-}
+data class HourlyWeatherEntity(
+        val hour: Long,
+        val icon: String,
+        val temperature:Double,
+    )
+
