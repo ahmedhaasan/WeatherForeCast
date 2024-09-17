@@ -1,9 +1,9 @@
-import com.google.gson.annotationsdata class Coord(
+import com.google.gson.annotations.SerializedName
+
+data class Coord(
     val lon: Double,
     val lat: Double
-).SerializedName
-
-
+)
 
 data class Weather(
     val id: Int,
@@ -17,8 +17,8 @@ data class Main(
     val feelsLike: Double,
    val tempMin: Double,
    val tempMax: Double,
-
-
+    val pressure :Int,
+    val humidity:Int,
    val seaLevel: Int? = null,
     val grndLevel: Int? = null
 )

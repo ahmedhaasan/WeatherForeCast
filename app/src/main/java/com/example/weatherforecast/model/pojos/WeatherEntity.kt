@@ -17,4 +17,5 @@ data class WeatherEntity(
     val pressure :Int,
     val humidity :Int,
     val clouds :Int,
+    val visibility :Int
 )
