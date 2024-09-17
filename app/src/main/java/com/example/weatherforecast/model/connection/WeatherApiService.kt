@@ -1,7 +1,7 @@
 package com.example.weatherforecast.model.connection
 
-import WeatherResponse
 import com.example.weatherforecast.Constants
+import com.example.weatherforecast.model.pojos.WeatherResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

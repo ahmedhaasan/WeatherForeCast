@@ -1,12 +1,14 @@
+package com.example.weatherforecast.model.database
 
-import WeatherResponse
+import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import android.content.Context
+import androidx.room.TypeConverters
+import com.example.weatherforecast.model.pojos.WeatherEntity
+import com.example.weatherforecast.model.pojos.WeatherResponse
 
-
-@Database(entities = [WeatherResponse::class], version = 1)
+@Database(entities = arrayOf(WeatherEntity::class), version = 1 ,exportSchema = false)
 abstract class WeatherDataBase : RoomDatabase() {
     abstract fun getWeatherDao(): WeatherDao
 

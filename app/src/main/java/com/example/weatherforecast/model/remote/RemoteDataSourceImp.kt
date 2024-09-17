@@ -1,7 +1,7 @@
 package com.example.weatherforecast.model.remote
 
-import WeatherResponse
 import com.example.weatherforecast.model.connection.RetrofitHelper
+import com.example.weatherforecast.model.pojos.WeatherResponse
 
 
 // first function in the remote dataSource

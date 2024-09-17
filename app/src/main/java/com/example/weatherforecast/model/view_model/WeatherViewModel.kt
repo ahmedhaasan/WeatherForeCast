@@ -1,9 +1,9 @@
-package com.example.weatherforecast.model.viewModel
+package com.example.weatherforecast.model.view_model
 
-import WeatherResponse
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.weatherforecast.model.pojos.WeatherResponse
 
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +28,8 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
         }
     }
 
-    // get the currentWeatehrLocally
+
+/*    // get the currentWeatehrLocally
     fun getCurrentWeatherLocally(lat: Double, lon: Double, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val tempWeather = repo.getCurrentLocalWeather()
@@ -57,6 +58,6 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
 
         }
         return result
-    }
+    }*/
 
 }
