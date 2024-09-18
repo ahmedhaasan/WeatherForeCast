@@ -1,10 +1,11 @@
 package com.example.weatherforecast.model.local
 
-import WeatherResponse
+import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
+
 
 interface LocalDataSourceContract {
 
-    suspend  fun insertCurrentWeather(c_weather:WeatherResponse):Long
-    suspend fun deleteCurrentWeather(c_weather: WeatherResponse):Int
-    suspend fun getCurrentWeather():WeatherResponse
+    suspend  fun insertCurrentWeather(c_weather: CurrentWeatherEntity):Long
+    suspend fun deleteCurrentWeather(c_weather: CurrentWeatherEntity):Int
+    suspend fun getCurrentWeather():CurrentWeatherEntity
 }

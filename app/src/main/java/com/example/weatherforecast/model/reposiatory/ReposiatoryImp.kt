@@ -1,8 +1,9 @@
 package com.example.weatherforecast.model.reposiatory
 
-import WeatherResponse
 import com.example.weatherforecast.model.local.LocalDataSourceImp
-import com.example.weatherforecast.model.remote.RemoteDataSourceContract
+import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
+import com.example.weatherforecast.model.pojos.FiveDayResponse
+import com.example.weatherforecast.model.pojos.WeatherResponse
 import com.example.weatherforecast.model.remote.RemoteDataSourceImp
 
 class ReposiatoryImp(
@@ -17,15 +18,23 @@ class ReposiatoryImp(
         return remote.getCurrentWeather(lat, lon, unit)
     }
 
-    override suspend fun getCurrentLocalWeather(): WeatherResponse {
+    override suspend fun getCurrentLocalWeather(): CurrentWeatherEntity {
         return local.getCurrentWeather()
     }
 
-    override suspend fun insertCurrentLocalWeather(c_weather: WeatherResponse): Long {
+    override suspend fun insertCurrentLocalWeather(c_weather: CurrentWeatherEntity): Long {
         return local.insertCurrentWeather(c_weather)
     }
 
-    override suspend fun deleteCurrentLocalWeather(c_weather: WeatherResponse): Int {
+    override suspend fun deleteCurrentLocalWeather(c_weather: CurrentWeatherEntity): Int {
         return local.deleteCurrentWeather(c_weather)
+    }
+
+    override suspend fun getFiveDayWeather(
+        lat: Double,
+        lon: Double,
+        unit: String
+    ): FiveDayResponse? {
+        return remote.getFiveDayWeather(lat, lon, unit)
     }
 }

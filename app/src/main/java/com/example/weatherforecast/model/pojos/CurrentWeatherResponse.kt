@@ -1,23 +1,9 @@
-import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
 
-@Entity(tableName = "currentWeather")
-data class WeatherResponse(
-    val coord: Coord,
-    val weather: List<Weather>,
-    val base: String,
-    val main: Main,
-    val visibility: Int,
-    val wind: Wind,
-    val clouds: Clouds,
-    val dt: Int,
-    val sys: Sys,
-    val timezone: Int,
-    val id: Int,
-    val name: String,
-    val cod: Int
-)
 
+/**
+ *  these are some classes used in Api call
+ */
 data class Coord(
     val lon: Double,
     val lat: Double
@@ -32,14 +18,16 @@ data class Weather(
 
 data class Main(
     val temp: Double,
-    @SerializedName("feels_like") val feelsLike: Double,
-    @SerializedName("temp_min") val tempMin: Double,
-    @SerializedName("temp_max") val tempMax: Double,
+    val feelsLike: Double,
+    val tempMin: Double,
+    val tempMax: Double,
     val pressure: Int,
     val humidity: Int,
-    @SerializedName("sea_level") val seaLevel: Int? = null,
-    @SerializedName("grnd_level") val grndLevel: Int? = null
+    val seaLevel: Int? = null,
+    val grndLevel: Int? = null,
+    val temp_kf: Double
 )
+
 
 data class Wind(
     val speed: Double,
@@ -57,4 +45,33 @@ data class Sys(
     val country: String,
     val sunrise: Int,
     val sunset: Int
+)
+data class Sys2 (
+    val pod: String // Day or night indicator
+)
+
+
+// used in FiveDayResponse
+data class City(
+    val id: Int,
+    val name: String,
+    val coord: Coord,
+    val country: String,
+    val population: Int
+)
+
+// used in fiveDayResponse
+data class WeatherItem(
+    val dt: Long,
+    val main: Main,
+    val weather: List<Weather>,
+    val clouds: Clouds,
+    val wind: Wind,
+    val sys: Sys2,
+    val dt_txt: String,
+    val pop:Double?,
+    val rain:Rain,
+)
+data class Rain(
+    @SerializedName("3h") val volume: Double? = null // Rain volume for the last 3 hours
 )
