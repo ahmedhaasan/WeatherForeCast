@@ -3,12 +3,15 @@ package com.example.weatherforecast.view.homefragment
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +24,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.databinding.FragmentHomeBinding
+import com.example.weatherforecast.model.checknetwork.NetworkChangeListener
+import com.example.weatherforecast.model.checknetwork.NetworkChangeReceiver
 import com.example.weatherforecast.model.database.WeatherDataBase
 import com.example.weatherforecast.model.local.LocalDataSourceImp
 import com.example.weatherforecast.model.remote.RemoteDataSourceImp
@@ -36,12 +41,15 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-class HomeFragment : Fragment() {
+
+class HomeFragment : Fragment(), NetworkChangeListener {
 
     lateinit var binding: FragmentHomeBinding
     private lateinit var dailyAdapter: DailyAdapter
     private lateinit var hourlyAdapter: HourlyAdapter
     private lateinit var fusedLocation: FusedLocationProviderClient
+    private lateinit var networkChangeReceiver: NetworkChangeReceiver
+
 
     // lat and long
     var lat: Double = 0.0
@@ -53,6 +61,23 @@ class HomeFragment : Fragment() {
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
+
+
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // register the BroadCast here to listen for network Changes
+        networkChangeReceiver = NetworkChangeReceiver(this)
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        requireActivity().registerReceiver(networkChangeReceiver, intentFilter)
+
+    }
+
+    // un register the listener
+    override fun onDestroy() {
+        super.onDestroy()
+        requireActivity().unregisterReceiver(networkChangeReceiver)
     }
 
     @SuppressLint("SetTextI18n")
@@ -110,7 +135,7 @@ class HomeFragment : Fragment() {
         val viewModel = ViewModelProvider(this, factory).get(WeatherViewModel::class.java)
 
         viewModel.getCurrentWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
-
+        viewModel.getCurrentWeatherLocally()  // get the data locally if no network
         viewModel.currentWeather.observe(viewLifecycleOwner, Observer { weather ->
             weather?.let {
                 val decimalFormat = DecimalFormat("#.##")
@@ -131,20 +156,29 @@ class HomeFragment : Fragment() {
                 binding.clouds.text = "${weather.clouds}%"
                 binding.visability.text = "${decimalFormat.format(weather.visibility / 1000)} km"
             } ?: run {
-                Toast.makeText(requireContext(), "No current weather available", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "No current weather available", Toast.LENGTH_SHORT)
+                    .show()
             }
         })
 
         hourlyAdapter = HourlyAdapter(emptyList())
         binding.hoursRecycler.apply {
             adapter = hourlyAdapter
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            // Set the layout manager to horizontal
+            layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
 
+        // try observe on hourly data
         viewModel.getHourlyWeather(lat, lon, Constants.METRIC_UNIT)
         viewModel.hourlyWeather.observe(viewLifecycleOwner, Observer { hourlyWeather ->
-            hourlyWeather?.let {
-                hourlyAdapter.submitList(it)
+            if (hourlyWeather != null && hourlyWeather.isNotEmpty()) {
+                hourlyAdapter.submitList(hourlyWeather)
+
+                Log.i(Constants.SUCCESS, "HOURLY FETCHED successfuly $hourlyWeather")
+            } else {
+                Log.i(Constants.ERROR, "Error fetch Hourly")
+
             }
         })
 
@@ -152,14 +186,21 @@ class HomeFragment : Fragment() {
         binding.daysRecyclerView.apply {
             adapter = dailyAdapter
             layoutManager = LinearLayoutManager(requireContext())
-        }
 
+        }
+        // observe on daily data and check it
         viewModel.getDailyWeather(lat, lon, Constants.METRIC_UNIT)
-        viewModel.dailyWeather.observe(viewLifecycleOwner, Observer { dailyWeather ->
-            dailyWeather?.let {
-                dailyAdapter.submitList(it)
+        viewModel.dailyWeather.observe(viewLifecycleOwner, Observer { mapDailyWeather ->
+            if (mapDailyWeather != null && mapDailyWeather.isNotEmpty()) {
+                dailyAdapter.submitList(mapDailyWeather)
+                Log.i(Constants.SUCCESS, "Daily FETCHED successfuly $mapDailyWeather")
+            } else {
+                Log.i(Constants.ERROR, "Error fetch Hourly")
+
+
             }
         })
+
     }
 
     // Check permissions
@@ -171,7 +212,9 @@ class HomeFragment : Fragment() {
     // Check if location services are enabled
     private fun isLocationEnabled(context: Context): Boolean {
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER
+        )
     }
 
     // Prompt the user to enable location services
@@ -226,5 +269,9 @@ class HomeFragment : Fragment() {
                 Constants.My_LOCATION_PERMISSION_ID
             )
         }
+    }
+
+    override fun onNetworkChanged(isConnected: Boolean) {
+
     }
 }

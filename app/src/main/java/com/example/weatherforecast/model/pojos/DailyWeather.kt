@@ -1,5 +1,11 @@
 package com.example.weatherforecast.model.pojos
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "DailyWeather")
 data class DailyWeather(
+    @PrimaryKey
     val day: Long,        // timestamp in seconds
     val icon: String,
     var minTemp: Double,

@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
+import com.example.weatherforecast.model.pojos.HourlyWeather
 
 @Dao
 interface WeatherDao {
@@ -17,4 +18,12 @@ interface WeatherDao {
 
     @Delete
     suspend fun deleteCurrentWeather(c_weather: CurrentWeatherEntity): Int
+
+    // insert hourly
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertHourlyWeather(h_weather: HourlyWeather): Long
+
+    // get hourly weather
+    @Query("SELECT * FROM HourlyWeather")
+    suspend fun getHorlyWeather(): HourlyWeather
 }

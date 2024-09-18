@@ -91,7 +91,7 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
 
 
     // get the currentWeatehrLocally
-    fun getCurrentWeatherLocally(lat: Double, lon: Double, unit: String) {
+    fun getCurrentWeatherLocally() {
         viewModelScope.launch(Dispatchers.IO) {
             val tempWeather = repo.getCurrentLocalWeather()
             withContext(Dispatchers.Main) {
@@ -109,6 +109,8 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
         }
         return result
     }
+
+
 
     // delete current Weather locally
 
