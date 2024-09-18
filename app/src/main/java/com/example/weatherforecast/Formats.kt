@@ -1,10 +1,18 @@
 package com.example.weatherforecast
 
+import android.os.Build
+import android.util.Log
 import android.widget.ImageView
+import androidx.annotation.RequiresApi
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
+import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.FiveDayResponse
-import com.example.weatherforecast.model.pojos.HourlyWeatherEntity
+import com.example.weatherforecast.model.pojos.HourlyWeather
 import com.example.weatherforecast.model.pojos.WeatherResponse
+
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 fun setIcon(id: String, iv: ImageView) {
     when (id) {
@@ -49,13 +57,131 @@ fun mapWeatherResponseToEntity(response: WeatherResponse): CurrentWeatherEntity 
     )
 }
 
-// fun to map data into hourly data
-fun mapWeatherResponseToHourly(response: FiveDayResponse): List<HourlyWeatherEntity> {
-    return response.list.map { item ->
-        HourlyWeatherEntity(
-            hour = item.dt,
-            icon = item.weather.firstOrNull()?.icon ?: "", // Safe access for icon
+
+
+/*@RequiresApi(Build.VERSION_CODES.O)
+fun mapHourlyWeatherForToday(response: FiveDayResponse): List<HourlyWeatherEntity> {
+    // Get the current date in the system default timezone
+    val currentDate = LocalDate.now(ZoneId.systemDefault())
+    println("Current Date: $currentDate") // Debugging output
+
+    return response.list
+        .map { item ->
+            // Convert timestamp to LocalDate
+            val forecastDate = Instant.ofEpochSecond(item.dt)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+            println("Forecast Date: $forecastDate, Timestamp: ${item.dt}") // Debugging output
+
+            // Map each item to HourlyWeatherEntity
+            HourlyWeatherEntity(
+                hour = item.dt, // timestamp in seconds
+                icon = item.weather[0].icon,
+                temperature = item.main.temp
+            ) to forecastDate // Return as a pair
+        }
+        .filter { (_, forecastDate) ->
+            // Filter to only include items for the current date
+            forecastDate == currentDate
+        }
+        .map { (hourlyWeatherEntity, _) ->
+            hourlyWeatherEntity
+        }
+}*/
+
+
+
+/*
+@RequiresApi(Build.VERSION_CODES.O)
+fun mapHourlyWeatherForToday(response: FiveDayResponse): List<HourlyWeatherEntity> {
+    // Get the current date in the timezone
+    val currentDate = LocalDate.now(ZoneId.systemDefault())
+    println("Current Date: $currentDate") // Debugging output
+
+    return response.list
+        .filter { item ->
+            // Convert timestamp to LocalDate
+            val forecastDate = Instant.ofEpochSecond(item.dt)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+            println("Forecast Date: $forecastDate, Timestamp: ${item.dt}") // Debugging output
+
+
+            // Check if the forecast date matches the current date
+            forecastDate == currentDate
+        }
+        .map { item ->
+            HourlyWeatherEntity(
+                hour = item.dt, // timestamp in seconds
+                icon = item.weather[0].icon,
+                temperature = item.main.temp
+            )
+        }
+}
+*/
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun mapHourlyWeatherForToday(response: FiveDayResponse): List<HourlyWeather> {
+    // Get the current date in the timezone
+    val currentDate = LocalDate.now(ZoneId.systemDefault())
+
+    // Find hourly data for today
+    val hourlyDataForToday = response.list.filter { item ->
+        val forecastDate = Instant.ofEpochSecond(item.dt)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+        forecastDate == currentDate
+    }
+
+    // Check if there is data for today
+    if (hourlyDataForToday.isEmpty()) {
+        Log.i(Constants.ERROR, "No hourly data available for today")
+        // Handle the case where there is no data for today
+        // For example, you could return a default message or use the next day's data
+        // return empty list or default data
+    }
+
+    return hourlyDataForToday.map { item ->
+        HourlyWeather(
+            day = item.dt, // timestamp in seconds
+            icon = item.weather[0].icon,
             temperature = item.main.temp
         )
     }
+}
+
+
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun mapDailyWeather(response: FiveDayResponse): List<DailyWeather> {
+    val dailyMap = mutableMapOf<LocalDate, DailyWeather>()
+
+    response.list.forEach { item ->
+        val timestamp = item.dt
+        val date = Instant.ofEpochSecond(timestamp)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+
+        val temperature = item.main.temp
+        val icon = item.weather[0].icon
+        val weatherStatus = item.weather[0].description // Assuming description provides weather status
+
+        if (!dailyMap.containsKey(date)) {
+            dailyMap[date] = DailyWeather(
+                day = timestamp,
+                icon = icon,
+                minTemp = temperature,
+                maxTemp = temperature,
+                weatherStatus = weatherStatus // Set weather status for the first data point of the day
+            )
+        } else {
+            val dailyWeather = dailyMap[date]!!
+            dailyWeather.minTemp = minOf(dailyWeather.minTemp, temperature)
+            dailyWeather.maxTemp = maxOf(dailyWeather.maxTemp, temperature)
+            // Update weatherStatus only if it's the first data point or if you want to track the most common status
+        }
+    }
+
+    return dailyMap.values.toList()
 }

@@ -1,4 +1,4 @@
-package com.example.weatherforecast.view
+package com.example.weatherforecast.view.homefragment
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -12,6 +12,8 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.databinding.FragmentHomeBinding
 import com.example.weatherforecast.model.database.WeatherDataBase
@@ -21,6 +23,8 @@ import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import com.example.weatherforecast.model.view_model.WeatherViewModel
 import com.example.weatherforecast.model.view_model.WeatherViewModelFactory
 import com.example.weatherforecast.setIcon
+import com.example.weatherforecast.view.homefragment.daily.DailyAdapter
+import com.example.weatherforecast.view.homefragment.hourly.HourlyAdapter
 import java.text.DecimalFormat
 import java.time.Instant
 import java.time.ZoneId
@@ -30,6 +34,8 @@ import java.util.Locale
 class HomeFragment : Fragment() {
 
     lateinit var binding: FragmentHomeBinding
+    private lateinit var dailyAdapter: DailyAdapter
+    private lateinit var hourlyAdapter: HourlyAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -100,16 +106,45 @@ class HomeFragment : Fragment() {
             }
         })
 
+        hourlyAdapter = HourlyAdapter(emptyList())
+        binding.hoursRecycler.apply {
+            adapter = hourlyAdapter
+            // Set the layout manager to horizontal
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        }
+
         // try observe on hourly data
         viewModel.getHourlyWeather(30.013056, 31.208853, Constants.METRIC_UNIT)
         viewModel.hourlyWeather.observe(viewLifecycleOwner, Observer { hourlyWeather ->
-            if (hourlyWeather != null){
-                Log.i(Constants.SUCCESS,"HOURLY FETCHED successfuly $hourlyWeather")
-            }else{
-                Log.i(Constants.ERROR,"Error fetch Hourly")
+            if (hourlyWeather != null && hourlyWeather.isNotEmpty()) {
+                hourlyAdapter.submitList(hourlyWeather)
+
+                Log.i(Constants.SUCCESS, "HOURLY FETCHED successfuly $hourlyWeather")
+            } else {
+                Log.i(Constants.ERROR, "Error fetch Hourly")
 
             }
         })
+
+        dailyAdapter = DailyAdapter(emptyList())
+        binding.daysRecyclerView.apply {
+            adapter = dailyAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+
+        }
+        // observe on daily data and check it
+        viewModel.getDailyWeather(30.013056, 31.208853, Constants.METRIC_UNIT)
+            viewModel.dailyWeather.observe(viewLifecycleOwner, Observer { mapDailyWeather ->
+                if (mapDailyWeather != null && mapDailyWeather.isNotEmpty()) {
+                    dailyAdapter.submitList(mapDailyWeather)
+                    Log.i(Constants.SUCCESS, "Daily FETCHED successfuly $mapDailyWeather")
+                } else {
+                    Log.i(Constants.ERROR, "Error fetch Hourly")
+
+
+                }
+            })
+
 
     }
 

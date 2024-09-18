@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:label="@string/home"
     android:background="@color/black"
-    tools:context=".view.HomeFragment">
+    tools:context=".view.homefragment.HomeFragment">
 
     <ScrollView
         android:id="@+id/homeScrollView"
@@ -262,8 +262,33 @@
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
 
+
+        </com.google.android.material.card.MaterialCardView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/hours_recycler"
+            android:layout_marginTop="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBaseline_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/weatherCardView"
+            tools:itemCount="3"
+            />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/days_recyclerView"
+            android:layout_marginTop="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBaseline_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/hours_recycler"
+            tools:itemCount="3"
+            />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

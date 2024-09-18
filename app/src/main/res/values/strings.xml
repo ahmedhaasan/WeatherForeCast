@@ -8,4 +8,6 @@
     <string name="home">Home</string>
     <string name="settings">settings</string>
     <string name="giza">Giza</string>
+    <string name="sunny_day">Sunny Day</string>
+    <string name="day_degree">Degree</string>
 </resources>
