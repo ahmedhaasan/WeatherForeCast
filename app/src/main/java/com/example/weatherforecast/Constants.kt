@@ -8,6 +8,8 @@ object Constants {
     const val  IMPERIAL_UNIT:String = "imperial "
     const val   ERROR :String = "error"
     const val   SUCCESS :String = "SUCCESS"
+    const val    My_LOCATION_PERMISSION_ID = 5005
+
 
 
 

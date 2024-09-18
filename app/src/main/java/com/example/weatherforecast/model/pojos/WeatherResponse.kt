@@ -19,7 +19,7 @@ data class WeatherResponse(
  val visibility: Int,
  val wind: Wind,
  val clouds: Clouds,
- val dt: Int,
+ val dt: Int,  //date
  val sys: Sys,
  val timezone: Int,
  val name: String,
