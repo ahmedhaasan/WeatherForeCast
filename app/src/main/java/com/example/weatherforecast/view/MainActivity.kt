@@ -44,52 +44,19 @@ class MainActivity : AppCompatActivity() {
             navController
         ) // Use binding to access NavigationView
 
-        val actionBar = supportActionBar
-        actionBar?.setHomeAsUpIndicator(R.drawable.menu)
-        actionBar!!.setDisplayShowHomeEnabled(true)
-        actionBar.setDisplayHomeAsUpEnabled(true)
+        // Set custom icon for home (hamburger menu)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.menu)
 
         // Update the ActionBar title based on the menu item's title
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val menuItem = binding.navView.menu.findItem(destination.id)
-            if (menuItem != null) {
-                supportActionBar?.title = menuItem.title // Set ActionBar title to menu item title
-            } else {
-                supportActionBar?.title = destination.label // Fallback to label in case no menu item is found
-            }
+            supportActionBar?.title = menuItem?.title ?: destination.label // Set ActionBar title
         }
-
     }
 
     override fun onSupportNavigateUp(): Boolean {
         return NavigationUI.navigateUp(navController, binding.drawerLayout) || super.onSupportNavigateUp()
-
-
     }
-
-    // This will handle the clicks for the menu icon (hamburger button)
-    // Handle menu item clicks
-/*    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.homeFragment -> {
-                supportActionBar?.title = item.title // Set action bar title to menu item's title
-                true
-            }
-            R.id.favoriteFragment -> {
-                supportActionBar?.title = item.title
-                true
-            }
-            R.id.alertFragment -> {
-                supportActionBar?.title = item.title
-                true
-            }
-            R.id.settingFragment -> {
-                supportActionBar?.title = item.title
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }*/
 
     // Handle back button when the drawer is open
     override fun onBackPressed() {

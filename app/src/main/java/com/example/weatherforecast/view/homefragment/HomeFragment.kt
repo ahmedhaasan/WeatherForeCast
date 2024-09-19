@@ -49,6 +49,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     private lateinit var hourlyAdapter: HourlyAdapter
     private lateinit var fusedLocation: FusedLocationProviderClient
     private lateinit var networkChangeReceiver: NetworkChangeReceiver
+    private var connected = true
 
 
     // lat and long
@@ -86,7 +87,6 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         super.onViewCreated(view, savedInstanceState)
 
         fusedLocation = LocationServices.getFusedLocationProviderClient(requireContext())
-
         checkLocationStatus()
         binding.allowLocationButton.setOnClickListener {
             enableLocationServices()
@@ -115,6 +115,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         }
     }
 
+    // check if the location is enabled then display the weather else display allow button
     private fun updateUI(isLocationEnabled: Boolean) {
         if (isLocationEnabled) {
             binding.homeScrollView.visibility = View.VISIBLE
@@ -128,15 +129,30 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     @SuppressLint("SetTextI18n")
     @RequiresApi(Build.VERSION_CODES.O)
     private fun loadWeatherData() {
+        if (lat == 0.0 && lon == 0.0) {
+            Log.e("LocationError", "Lat/Lon are not set yet")
+            return
+        }
         val db = WeatherDataBase.getInstance(requireContext())
         val dao = db.getWeatherDao()
         val repo = ReposiatoryImp(RemoteDataSourceImp(), LocalDataSourceImp(dao))
         val factory = WeatherViewModelFactory(repo)
         val viewModel = ViewModelProvider(this, factory).get(WeatherViewModel::class.java)
 
-        viewModel.getCurrentWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
-        viewModel.getCurrentWeatherLocally()  // get the data locally if no network
-        viewModel.currentWeather.observe(viewLifecycleOwner, Observer { weather ->
+        if(connected){
+            viewModel.getCurrentWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
+            viewModel.getHourlyWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
+            viewModel.getDailyWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
+
+        }else
+        {
+         viewModel.getCurrentWeatherLocally()
+         viewModel.getHourlyWeatherLocally()
+         viewModel.getDailyWeatehrLocally()
+        }
+        var isToastShown = false
+
+        viewModel.currentWeather.observe(this, Observer { weather ->
             weather?.let {
                 val decimalFormat = DecimalFormat("#.##")
                 binding.tvLocationName.text = weather.city
@@ -155,11 +171,16 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                 binding.wind.text = "${decimalFormat.format(weather.windSpeed)} m/s"
                 binding.clouds.text = "${weather.clouds}%"
                 binding.visability.text = "${decimalFormat.format(weather.visibility / 1000)} km"
+                isToastShown = false // Reset the toast flag when data is available
             } ?: run {
-                Toast.makeText(requireContext(), "No current weather available", Toast.LENGTH_SHORT)
-                    .show()
+                if (!isToastShown) {
+                    Toast.makeText(requireContext(), "No current weather available", Toast.LENGTH_SHORT)
+                        .show()
+                    isToastShown = true // Set the toast flag so it only shows once
+                }
             }
         })
+
 
         hourlyAdapter = HourlyAdapter(emptyList())
         binding.hoursRecycler.apply {
@@ -170,8 +191,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         }
 
         // try observe on hourly data
-        viewModel.getHourlyWeather(lat, lon, Constants.METRIC_UNIT)
-        viewModel.hourlyWeather.observe(viewLifecycleOwner, Observer { hourlyWeather ->
+        viewModel.hourlyWeather.observe(this, Observer { hourlyWeather ->
             if (hourlyWeather != null && hourlyWeather.isNotEmpty()) {
                 hourlyAdapter.submitList(hourlyWeather)
 
@@ -189,8 +209,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
 
         }
         // observe on daily data and check it
-        viewModel.getDailyWeather(lat, lon, Constants.METRIC_UNIT)
-        viewModel.dailyWeather.observe(viewLifecycleOwner, Observer { mapDailyWeather ->
+        viewModel.dailyWeather.observe(this, Observer { mapDailyWeather ->
             if (mapDailyWeather != null && mapDailyWeather.isNotEmpty()) {
                 dailyAdapter.submitList(mapDailyWeather)
                 Log.i(Constants.SUCCESS, "Daily FETCHED successfuly $mapDailyWeather")
@@ -226,9 +245,10 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     // Get the user's fresh location
     @SuppressLint("MissingPermission")
     private fun getFreshLocation() {
-        val locationRequest = LocationRequest.Builder(0).apply {
-            setPriority(Priority.PRIORITY_HIGH_ACCURACY)
-        }.build()
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
+            .setMinUpdateIntervalMillis(5000)
+            .build()
+
 
         fusedLocation.requestLocationUpdates(locationRequest, object : LocationCallback() {
             @RequiresApi(Build.VERSION_CODES.O)
@@ -271,7 +291,28 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onNetworkChanged(isConnected: Boolean) {
+        connected = isConnected
+        if (connected) {
+            loadWeatherData()
+        }
+    }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == Constants.My_LOCATION_PERMISSION_ID) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted
+                checkLocationStatus()
+            } else {
+                // Permission denied
+                Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

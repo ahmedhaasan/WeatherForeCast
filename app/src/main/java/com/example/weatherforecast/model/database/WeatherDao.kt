@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
+import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.HourlyWeather
 
 @Dao
@@ -16,14 +17,28 @@ interface WeatherDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCurrentWeather(c_weather: CurrentWeatherEntity): Long
 
-    @Delete
-    suspend fun deleteCurrentWeather(c_weather: CurrentWeatherEntity): Int
+    @Query("DELETE FROM currentWeather")
+    suspend fun deleteCurrentWeather(): Int  // Correct table for deletion
 
-    // insert hourly
+    // Insert hourly weather
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertHourlyWeather(h_weather: HourlyWeather): Long
+    suspend fun insertHourlyWeatherLocally(h_weather: List<HourlyWeather>): List<Long>  // Return List<Long>
 
-    // get hourly weather
+    // Get hourly weather
     @Query("SELECT * FROM HourlyWeather")
-    suspend fun getHorlyWeather(): HourlyWeather
+    suspend fun getHourlyWeatherLocally(): List<HourlyWeather>  // Fixed typo
+
+    @Query("DELETE FROM HourlyWeather")
+    suspend fun deleteHourlyWeather(): Int
+
+    // Insert daily weather
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDailyWeatherLocally(d_weather: List<DailyWeather>): List<Long>  // Return List<Long>
+
+    // Get daily weather
+    @Query("SELECT * FROM DailyWeather")
+    suspend fun getDailyWeatherLocally(): List<DailyWeather>
+
+    @Query("DELETE FROM DailyWeather")
+    suspend fun deleteDailyWeather(): Int  // Fixed typo in method name
 }
