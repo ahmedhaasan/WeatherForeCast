@@ -16,6 +16,7 @@ import com.example.weatherforecast.model.pojos.HourlyWeather
 
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -104,18 +105,16 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
     // get the currentWeatehrLocally
     fun getCurrentWeatherLocally() {
         viewModelScope.launch(Dispatchers.IO) {
-            val tempWeather = repo.getCurrentLocalWeather()
-            withContext(Dispatchers.Main) {
-                _currentWeather.postValue(tempWeather)
-            }
+             repo.getCurrentLocalWeather().collect{
+                 currentWeather -> _currentWeather.postValue(currentWeather)
+             }
         }
     }
 
     fun  getHourlyWeatherLocally(){
         viewModelScope.launch( Dispatchers.IO) {
-            val localHourly = repo.getHourlyWeatherLocally()
-            withContext(Dispatchers.Main) {
-                _hourlyWeather.postValue(localHourly)
+            repo.getHourlyWeatherLocally().collect{
+                hourlyWeather -> _hourlyWeather.postValue(hourlyWeather)
             }
         }
     }
@@ -123,10 +122,10 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
     fun getDailyWeatehrLocally(){
 
         viewModelScope.launch(Dispatchers.IO) {
-            val localDaily = repo.getDailyWeatherLocally()
-            withContext(Dispatchers.Main) {
-                _dailyWeather.postValue(localDaily)
-            }
+             repo.getDailyWeatherLocally().collect{
+                 dailyWeather -> _dailyWeather.postValue(dailyWeather)
+             }
+
         }
     }
 

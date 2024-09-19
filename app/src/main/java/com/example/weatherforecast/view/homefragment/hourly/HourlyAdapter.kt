@@ -17,14 +17,13 @@ import java.util.Locale
 
 class HourlyAdapter(private val hourlyWeather: List<HourlyWeather>) :
     ListAdapter<HourlyWeather, HourlyAdapter.HourlyViewHolder>(HourlyDeffUtil()) {
-    lateinit var binding: ItemHoursBinding
 
-    class HourlyViewHolder(var itemBinding: ItemHoursBinding) :
+    inner class HourlyViewHolder(var itemBinding: ItemHoursBinding) :
         RecyclerView.ViewHolder(itemBinding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HourlyViewHolder {
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
-        binding = ItemHoursBinding.inflate(inflater, parent, false)
+        val binding = ItemHoursBinding.inflate(inflater, parent, false)
         return HourlyViewHolder(binding)
     }
 
@@ -45,12 +44,12 @@ class HourlyAdapter(private val hourlyWeather: List<HourlyWeather>) :
             val dayOfWeek = localDateTime.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, Locale.getDefault())
 
             // Set the hour and day of the week in separate TextViews
-            binding.tvDay.text = dayOfWeek
-            binding.tvTimeHours.text = formattedHour
+            holder.itemBinding.tvDay.text = dayOfWeek
+            holder.itemBinding.tvTimeHours.text = formattedHour
 
             // Set the icon and temperature
-            setIcon(current.icon, binding.ivStatusIcon)
-            binding.tvDegree.text = "${current.temperature}°"
+            setIcon(current.icon, holder.itemBinding.ivStatusIcon)
+            holder.itemBinding.tvDegree.text = "${current.temperature}°"
         }
     }
 }

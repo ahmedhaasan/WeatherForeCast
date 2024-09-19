@@ -7,6 +7,7 @@ import com.example.weatherforecast.model.pojos.FiveDayResponse
 import com.example.weatherforecast.model.pojos.HourlyWeather
 import com.example.weatherforecast.model.pojos.WeatherResponse
 import com.example.weatherforecast.model.remote.RemoteDataSourceImp
+import kotlinx.coroutines.flow.Flow
 
 class ReposiatoryImp(
     private val remote: RemoteDataSourceImp,
@@ -31,7 +32,7 @@ class ReposiatoryImp(
         return remote.getFiveDayWeather(lat, lon, unit)
     }
 
-    override suspend fun getCurrentLocalWeather(): CurrentWeatherEntity {
+    override suspend fun getCurrentLocalWeather(): Flow<CurrentWeatherEntity> {
         return local.getCurrentWeather()
     }
 
@@ -44,7 +45,7 @@ class ReposiatoryImp(
         return local.insertHourlyWeatherLocally(h_weather)
     }
 
-    override suspend fun getHourlyWeatherLocally(): List<HourlyWeather> {
+    override suspend fun getHourlyWeatherLocally():Flow< List<HourlyWeather>> {
         return local.getHorlyWeatherLocally()
     }
 
@@ -52,7 +53,7 @@ class ReposiatoryImp(
         return local.insertDailyWeatherLocally(d_weather)
     }
 
-    override suspend fun getDailyWeatherLocally(): List<DailyWeather> {
+    override suspend fun getDailyWeatherLocally(): Flow<List<DailyWeather>> {
         return local.getDailyWeatherLocally()
     }
 

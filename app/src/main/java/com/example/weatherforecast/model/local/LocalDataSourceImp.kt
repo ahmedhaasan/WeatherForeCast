@@ -4,6 +4,7 @@ import com.example.weatherforecast.model.database.WeatherDao
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.HourlyWeather
+import kotlinx.coroutines.flow.Flow
 
 
 // start in local weather data
@@ -16,7 +17,7 @@ class LocalDataSourceImp(val dao: WeatherDao) : LocalDataSourceContract {
         return dao.deleteCurrentWeather()
     }
 
-    override suspend fun getCurrentWeather(): CurrentWeatherEntity {
+    override suspend fun getCurrentWeather(): Flow<CurrentWeatherEntity> {
         return dao.getCurrentWeather()
     }
 
@@ -24,7 +25,7 @@ class LocalDataSourceImp(val dao: WeatherDao) : LocalDataSourceContract {
         return dao.insertHourlyWeatherLocally(h_weather)
     }
 
-    override suspend fun getHorlyWeatherLocally(): List<HourlyWeather> {
+    override suspend fun getHorlyWeatherLocally(): Flow<List<HourlyWeather>> {
         return dao.getHourlyWeatherLocally()
     }
 
@@ -32,7 +33,7 @@ class LocalDataSourceImp(val dao: WeatherDao) : LocalDataSourceContract {
         return dao.insertDailyWeatherLocally(d_weather)
     }
 
-    override suspend fun getDailyWeatherLocally(): List<DailyWeather> {
+    override suspend fun getDailyWeatherLocally(): Flow<List<DailyWeather>> {
         return dao.getDailyWeatherLocally()
     }
 

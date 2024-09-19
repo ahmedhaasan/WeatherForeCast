@@ -5,8 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "HourlyWeather")
 data class HourlyWeather(
-        @PrimaryKey
-        val day: Long,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val day: Long,
         val icon: String,
         val temperature:Double,
     )

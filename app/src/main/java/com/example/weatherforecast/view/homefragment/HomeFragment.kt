@@ -36,6 +36,7 @@ import com.example.weatherforecast.setIcon
 import com.example.weatherforecast.view.homefragment.daily.DailyAdapter
 import com.example.weatherforecast.view.homefragment.hourly.HourlyAdapter
 import com.google.android.gms.location.*
+import com.google.android.material.snackbar.Snackbar
 import java.text.DecimalFormat
 import java.time.Instant
 import java.time.ZoneId
@@ -140,19 +141,22 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         val viewModel = ViewModelProvider(this, factory).get(WeatherViewModel::class.java)
 
         if(connected){
+
             viewModel.getCurrentWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
             viewModel.getHourlyWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
             viewModel.getDailyWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
 
         }else
         {
-         viewModel.getCurrentWeatherLocally()
+            Snackbar.make(requireView(), "YOU See the Weather Without Internet", Snackbar.LENGTH_SHORT).show()
+
+            viewModel.getCurrentWeatherLocally()
          viewModel.getHourlyWeatherLocally()
          viewModel.getDailyWeatehrLocally()
         }
         var isToastShown = false
 
-        viewModel.currentWeather.observe(this, Observer { weather ->
+        viewModel.currentWeather.observe(viewLifecycleOwner, Observer { weather ->
             weather?.let {
                 val decimalFormat = DecimalFormat("#.##")
                 binding.tvLocationName.text = weather.city
@@ -191,7 +195,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         }
 
         // try observe on hourly data
-        viewModel.hourlyWeather.observe(this, Observer { hourlyWeather ->
+        viewModel.hourlyWeather.observe(viewLifecycleOwner, Observer { hourlyWeather ->
             if (hourlyWeather != null && hourlyWeather.isNotEmpty()) {
                 hourlyAdapter.submitList(hourlyWeather)
 
@@ -209,16 +213,17 @@ class HomeFragment : Fragment(), NetworkChangeListener {
 
         }
         // observe on daily data and check it
-        viewModel.dailyWeather.observe(this, Observer { mapDailyWeather ->
+        viewModel.dailyWeather.observe(viewLifecycleOwner, Observer { mapDailyWeather ->
             if (mapDailyWeather != null && mapDailyWeather.isNotEmpty()) {
-                dailyAdapter.submitList(mapDailyWeather)
-                Log.i(Constants.SUCCESS, "Daily FETCHED successfuly $mapDailyWeather")
+                // Drop the first item and submit the updated list
+                val listWithoutFirstItem = mapDailyWeather.drop(1)
+                dailyAdapter.submitList(listWithoutFirstItem)
+                Log.i(Constants.SUCCESS, "Daily FETCHED successfully $listWithoutFirstItem")
             } else {
-                Log.i(Constants.ERROR, "Error fetch Hourly")
-
-
+                Log.i(Constants.ERROR, "Error fetching Hourly")
             }
         })
+
 
     }
 

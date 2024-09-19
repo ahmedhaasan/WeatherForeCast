@@ -5,11 +5,11 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "DailyWeather")
 data class DailyWeather(
-    @PrimaryKey
-    val day: Long,        // timestamp in seconds
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,             // Auto-incrementing primary key
+    val day: Long,                // timestamp in seconds
     val icon: String,
     var minTemp: Double,
     var maxTemp: Double,
-    val weatherStatus: String // Add this field for weather condition description
-
+    val weatherStatus: String    // Add this field for weather condition description
 )

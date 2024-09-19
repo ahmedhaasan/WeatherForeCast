@@ -12,7 +12,7 @@
         android:id="@+id/homeScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -300,6 +300,7 @@
         android:id="@+id/permission_constrain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         android:background="@color/white">
 
         <androidx.constraintlayout.widget.ConstraintLayout
