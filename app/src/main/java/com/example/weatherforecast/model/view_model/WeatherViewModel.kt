@@ -16,6 +16,7 @@ import com.example.weatherforecast.model.pojos.HourlyWeather
 
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -37,25 +38,33 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
     fun getCurrentWeatherRemotly(lat: Double, lon: Double, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val tempWeather = repo.getCurrentWeatherRemotely(lat, lon, unit)
-            val temp2 = tempWeather?.let { mapWeatherResponseToEntity(it) } // map what i need here to my response
+            val temp2 =
+                tempWeather?.let { mapWeatherResponseToEntity(it) } // map what i need here to my response
             withContext(Dispatchers.Main) {
                 _currentWeather.postValue(temp2)
             }
+            // then clear the db and add the new one
+            repo.deleteCurrentLocalWeather()
+            repo.insertCurrentLocalWeather(temp2!!)
         }
     }
 
     // get Hourly
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getHourlyWeather(lat: Double, lon: Double, unit: String) {
+    fun getHourlyWeatherRemotly(lat: Double, lon: Double, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val fiveDayResponse = repo.getFiveDayWeather(lat, lon, unit)
                 if (fiveDayResponse != null) {
-                    val hourlyWeather: List<HourlyWeather> = mapHourlyWeatherForToday(fiveDayResponse)
+                    val hourlyWeather: List<HourlyWeather> =
+                        mapHourlyWeatherForToday(fiveDayResponse)
                     // Update the hourly data on the main thread
                     withContext(Dispatchers.Main) {
                         _hourlyWeather.postValue(hourlyWeather)
                     }
+                    // then clear the db and add the new one
+                    repo.deleteHourlyWeather()
+                    repo.insertHourlyWeatherLocally(hourlyWeather)
                 } else {
                     Log.i(Constants.ERROR, "No data received from getFiveDayWeather")
                 }
@@ -68,7 +77,7 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
 
     // get Hourly
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getDailyWeather(lat: Double, lon: Double, unit: String) {
+    fun getDailyWeatherRemotly(lat: Double, lon: Double, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val fiveDayResponse = repo.getFiveDayWeather(lat, lon, unit)
@@ -78,6 +87,10 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
                     withContext(Dispatchers.Main) {
                         _dailyWeather.postValue(tempDailyWeather)
                     }
+                    // after fetch the daily weather Remotly so Added it to DB locally
+                    repo.deleteDailyWeatehr()
+                    repo.insertDailyWeatherLocally(tempDailyWeather)
+
                 } else {
                     Log.i(Constants.ERROR, "No data received from getFiveDayWeather")
                 }
@@ -89,18 +102,34 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
     }
 
 
-
     // get the currentWeatehrLocally
-    fun getCurrentWeatherLocally(lat: Double, lon: Double, unit: String) {
+    fun getCurrentWeatherLocally() {
         viewModelScope.launch(Dispatchers.IO) {
-            val tempWeather = repo.getCurrentLocalWeather()
-            withContext(Dispatchers.Main) {
-                _currentWeather.postValue(tempWeather)
+             repo.getCurrentLocalWeather().collect{
+                 currentWeather -> _currentWeather.postValue(currentWeather)
+             }
+        }
+    }
+
+    fun  getHourlyWeatherLocally(){
+        viewModelScope.launch( Dispatchers.IO) {
+            repo.getHourlyWeatherLocally().collect{
+                hourlyWeather -> _hourlyWeather.postValue(hourlyWeather)
             }
         }
     }
 
-    // insert weather in Db
+    fun getDailyWeatehrLocally(){
+
+        viewModelScope.launch(Dispatchers.IO) {
+             repo.getDailyWeatherLocally().collect{
+                 dailyWeather -> _dailyWeather.postValue(dailyWeather)
+             }
+
+        }
+    }
+
+/*    // insert weather in Db
     fun insertCurrentWeatherLocally(c_weather: CurrentWeatherEntity): Long? {
         var result: Long? = null
         viewModelScope.launch(Dispatchers.IO) {
@@ -110,15 +139,16 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
         return result
     }
 
+
     // delete current Weather locally
 
-    fun deleteCurrentWeatherLocally(c_weather: CurrentWeatherEntity): Int? {
+    fun deleteCurrentWeatherLocally(): Int? {
         var result: Int? = null
         viewModelScope.launch(Dispatchers.IO) {
-            result = repo.deleteCurrentLocalWeather(c_weather)
+            result = repo.deleteCurrentLocalWeather()
 
         }
         return result
-    }
+    }*/
 
 }

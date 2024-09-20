@@ -17,17 +17,14 @@ import java.util.Locale
 
 class DailyAdapter(val dailyWeather: List<DailyWeather>) :
     ListAdapter<DailyWeather, DailyAdapter.DailyViewHolder>(DailyDeffUtil()) {
-    lateinit var binding: ItemDailyBinding
+
 
     class DailyViewHolder(var itemBinding: ItemDailyBinding) :
-        RecyclerView.ViewHolder(itemBinding.root) {
-
-    }
+        RecyclerView.ViewHolder(itemBinding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DailyViewHolder {
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
-        // val view = inflater.inflate(R.layout.product_row, parent, false)
-        binding = ItemDailyBinding.inflate(inflater, parent, false)
+        val binding = ItemDailyBinding.inflate(inflater, parent, false)
         return DailyViewHolder(binding)
     }
 
@@ -35,7 +32,6 @@ class DailyAdapter(val dailyWeather: List<DailyWeather>) :
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: DailyViewHolder, position: Int) {
         val current: DailyWeather? = getItem(position)
-
 
         if (current != null) {
             // Convert timestamp to LocalDate
@@ -47,16 +43,14 @@ class DailyAdapter(val dailyWeather: List<DailyWeather>) :
             val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
 
             // Set the day of the week and weather status
-            binding.tvDay.text = dayOfWeek
-            binding.tvStatus.text = current.weatherStatus
+            holder.itemBinding.tvDay.text = if (position == 0) "Tomorrow" else dayOfWeek
+            holder.itemBinding.tvStatus.text = current.weatherStatus
 
             // Set the icon
-            setIcon(current.icon, binding.ivIcon)
+            setIcon(current.icon, holder.itemBinding.ivIcon)
 
             // Format the temperatures
-            binding.tvDegree.text = "${current.maxTemp.toInt()}°/${current.minTemp.toInt()}°"
-
-
+            holder.itemBinding.tvDegree.text = "${current.maxTemp.toInt()}°/${current.minTemp.toInt()}°"
         }
     }
 }

@@ -91,5 +91,9 @@ dependencies {
     // matirial card view
     implementation ("com.google.android.material:material:1.9.0")
 
+    // google services
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+
+
 
 }

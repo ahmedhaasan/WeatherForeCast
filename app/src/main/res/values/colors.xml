@@ -4,4 +4,11 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#aeb6bf</color>
     <color name="sky">#3498db</color>
+    <!-- Custom Colors -->
+    <color name="your_color">#FF5733</color> <!-- Replace with your desired color -->
+
+    <!-- Card Background Colors -->
+    <color name="card_background_color">#007BFF</color> <!-- A vibrant blue -->
+    <color name="card_background_color2">#F5F5F5</color> <!-- A light gray -->
+    <color name="card_background_color3">#003366</color> <!-- A deep navy blue -->
 </resources>
