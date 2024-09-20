@@ -32,8 +32,8 @@ interface ReposiatoryContract {
      */
 
     suspend fun insertFavoriteLocation(fav_location: Favorite): Long
-    suspend fun deleteFavoriteLocation(fav_id: Int)
-    fun getAllFavoriteLocations(): Flow<List<Favorite>>
+    suspend fun deleteFavoriteLocation(fav_id: String)
+    suspend fun getAllFavoriteLocations(): Flow<List<Favorite>>
 
 
 }

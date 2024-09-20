@@ -5,7 +5,7 @@ import com.example.weatherforecast.model.pojos.Favorite
 
 class FavoriteDeffUtil : DiffUtil.ItemCallback<Favorite>() {
     override fun areItemsTheSame(oldItem: Favorite, newItem: Favorite): Boolean {
-        return oldItem.id == newItem.id
+        return oldItem.locationName == newItem.locationName
     }
 
     override fun areContentsTheSame(oldItem: Favorite, newItem: Favorite): Boolean {

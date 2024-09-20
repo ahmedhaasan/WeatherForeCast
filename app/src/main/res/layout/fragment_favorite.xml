@@ -11,8 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="20dp"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/favorite_fab_button"
@@ -21,7 +21,6 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
         android:layout_marginEnd="40dp"
-        android:layout_marginBottom="100dp"
         android:src="@drawable/add"
         app:backgroundTint="@color/sky"
         app:layout_constraintBottom_toBottomOf="parent"

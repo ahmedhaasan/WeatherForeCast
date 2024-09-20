@@ -53,8 +53,8 @@ interface WeatherDao {
     suspend fun insertFavoriteLocation(fav_location: Favorite): Long
 
     // Delete favorite location by ID
-    @Query("DELETE FROM FAVORITELOCATIONS WHERE id = :fav_id")
-    suspend fun deleteFavoriteLocation(fav_id: Int)
+    @Query("DELETE FROM FAVORITELOCATIONS WHERE locationName = :fav_id")
+    suspend fun deleteFavoriteLocation(fav_id: String)
 
     // Get all favorite locations as Flow
     @Query("SELECT * FROM FAVORITELOCATIONS")

@@ -80,11 +80,11 @@ class ReposiatoryImp(
         return local.insertFavoriteLocation(fav_location)
     }
 
-    override suspend fun deleteFavoriteLocation(fav_id: Int) {
+    override suspend fun deleteFavoriteLocation(fav_id: String) {
         return local.deleteFavoriteLocation(fav_id)
     }
 
-    override fun getAllFavoriteLocations(): Flow<List<Favorite>> {
+    override suspend fun getAllFavoriteLocations(): Flow<List<Favorite>> {
         return local.getAllFavoriteLocations()
     }
 }
