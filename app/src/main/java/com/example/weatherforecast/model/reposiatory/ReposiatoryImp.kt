@@ -3,6 +3,7 @@ package com.example.weatherforecast.model.reposiatory
 import com.example.weatherforecast.model.local.LocalDataSourceImp
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.DailyWeather
+import com.example.weatherforecast.model.pojos.Favorite
 import com.example.weatherforecast.model.pojos.FiveDayResponse
 import com.example.weatherforecast.model.pojos.HourlyWeather
 import com.example.weatherforecast.model.pojos.WeatherResponse
@@ -45,7 +46,7 @@ class ReposiatoryImp(
         return local.insertHourlyWeatherLocally(h_weather)
     }
 
-    override suspend fun getHourlyWeatherLocally():Flow< List<HourlyWeather>> {
+    override suspend fun getHourlyWeatherLocally(): Flow<List<HourlyWeather>> {
         return local.getHorlyWeatherLocally()
     }
 
@@ -62,11 +63,28 @@ class ReposiatoryImp(
         return local.deleteCurrentWeather()
     }
 
+
     override suspend fun deleteHourlyWeather(): Int {
         return local.deleteHourlyWeather()
     }
 
     override suspend fun deleteDailyWeatehr(): Int {
         return local.deleteDailyWeatehr()
+    }
+
+    /**
+     *  working on favorite
+     */
+
+    override suspend fun insertFavoriteLocation(fav_location: Favorite): Long {
+        return local.insertFavoriteLocation(fav_location)
+    }
+
+    override suspend fun deleteFavoriteLocation(fav_id: Int) {
+        return local.deleteFavoriteLocation(fav_id)
+    }
+
+    override fun getAllFavoriteLocations(): Flow<List<Favorite>> {
+        return local.getAllFavoriteLocations()
     }
 }

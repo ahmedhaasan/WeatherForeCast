@@ -1,4 +1,4 @@
-package com.example.weatherforecast.model.view_model
+package com.example.weatherforecast.model.view_models.home
 
 import android.os.Build
 import android.util.Log
@@ -16,7 +16,6 @@ import com.example.weatherforecast.model.pojos.HourlyWeather
 
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

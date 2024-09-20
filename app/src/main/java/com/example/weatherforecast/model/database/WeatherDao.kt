@@ -8,13 +8,14 @@ import androidx.room.Query
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 
 import com.example.weatherforecast.model.pojos.DailyWeather
+import com.example.weatherforecast.model.pojos.Favorite
 import com.example.weatherforecast.model.pojos.HourlyWeather
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WeatherDao {
     @Query("SELECT * FROM currentWeather")
-     fun getCurrentWeather(): Flow<CurrentWeatherEntity>  // we remove suspeded and use flow
+    fun getCurrentWeather(): Flow<CurrentWeatherEntity>  // we remove suspeded and use flow
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCurrentWeather(c_weather: CurrentWeatherEntity): Long
@@ -28,7 +29,7 @@ interface WeatherDao {
 
     // Get hourly weather
     @Query("SELECT * FROM HourlyWeather")
-     fun getHourlyWeatherLocally(): Flow<List<HourlyWeather>> // we remove suspeded and use flow
+    fun getHourlyWeatherLocally(): Flow<List<HourlyWeather>> // we remove suspeded and use flow
 
     @Query("DELETE FROM HourlyWeather")
     suspend fun deleteHourlyWeather(): Int
@@ -39,8 +40,23 @@ interface WeatherDao {
 
     // Get daily weather
     @Query("SELECT * FROM DailyWeather")
-     fun getDailyWeatherLocally(): Flow<List<DailyWeather>> // we remove suspeded and use flow
+    fun getDailyWeatherLocally(): Flow<List<DailyWeather>> // we remove suspeded and use flow
 
     @Query("DELETE FROM DailyWeather")
     suspend fun deleteDailyWeather(): Int
+
+    /**
+     *      working on favorite
+     */
+    // Insert favorite location
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFavoriteLocation(fav_location: Favorite): Long
+
+    // Delete favorite location by ID
+    @Query("DELETE FROM FAVORITELOCATIONS WHERE id = :fav_id")
+    suspend fun deleteFavoriteLocation(fav_id: Int)
+
+    // Get all favorite locations as Flow
+    @Query("SELECT * FROM FAVORITELOCATIONS")
+    fun getAllFavoriteLocations(): Flow<List<Favorite>>
 }

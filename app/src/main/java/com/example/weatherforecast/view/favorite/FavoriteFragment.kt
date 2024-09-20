@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.databinding.FragmentFavoriteBinding
 
 class FavoriteFragment : Fragment() {
@@ -34,6 +35,12 @@ class FavoriteFragment : Fragment() {
         favoriteAdapter = FavoriteAdapter(emptyList()){
 
             // implementation of removing from favorite here
+        }
+
+        fav_binding.recyclerView.apply {
+            adapter = favoriteAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+
         }
     }
 

@@ -30,8 +30,8 @@ import com.example.weatherforecast.model.database.WeatherDataBase
 import com.example.weatherforecast.model.local.LocalDataSourceImp
 import com.example.weatherforecast.model.remote.RemoteDataSourceImp
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
-import com.example.weatherforecast.model.view_model.WeatherViewModel
-import com.example.weatherforecast.model.view_model.WeatherViewModelFactory
+import com.example.weatherforecast.model.view_models.home.WeatherViewModel
+import com.example.weatherforecast.model.view_models.home.WeatherViewModelFactory
 import com.example.weatherforecast.setIcon
 import com.example.weatherforecast.view.homefragment.daily.DailyAdapter
 import com.example.weatherforecast.view.homefragment.hourly.HourlyAdapter
