@@ -7,7 +7,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface WeatherApiService {
+interface   WeatherApiService {
 
     // Define the GET request to retrieve the 5-day weather forecast
     @GET("data/2.5/forecast")

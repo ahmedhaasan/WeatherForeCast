@@ -1,5 +1,6 @@
 package com.example.weatherforecast.view.homefragment
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -95,30 +96,58 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         checkLocationStatus() // and update ui
-        binding.allowLocationButton.setOnClickListener { enableLocationServices() }
+        binding.allowLocationButton.setOnClickListener { requestLocationPermissions() }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun checkLocationStatus() {
         if (checkPermissions(requireContext())) {
             if (isLocationEnabled(requireContext())) {
+                updateUI(true) // Location is enabled, show weather data
                 getFreshLocation()
-                updateUI(true) // Show weather data and hide permission layout
             } else {
-                updateUI(false) // Show permission layout and hide weather data
+               updateUI(false) // Show enable location prompt
+                Toast.makeText(requireContext(), "Please enable location services", Toast.LENGTH_SHORT).show()
             }
         } else {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(
-                    android.Manifest.permission.ACCESS_FINE_LOCATION,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                Constants.My_LOCATION_PERMISSION_ID
-            )
+            // Request permissions if not already granted
+          //  requestLocationPermissions()
+            updateUI(false)
+        }
+    }
+    private fun requestLocationPermissions() {
+        ActivityCompat.requestPermissions(
+            requireActivity(),
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ),
+            Constants.My_LOCATION_PERMISSION_ID
+        )
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == Constants.My_LOCATION_PERMISSION_ID) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted
+                checkLocationStatus()
+            } else {
+                // Permission denied
+                updateUI(false)
+                Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onResume() {
+        super.onResume()
+        checkLocationStatus() // Check location status again
+    }
     // check if the location is enabled then display the weather else display allow button
     private fun updateUI(isLocationEnabled: Boolean) {
         if (isLocationEnabled) {
@@ -139,7 +168,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         }
         fetchWeatherData() // Call the refactored method here
 
-      //  var isToastShown = false
+        //  var isToastShown = false
         // check befor observing if the view is exists
         if (isAdded) {
             viewModel.currentWeather.observe(viewLifecycleOwner, Observer { weather ->
@@ -223,12 +252,12 @@ class HomeFragment : Fragment(), NetworkChangeListener {
             if (!snackbarShown) {
                 Snackbar.make(
                     requireView(),
-                    "YOU See the Weather Without Internet",
+                    "You see Weather Offline",
                     Snackbar.LENGTH_SHORT
                 ).show()
                 snackbarShown = true // Set the flag to true after showing
             }
-           // Toast.makeText(context,"Data is Shown in Offline Mode ",Toast.LENGTH_SHORT).show()
+            // Toast.makeText(context,"Data is Shown in Offline Mode ",Toast.LENGTH_SHORT).show()
             viewModel.getCurrentWeatherLocally()
             viewModel.getHourlyWeatherLocally()
             viewModel.getDailyWeatehrLocally()
@@ -273,7 +302,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         }, Looper.myLooper())
     }
 
-    // when comeBack to the same home fragment again
+/*    // when comeBack to the same home fragment again
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
@@ -296,33 +325,14 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                 Constants.My_LOCATION_PERMISSION_ID
             )
         }
-    }
+    }*/
 
     // implementation for network BroadCastReciver
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onNetworkChanged(isConnected: Boolean) {
         connected = isConnected
-        if (connected) {
-            loadWeatherData()
-        }
     }
 
-    /*    @RequiresApi(Build.VERSION_CODES.O)
-        override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<String>,
-            grantResults: IntArray
-        ) {
-            if (requestCode == Constants.My_LOCATION_PERMISSION_ID) {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Permission granted
-                    checkLocationStatus()
-                } else {
-                    // Permission denied
-                    Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }*/
 
 
     // un register the listener
@@ -332,4 +342,6 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         requireActivity().unregisterReceiver(networkChangeReceiver)
     }
 
-}
+ }
+
+

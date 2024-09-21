@@ -1,8 +1,13 @@
 package com.example.weatherforecast.view.favorite
 
 import android.app.AlertDialog
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +29,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.findNavController
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.R
+import com.example.weatherforecast.model.checknetwork.NetworkChangeListener
+import com.example.weatherforecast.model.checknetwork.NetworkChangeReceiver
 import com.example.weatherforecast.model.pojos.Favorite
 import com.example.weatherforecast.model.view_models.home.WeatherViewModel
 import com.example.weatherforecast.model.view_models.home.WeatherViewModelFactory
@@ -31,15 +38,20 @@ import com.example.weatherforecast.view.homefragment.HomeFragment
 import com.google.android.material.snackbar.Snackbar
 
 
-class FavoriteFragment : Fragment() {
+class FavoriteFragment : Fragment(), NetworkChangeListener {
 
     // declare binding
     lateinit var fav_binding: FragmentFavoriteBinding
     lateinit var favoriteAdapter: FavoriteAdapter
+    var isConnected: Boolean? = null
+    private lateinit var networkChangeReceiver: NetworkChangeReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        // register the BroadCast here to listen for network Changes
+        networkChangeReceiver = NetworkChangeReceiver(this)
+        val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        requireActivity().registerReceiver(networkChangeReceiver, intentFilter)
     }
 
     override fun onCreateView(
@@ -62,6 +74,7 @@ class FavoriteFragment : Fragment() {
         val factory = FavoriteViewModelFactory(repo)
         // now view Model
         val favoriteViewModel = ViewModelProvider(this, factory).get(FavoriteViewModel::class.java)
+
         /**
          *      intialize home viw model to use when updating the data
          */
@@ -92,7 +105,8 @@ class FavoriteFragment : Fragment() {
                     create().show() // Show the dialog
                 }
             },  // when city is selected
-            onItemSelected = { place ->
+            onItemSelected = { place -> if (isConnected == true)
+            {
                 val fav_home = Fav_Home()
                 // Create a Bundle and put the necessary data
                 val bundle = Bundle()
@@ -108,7 +122,12 @@ class FavoriteFragment : Fragment() {
                     .commit()
                 fav_binding.favoriteFabButton.visibility = View.GONE
 
+            }else
+            {
+                showNetworkDialog(requireContext())
             }
+            }
+
 
         )
 
@@ -117,7 +136,7 @@ class FavoriteFragment : Fragment() {
         fav_binding.recyclerView.apply {
             adapter = favoriteAdapter
             layoutManager = LinearLayoutManager(requireContext())
-            }
+        }
         // observe on favorites locally and pass them to the reciclerView
         favoriteViewModel.getAllFavotiteLccations()
         favoriteViewModel.favorites.observe(viewLifecycleOwner, Observer { favorites ->
@@ -146,6 +165,37 @@ class FavoriteFragment : Fragment() {
     override fun onResume() {
         super.onResume()  // enable the fabButton again
         fav_binding.favoriteFabButton.visibility = View.VISIBLE
+    }
+
+    override fun onNetworkChanged(isConnected: Boolean) {
+        this.isConnected = isConnected
+    }
+
+    fun showNetworkDialog(context: Context) {
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Network Required")
+        builder.setMessage("Connect to a network to see favorite weather details.")
+
+        // Add buttons
+        builder.setPositiveButton("Connect to Network") { dialog, _ ->
+            // Open network settings
+            context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            // Dismiss the dialog
+            dialog.dismiss()
+        }
+
+        // Create and show the dialog
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        requireActivity().unregisterReceiver(networkChangeReceiver)
     }
 
 

@@ -18,6 +18,8 @@ import com.example.weatherforecast.model.database.WeatherDataBase
 import com.example.weatherforecast.model.local.LocalDataSourceImp
 import com.example.weatherforecast.model.remote.RemoteDataSourceImp
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
+import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModel
+import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModelFactory
 import com.example.weatherforecast.model.view_models.home.WeatherViewModel
 import com.example.weatherforecast.model.view_models.home.WeatherViewModelFactory
 import com.example.weatherforecast.setIcon
@@ -34,7 +36,7 @@ class Fav_Home : Fragment() {
     // declare  biew binding
     lateinit var binding: FragmentFavHomeBinding
     // some variables from home
-    lateinit var fav_homeViewModel: WeatherViewModel
+    lateinit var fav_homeViewModel: FavoriteViewModel
     private lateinit var dailyAdapter: DailyAdapter
     private lateinit var hourlyAdapter: HourlyAdapter
     //
@@ -44,8 +46,8 @@ class Fav_Home : Fragment() {
         val db = WeatherDataBase.getInstance(requireContext())
         val dao = db.getWeatherDao()
         val repo = ReposiatoryImp(RemoteDataSourceImp(), LocalDataSourceImp(dao))
-        val factory = WeatherViewModelFactory(repo)
-        fav_homeViewModel = ViewModelProvider(this, factory).get(WeatherViewModel::class.java)
+        val factory = FavoriteViewModelFactory(repo)
+        fav_homeViewModel = ViewModelProvider(this, factory).get(FavoriteViewModel::class.java)
 
     }
 

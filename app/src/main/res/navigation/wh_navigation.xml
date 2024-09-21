@@ -29,7 +29,7 @@
         tools:layout="@layout/fragment_alert" />
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.example.weatherforecast.view.SettingFragment"
+        android:name="com.example.weatherforecast.view.setting.SettingFragment"
         android:label="fragment_setting"
         tools:layout="@layout/fragment_setting" />
     <fragment

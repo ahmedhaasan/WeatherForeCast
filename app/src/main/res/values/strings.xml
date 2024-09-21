@@ -11,4 +11,22 @@
     <string name="sunny_day">Sunny Day</string>
     <string name="day_degree">Degree</string>
     <string name="save">Save Location</string>
+    <string name="locationText">Location</string>
+    <string name="gps">Gps</string>
+    <string name="map">Map</string>
+    <string name="setting">App Setting</string>
+    <string name="location">Location</string>
+    <string name="wind_speed">Wind Speed\n</string>
+    <string name="meter_second">Meter/ seconds</string>
+    <string name="mile_hour">Mile / Hour</string>
+    <string name="language">App Language</string>
+    <string name="english">English</string>
+    <string name="arabic">Arabic</string>
+    <string name="notification">Notification</string>
+    <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
+    <string name="temperature">Tempreture</string>
+    <string name="celsius">Celisus</string>
+    <string name="kelvin">Kelvin</string>
+    <string name="fahrenheit">Fahrenheit</string>
 </resources>

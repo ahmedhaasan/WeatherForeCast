@@ -36,6 +36,7 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
 
     fun getCurrentWeatherRemotly(lat: Double, lon: Double, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            repo.deleteCurrentLocalWeather()
             val tempWeather =  repo.getCurrentWeatherRemotely(lat, lon, unit)
             val temp2 = tempWeather?.let { mapWeatherResponseToEntity(it) }
             withContext(Dispatchers.Main) {
@@ -51,13 +52,11 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
     fun getHourlyWeatherRemotly(lat: Double, lon: Double, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                // Clear the DB before adding new data
+                repo.deleteHourlyWeather()
                 val fiveDayResponse = repo.getFiveDayWeather(lat, lon, unit)
                 if (fiveDayResponse != null) {
                     val hourlyWeather: List<HourlyWeather> = mapHourlyWeatherForToday(fiveDayResponse)
-
-                    // Clear the DB before adding new data
-                    repo.deleteHourlyWeather()
-
                     // Insert new hourly weather data
                     repo.insertHourlyWeatherLocally(hourlyWeather)
 
@@ -79,16 +78,13 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
     fun getDailyWeatherRemotly(lat: Double, lon: Double, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                // Clear the DB before adding new data
+                repo.deleteDailyWeatehr()
                 val fiveDayResponse = repo.getFiveDayWeather(lat, lon, unit)
                 if (fiveDayResponse != null) {
                     val tempDailyWeather: List<DailyWeather> = mapDailyWeather(fiveDayResponse)
-
-                    // Clear the DB before adding new data
-                    repo.deleteDailyWeatehr()
-
                     // Insert new daily weather data
                     repo.insertDailyWeatherLocally(tempDailyWeather)
-
                     // Update the UI on the main thread
                     withContext(Dispatchers.Main) {
                         _dailyWeather.postValue(tempDailyWeather)
