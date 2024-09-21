@@ -70,9 +70,9 @@ class Fav_Home : Fragment() {
 
         // Make sure lat and lon are not null
         if (lat != null && lon != null) {
-            fav_homeViewModel.getCurrentWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
-            fav_homeViewModel.getDailyWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
-            fav_homeViewModel.getHourlyWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
+            fav_homeViewModel.getCurrentWeatherRemotly(lat, lon,Constants.ENGLISH, Constants.METRIC_UNIT)
+            fav_homeViewModel.getDailyWeatherRemotly(lat, lon,Constants.ENGLISH, Constants.METRIC_UNIT)
+            fav_homeViewModel.getHourlyWeatherRemotly(lat, lon,Constants.ENGLISH, Constants.METRIC_UNIT)
         }
         super.onViewCreated(view, savedInstanceState)
         if (isAdded) {

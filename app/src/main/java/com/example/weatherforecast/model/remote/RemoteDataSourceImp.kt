@@ -11,10 +11,11 @@ class RemoteDataSourceImp : RemoteDataSourceContract {
     override suspend fun getCurrentWeather(
         lat: Double,
         lon: Double,
+        lang:String,
         unit: String
     ): WeatherResponse? {
         return try {
-            val response = RetrofitHelper.service.getCurrentWeather(lat, lon, unit)
+            val response = RetrofitHelper.service.getCurrentWeather(lat, lon,lang, unit)
             if (response.isSuccessful) {
                 response.body() // Return the weather response body
             } else {
@@ -34,10 +35,11 @@ class RemoteDataSourceImp : RemoteDataSourceContract {
     override suspend fun getFiveDayWeather(
         lat: Double,
         lon: Double,
+        lang:String,
         unit: String
     ): FiveDayResponse? {
         return try {
-            val response = RetrofitHelper.service.getFiveDayWeather(lat, lon, unit)
+            val response = RetrofitHelper.service.getFiveDayWeather(lat, lon,lang, unit)
             if (response.isSuccessful) {
                 response.body() // Return the 5-day weather response body
             } else {

@@ -5,6 +5,6 @@ import com.example.weatherforecast.model.pojos.WeatherResponse
 
 
 interface RemoteDataSourceContract {
-   suspend fun getCurrentWeather(lat :Double , lon :Double , unit :String) : WeatherResponse?
-   suspend fun getFiveDayWeather(lat :Double , lon :Double , unit :String):FiveDayResponse?
+   suspend fun getCurrentWeather(lat :Double , lon :Double ,lang :String, unit :String) : WeatherResponse?
+   suspend fun getFiveDayWeather(lat :Double , lon :Double ,lang:String, unit :String):FiveDayResponse?
 }

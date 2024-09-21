@@ -1,5 +1,7 @@
 package com.example.weatherforecast.view
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +9,7 @@ import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
+import com.example.weatherforecast.LocaleHelper.setLocale
 import com.example.weatherforecast.R
 import com.example.weatherforecast.databinding.ActivityMainBinding
 
@@ -16,9 +19,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var drawerToggle: ActionBarDrawerToggle
     private lateinit var navController: NavController
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences("WeatherAppPrefs", Context.MODE_PRIVATE)
 
         // Initialize View Binding
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -52,6 +59,16 @@ class MainActivity : AppCompatActivity() {
             val menuItem = binding.navView.menu.findItem(destination.id)
             supportActionBar?.title = menuItem?.title ?: destination.label // Set ActionBar title
         }
+    }
+
+    // when start the application again so reset the last app language
+    override fun onStart() {
+        val savedLanguage = sharedPreferences.getString("LanguagePreference", "en")
+        super.onStart()
+        if (savedLanguage != null) {
+            setLocale(this,savedLanguage)
+        }
+
     }
 
     override fun onSupportNavigateUp(): Boolean {

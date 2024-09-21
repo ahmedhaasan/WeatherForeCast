@@ -36,9 +36,9 @@ class FavoriteViewModel(val repo: ReposiatoryImp) : ViewModel() {
     private val _hourlyWeather = MutableLiveData<List<HourlyWeather>>()
     val hourlyWeather = _hourlyWeather
 
-    fun getCurrentWeatherRemotly(lat: Double, lon: Double, unit: String) {
+    fun getCurrentWeatherRemotly(lat: Double, lon: Double,lang:String, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val tempWeather = repo.getCurrentWeatherRemotely(lat, lon, unit)
+            val tempWeather = repo.getCurrentWeatherRemotely(lat, lon,lang, unit)
             val temp2 = tempWeather?.let { mapWeatherResponseToEntity(it) }
             withContext(Dispatchers.Main) {
                 _currentWeather.postValue(temp2)
@@ -49,10 +49,10 @@ class FavoriteViewModel(val repo: ReposiatoryImp) : ViewModel() {
 
     // get Hourly
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getHourlyWeatherRemotly(lat: Double, lon: Double, unit: String) {
+    fun getHourlyWeatherRemotly(lat: Double, lon: Double,lang:String, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val fiveDayResponse = repo.getFiveDayWeather(lat, lon, unit)
+                val fiveDayResponse = repo.getFiveDayWeather(lat, lon,lang, unit)
                 if (fiveDayResponse != null) {
                     val hourlyWeather: List<HourlyWeather> =
                         mapHourlyWeatherForToday(fiveDayResponse)
@@ -68,10 +68,10 @@ class FavoriteViewModel(val repo: ReposiatoryImp) : ViewModel() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getDailyWeatherRemotly(lat: Double, lon: Double, unit: String) {
+    fun getDailyWeatherRemotly(lat: Double, lon: Double,lang: String, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val fiveDayResponse = repo.getFiveDayWeather(lat, lon, unit)
+                val fiveDayResponse = repo.getFiveDayWeather(lat, lon,lang, unit)
                 if (fiveDayResponse != null) {
                     val tempDailyWeather: List<DailyWeather> = mapDailyWeather(fiveDayResponse)
                     _dailyWeather.postValue(tempDailyWeather)

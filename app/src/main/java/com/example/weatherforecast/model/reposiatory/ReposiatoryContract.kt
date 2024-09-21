@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface ReposiatoryContract {
-    suspend fun getCurrentWeatherRemotely(lat :Double,lon:Double,unit:String): WeatherResponse?
+    suspend fun getCurrentWeatherRemotely(lat :Double,lon:Double,lang:String,unit:String): WeatherResponse?
     suspend fun getCurrentLocalWeather(): Flow<CurrentWeatherEntity> // use flow when get data remotely
     suspend fun insertCurrentLocalWeather(c_weather:CurrentWeatherEntity):Long
-    suspend fun getFiveDayWeather(lat :Double , lon :Double , unit :String): FiveDayResponse?
+    suspend fun getFiveDayWeather(lat :Double , lon :Double ,lang: String, unit :String): FiveDayResponse?
 
     // daily and hourly
     suspend fun insertHourlyWeatherLocally(h_weather: List<HourlyWeather>): List<Long>

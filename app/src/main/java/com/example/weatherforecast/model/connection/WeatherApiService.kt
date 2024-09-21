@@ -14,6 +14,7 @@ interface   WeatherApiService {
     suspend fun getFiveDayWeather(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
+        @Query("lang") lang: String ,
         @Query("units") units: String,
         @Query("appid") apiKey:  String = Constants.API_KEY
     ): Response<FiveDayResponse>
@@ -22,6 +23,7 @@ interface   WeatherApiService {
     suspend fun getCurrentWeather(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
+        @Query("lang") lang: String ,
         @Query("units") units: String,
         @Query("appid") apiKey: String = Constants.API_KEY
     ): Response<WeatherResponse>

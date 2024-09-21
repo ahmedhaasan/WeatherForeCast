@@ -6,21 +6,21 @@
         <item
             android:id="@+id/homeFragment"
             android:icon="@drawable/home"
-            android:title="Home" />
+            android:title="@string/home_menu" />
 
         <item
             android:id="@+id/favoriteFragment"
             android:icon="@drawable/favorite"
-            android:title="Favorite" />
+            android:title="@string/favorite_menu" />
 
         <item
             android:id="@+id/alertFragment"
             android:icon="@drawable/alert"
-            android:title="Alert" />
+            android:title="@string/alert_menu" />
         <item
             android:id="@+id/settingFragment"
             android:icon="@drawable/setting"
-            android:title="Setting" />
+            android:title="@string/setting_menu" />
     </group>
 
 </menu>

@@ -34,10 +34,10 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
      *  take care you will use the courotines here with the viewModelLifeScope
      */
 
-    fun getCurrentWeatherRemotly(lat: Double, lon: Double, unit: String) {
+    fun getCurrentWeatherRemotly(lat: Double, lon: Double,lang:String, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.deleteCurrentLocalWeather()
-            val tempWeather =  repo.getCurrentWeatherRemotely(lat, lon, unit)
+            val tempWeather =  repo.getCurrentWeatherRemotely(lat, lon,lang, unit)
             val temp2 = tempWeather?.let { mapWeatherResponseToEntity(it) }
             withContext(Dispatchers.Main) {
                 _currentWeather.postValue(temp2)
@@ -49,12 +49,12 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
 
     // get Hourly
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getHourlyWeatherRemotly(lat: Double, lon: Double, unit: String) {
+    fun getHourlyWeatherRemotly(lat: Double, lon: Double,lang:String, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Clear the DB before adding new data
                 repo.deleteHourlyWeather()
-                val fiveDayResponse = repo.getFiveDayWeather(lat, lon, unit)
+                val fiveDayResponse = repo.getFiveDayWeather(lat, lon,lang, unit)
                 if (fiveDayResponse != null) {
                     val hourlyWeather: List<HourlyWeather> = mapHourlyWeatherForToday(fiveDayResponse)
                     // Insert new hourly weather data
@@ -75,12 +75,12 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getDailyWeatherRemotly(lat: Double, lon: Double, unit: String) {
+    fun getDailyWeatherRemotly(lat: Double, lon: Double,lang:String, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Clear the DB before adding new data
                 repo.deleteDailyWeatehr()
-                val fiveDayResponse = repo.getFiveDayWeather(lat, lon, unit)
+                val fiveDayResponse = repo.getFiveDayWeather(lat, lon,lang, unit)
                 if (fiveDayResponse != null) {
                     val tempDailyWeather: List<DailyWeather> = mapDailyWeather(fiveDayResponse)
                     // Insert new daily weather data

@@ -34,7 +34,6 @@ import com.example.weatherforecast.model.checknetwork.NetworkChangeReceiver
 import com.example.weatherforecast.model.pojos.Favorite
 import com.example.weatherforecast.model.view_models.home.WeatherViewModel
 import com.example.weatherforecast.model.view_models.home.WeatherViewModelFactory
-import com.example.weatherforecast.view.homefragment.HomeFragment
 import com.google.android.material.snackbar.Snackbar
 
 

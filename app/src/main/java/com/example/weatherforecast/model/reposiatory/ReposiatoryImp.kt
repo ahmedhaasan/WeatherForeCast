@@ -19,18 +19,20 @@ class ReposiatoryImp(
     override suspend fun getCurrentWeatherRemotely(
         lat: Double,
         lon: Double,
+        lang:String,
         unit: String
     ): WeatherResponse? {
-        return remote.getCurrentWeather(lat, lon, unit)
+        return remote.getCurrentWeather(lat, lon,lang, unit)
     }
 
     // remotelyy
     override suspend fun getFiveDayWeather(
         lat: Double,
         lon: Double,
+        lang:String,
         unit: String
     ): FiveDayResponse? {
-        return remote.getFiveDayWeather(lat, lon, unit)
+        return remote.getFiveDayWeather(lat, lon,lang, unit)
     }
 
     override suspend fun getCurrentLocalWeather(): Flow<CurrentWeatherEntity> {

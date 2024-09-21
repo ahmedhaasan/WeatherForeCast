@@ -59,6 +59,8 @@ fun mapWeatherResponseToEntity(response: WeatherResponse): CurrentWeatherEntity 
 
 
 
+
+
 /*@RequiresApi(Build.VERSION_CODES.O)
 fun mapHourlyWeatherForToday(response: FiveDayResponse): List<HourlyWeatherEntity> {
     // Get the current date in the system default timezone

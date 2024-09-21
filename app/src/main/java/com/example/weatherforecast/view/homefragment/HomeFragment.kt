@@ -1,5 +1,4 @@
 package com.example.weatherforecast.view.homefragment
-
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -34,6 +33,7 @@ import com.example.weatherforecast.model.remote.RemoteDataSourceImp
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import com.example.weatherforecast.model.view_models.home.WeatherViewModel
 import com.example.weatherforecast.model.view_models.home.WeatherViewModelFactory
+import com.example.weatherforecast.model.view_models.setting.SettingViewModel
 import com.example.weatherforecast.setIcon
 import com.example.weatherforecast.view.homefragment.daily.DailyAdapter
 import com.example.weatherforecast.view.homefragment.hourly.HourlyAdapter
@@ -44,6 +44,8 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import com.example.weatherforecast.R
+
 
 class HomeFragment : Fragment(), NetworkChangeListener {
 
@@ -52,8 +54,12 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     private lateinit var hourlyAdapter: HourlyAdapter
     private lateinit var fusedLocation: FusedLocationProviderClient
     private lateinit var networkChangeReceiver: NetworkChangeReceiver
-    private var connected = true
+    // Observed settings for language and units
+    private var selectedLanguage: String = "en"
+    lateinit var settingViewModel: SettingViewModel
+    private var selectedUnit: String = "metric"
 
+    private var connected = true
     lateinit var viewModel: WeatherViewModel
 
 
@@ -106,15 +112,17 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                 updateUI(true) // Location is enabled, show weather data
                 getFreshLocation()
             } else {
-               updateUI(false) // Show enable location prompt
+                updateUI(false) // Show enable location prompt
                 Toast.makeText(requireContext(), "Please enable location services", Toast.LENGTH_SHORT).show()
             }
         } else {
             // Request permissions if not already granted
-          //  requestLocationPermissions()
+            //  requestLocationPermissions()
             updateUI(false)
         }
+
     }
+
     private fun requestLocationPermissions() {
         ActivityCompat.requestPermissions(
             requireActivity(),
@@ -167,9 +175,23 @@ class HomeFragment : Fragment(), NetworkChangeListener {
             return
         }
         fetchWeatherData() // Call the refactored method here
+        // observe on language or wind or unit change
+        // Initialize SettingViewModel
+        settingViewModel = ViewModelProvider(requireActivity()).get(SettingViewModel::class.java)
 
+        // Observe language and unit changes
+        settingViewModel.languageSetting.observe(requireActivity(), Observer { language ->
+            selectedLanguage = language
+            fetchWeatherData() // Re-fetch data when the language changes
+        })
+
+        settingViewModel.unitSetting.observe(requireActivity(), Observer { unit ->
+            selectedUnit = unit
+            fetchWeatherData() // Re-fetch data when the unit changes
+        })
         //  var isToastShown = false
         // check befor observing if the view is exists
+        // Check before observing if the view is added
         if (isAdded) {
             viewModel.currentWeather.observe(viewLifecycleOwner, Observer { weather ->
                 weather?.let {
@@ -184,19 +206,19 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                     binding.tvCurrentDate.text = dateTime.format(dateFormatter)
 
                     binding.tvWeatherStatus.text = weather.weatherStatus
-                    binding.tvCurrentDegree.text =
-                        "${decimalFormat.format(weather.temperature)}°C"
+                    binding.tvCurrentDegree.text = getString(R.string.degree_format, decimalFormat.format(weather.temperature))
                     setIcon(weather.weatherIcon, binding.ivWeatherIcon)
-                    binding.presser.text = "${decimalFormat.format(weather.pressure)} hPa"
-                    binding.humidity.text = "${weather.humidity}%"
-                    binding.wind.text = "${decimalFormat.format(weather.windSpeed)} m/s"
-                    binding.clouds.text = "${weather.clouds}%"
-                    binding.visability.text =
-                        "${decimalFormat.format(weather.visibility / 1000)} km"
+                    binding.presser.text = getString(R.string.pressure_format, decimalFormat.format(weather.pressure))
+                    binding.humidity.text = getString(R.string.humidity_format, weather.humidity)
+                    binding.wind.text = getString(R.string.wind_speed_format, decimalFormat.format(weather.windSpeed))
+                    binding.clouds.text = getString(R.string.clouds_format, weather.clouds)
+                    binding.visability.text = getString(R.string.visibility_format, decimalFormat.format(weather.visibility / 1000))
                     //isToastShown = false // Reset the toast flag when data is available
                 }
             })
         }
+
+
 
         hourlyAdapter = HourlyAdapter(emptyList())
         binding.hoursRecycler.apply {
@@ -221,7 +243,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         dailyAdapter = DailyAdapter(emptyList())
         binding.daysRecyclerView.apply {
             adapter = dailyAdapter
-            layoutManager = LinearLayoutManager(requireContext())
+            layoutManager = LinearLayoutManager(context)
 
         }
         // observe on daily data and check it
@@ -245,9 +267,9 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         if (connected) {
             snackbarShown = false // Reset the flag when connected
             // Fetch weather data
-            viewModel.getCurrentWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
-            viewModel.getHourlyWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
-            viewModel.getDailyWeatherRemotly(lat, lon, Constants.METRIC_UNIT)
+            viewModel.getCurrentWeatherRemotly(lat, lon,selectedLanguage, selectedUnit)
+            viewModel.getHourlyWeatherRemotly(lat, lon,selectedLanguage, selectedUnit)
+            viewModel.getDailyWeatherRemotly(lat, lon,selectedLanguage, selectedUnit)
         } else {
             if (!snackbarShown) {
                 Snackbar.make(
@@ -302,30 +324,30 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         }, Looper.myLooper())
     }
 
-/*    // when comeBack to the same home fragment again
-    @RequiresApi(Build.VERSION_CODES.O)
-    override fun onResume() {
-        super.onResume()
-        // Check again if the location is enabled
-        if (checkPermissions(requireContext())) {
-            if (isLocationEnabled(requireContext())) {
-                updateUI(true)
-                getFreshLocation()
+    /*    // when comeBack to the same home fragment again
+        @RequiresApi(Build.VERSION_CODES.O)
+        override fun onResume() {
+            super.onResume()
+            // Check again if the location is enabled
+            if (checkPermissions(requireContext())) {
+                if (isLocationEnabled(requireContext())) {
+                    updateUI(true)
+                    getFreshLocation()
+                } else {
+                    updateUI(false)
+                }
             } else {
-                updateUI(false)
+                // Request permissions if not granted
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(
+                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION
+                    ),
+                    Constants.My_LOCATION_PERMISSION_ID
+                )
             }
-        } else {
-            // Request permissions if not granted
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(
-                    android.Manifest.permission.ACCESS_FINE_LOCATION,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                Constants.My_LOCATION_PERMISSION_ID
-            )
-        }
-    }*/
+        }*/
 
     // implementation for network BroadCastReciver
     @RequiresApi(Build.VERSION_CODES.O)
@@ -342,6 +364,4 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         requireActivity().unregisterReceiver(networkChangeReceiver)
     }
 
- }
-
-
+}
