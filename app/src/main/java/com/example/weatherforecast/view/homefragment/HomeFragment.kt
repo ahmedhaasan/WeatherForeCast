@@ -174,7 +174,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
             adapter = hourlyAdapter
             // Set the layout manager to horizontal
             layoutManager =
-                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         }
         // try observe on hourly data
         if (isAdded) {

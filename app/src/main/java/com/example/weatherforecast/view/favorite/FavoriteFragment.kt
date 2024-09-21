@@ -106,6 +106,7 @@ class FavoriteFragment : Fragment() {
                     .replace(R.id.homeFragmentContainer, fav_home)
                     .addToBackStack(null)
                     .commit()
+                fav_binding.favoriteFabButton.visibility = View.GONE
 
             }
 
@@ -140,6 +141,11 @@ class FavoriteFragment : Fragment() {
             findNavController().navigate(action)
 
         }
+    }
+
+    override fun onResume() {
+        super.onResume()  // enable the fabButton again
+        fav_binding.favoriteFabButton.visibility = View.VISIBLE
     }
 
 
