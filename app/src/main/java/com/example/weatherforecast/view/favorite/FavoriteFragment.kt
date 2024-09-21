@@ -1,11 +1,13 @@
 package com.example.weatherforecast.view.favorite
 
 import android.app.AlertDialog
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -20,8 +22,12 @@ import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModel
 import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModelFactory
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.findNavController
+import com.example.weatherforecast.Constants
 import com.example.weatherforecast.R
 import com.example.weatherforecast.model.pojos.Favorite
+import com.example.weatherforecast.model.view_models.home.WeatherViewModel
+import com.example.weatherforecast.model.view_models.home.WeatherViewModelFactory
+import com.example.weatherforecast.view.homefragment.HomeFragment
 import com.google.android.material.snackbar.Snackbar
 
 
@@ -45,6 +51,7 @@ class FavoriteFragment : Fragment() {
         return fav_binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -54,7 +61,12 @@ class FavoriteFragment : Fragment() {
         val repo = ReposiatoryImp(RemoteDataSourceImp(), LocalDataSourceImp(dao))
         val factory = FavoriteViewModelFactory(repo)
         // now view Model
-        val viewModel = ViewModelProvider(this, factory).get(FavoriteViewModel::class.java)
+        val favoriteViewModel = ViewModelProvider(this, factory).get(FavoriteViewModel::class.java)
+        /**
+         *      intialize home viw model to use when updating the data
+         */
+        val factory2 = WeatherViewModelFactory(repo)
+        val homeViewModel = ViewModelProvider(this, factory2).get(WeatherViewModel::class.java)
         // intialize the favorite Adapter
         favoriteAdapter = FavoriteAdapter(
             onItemDeleted = { place ->
@@ -64,14 +76,14 @@ class FavoriteFragment : Fragment() {
                     setMessage("Are you sure you want to delete the location ${place.locationName}?")
                     setPositiveButton("Yes") { _, _ ->
                         // If user confirms, delete the location
-                        viewModel.deleteFavoriteLocation(place.locationName)
+                        favoriteViewModel.deleteFavoriteLocation(place.locationName)
                         Snackbar.make(
                             requireView(),
                             "Deleted Location ${place.locationName}",
                             Snackbar.LENGTH_LONG
                         ).apply {
                             setAction("Undo") {
-                                viewModel.insertFavoriteLocation(place)
+                                favoriteViewModel.insertFavoriteLocation(place)
                             }
                             show()
                         }
@@ -81,10 +93,22 @@ class FavoriteFragment : Fragment() {
                 }
             },  // when city is selected
             onItemSelected = { place ->
-                val action = FavoriteFragmentDirections.actionFavoriteFragmentToHomeFragment()
-                findNavController().navigate(action)
-                Log.d("FavoriteFragment", "Selected item: ${place.locationName}")
+                val fav_home = Fav_Home()
+                // Create a Bundle and put the necessary data
+                val bundle = Bundle()
+                bundle.putDouble("lat", place.lat)
+                bundle.putDouble("lon", place.lon)
+                // Set the arguments for the fragment
+                fav_home.arguments = bundle
+
+                // Replace the fragment and add it to the back stack
+                childFragmentManager.beginTransaction()
+                    .replace(R.id.homeFragmentContainer, fav_home)
+                    .addToBackStack(null)
+                    .commit()
+
             }
+
         )
 
 
@@ -94,8 +118,8 @@ class FavoriteFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             }
         // observe on favorites locally and pass them to the reciclerView
-        viewModel.getAllFavotiteLccations()
-        viewModel.favorites.observe(viewLifecycleOwner, Observer { favorites ->
+        favoriteViewModel.getAllFavotiteLccations()
+        favoriteViewModel.favorites.observe(viewLifecycleOwner, Observer { favorites ->
             if (favorites != null) {
                 favoriteAdapter.submitList(favorites)
                 favoriteAdapter.notifyDataSetChanged() // Add this after submitList()

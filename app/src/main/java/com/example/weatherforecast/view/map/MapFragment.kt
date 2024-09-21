@@ -34,8 +34,13 @@ import java.util.Locale
 
 class MapFragment : Fragment() {
     lateinit var viewModel: FavoriteViewModel
-
     lateinit var binding: FragmentMapBinding
+    lateinit var marker :Marker
+ var lat :Double? =null
+ var lon :Double? =null
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Load OSMDroid configuration
@@ -94,10 +99,10 @@ class MapFragment : Fragment() {
                     binding.mapView.overlays.removeAll { overlay -> overlay is Marker }
                     addMarkerAtLocation(it)
                     // Get latitude and longitude from the tapped location (geoPoint)
-                    val latitude = it.latitude
-                    val longitude = it.longitude
+                    lat = it.latitude
+                     lon = it.longitude
                     // Handle the lat and long as needed (e.g., pass it to another function)
-                    onLocationSelected(latitude, longitude)
+                    onLocationSelected(lat!!, lon!!)
                 }
                 return true
             }
@@ -133,6 +138,14 @@ class MapFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding.mapView.onDetach() // Detach the map to free up resources
+
+        binding.btnSaveLocation.setOnClickListener{
+            if (marker == null)
+                Toast.makeText(requireContext(), "You Need To Select Your Location.", Toast.LENGTH_SHORT).show()
+            else {
+
+            }
+        }
     }
 
 
@@ -143,12 +156,8 @@ class MapFragment : Fragment() {
 
             try {
                 // Reverse geocode the latitude and longitude into an address
-                val addresses: MutableList<Address>? = geocoder.getFromLocation(lat, lon, 1)
 
-                if (addresses != null) {
-                    if (addresses.isNotEmpty()) {
-                        val address: Address = addresses[0]
-                        val cityName: String? = address.locality
+                        val cityName: String? = getCityName(lat,lon)
 
                         // Switch to the main thread to update UI
                         withContext(Dispatchers.Main) {
@@ -168,8 +177,8 @@ class MapFragment : Fragment() {
                                 ).show()
                             }
                         }
-                    }
-                }
+
+
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(requireContext(), "Unable to get city name.", Toast.LENGTH_SHORT)
@@ -177,6 +186,20 @@ class MapFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun getCityName(lat: Double,lon: Double): String {
+        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+        val address = geocoder.getFromLocation(lat, lon, 1)
+
+        var cityName = "UnKnown Location"
+        if (address != null && address.size!= 0&& address[0].locality != null) {
+            cityName = "${address[0].countryName} / ${address[0].locality}"
+        } else if (address != null) {
+            cityName = "${address[0].countryName} / ${address[0].adminArea}"
+        }
+
+        return cityName
     }
 
 
