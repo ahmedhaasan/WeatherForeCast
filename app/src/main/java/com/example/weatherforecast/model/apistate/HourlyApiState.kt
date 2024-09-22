@@ -5,7 +5,7 @@ import com.example.weatherforecast.model.pojos.HourlyWeather
 
 sealed class HourlyApiState {
 
-    class Success(val dailyWeatehr: List<HourlyWeather>) : HourlyApiState()
+    class Success(val hourlyWeather: List<HourlyWeather>) : HourlyApiState()
     class Failure(val msg: Throwable) : HourlyApiState()
     class Loading() : HourlyApiState()
 }
