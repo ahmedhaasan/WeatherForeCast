@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">توقعات الطقس</string>
+    <string name="hello_blank_fragment">مرحباً  صفحه فارغه</string>
+    <string name="open">فتح  </string>
+    <string name="close">إغلاق  </string>
+    <string name="giza">الجيزة</string>
+    <string name="sunny_day">يوم مشمس</string>
+    <string name="day_degree">درجة الحرارة</string>
+    <string name="save">حفظ </string>
+    <string name="locationText">الموقع</string>
+    <string name="gps">نظام تحديد المواقع</string>
+    <string name="map">الخريطة</string>
+    <string name="setting">إعدادات التطبيق</string>
+    <string name="location">الموقع</string>
+    <string name="wind_speed">سرعة الرياح</string>
+    <string name="meter_second">متر / ثانية</string>
+    <string name="mile_hour">ميل / ساعة</string>
+    <string name="language">لغة التطبيق</string>
+    <string name="english">الإنجليزية</string>
+    <string name="arabic">العربية</string>
+    <string name="notification">الإشعارات</string>
+    <string name="enable">تفعيل</string>
+    <string name="disable">تعطيل</string>
+    <string name="temperature">درجة الحرارة</string>
+    <string name="celsius">درجة مئوية</string>
+    <string name="kelvin">كلفن</string>
+    <string name="fahrenheit">فهرنهايت</string>
+    <string name="weather_location">الموقع: %1$s</string>
+    <string name="weather_date">التاريخ: %1$s</string>
+    <string name="weather_status">الحالة: %1$s</string>
+    <string name="degree_format">%s°C</string>
+    <string name="pressure_format">%s هكتوباسكال</string>
+    <string name="humidity_format">%s%% رطوبة</string>
+    <string name="wind_speed_format">%s م/ث</string>
+    <string name="clouds_format">%s%% غيوم</string>
+    <string name="visibility_format">%s كم</string>
+    <string name="sunday">الأحد</string>
+    <string name="monday">الاثنين</string>
+    <string name="tuesday">الثلاثاء</string>
+    <string name="wednesday">الأربعاء</string>
+    <string name="thursday">الخميس</string>
+    <string name="friday">الجمعة</string>
+    <string name="saturday">السبت</string>
+    <string name="tomorrow">غداً</string>
+    <string name="hour_format">%02d:00</string>
+    <string name="home_menu">الرئيسيه</string>
+    <string name="favorite_menu">المفضله</string>
+    <string name="alert_menu">التنبيهات</string>
+    <string name="setting_menu">الإعدادات</string>
+    <string name="unit_hpa">هكتوباسكال</string>
+    <string name="unit_percent">%</string>
+    <string name="unit_meter_per_sec">م/ث</string>
+    <string name="unit_kilometer">كم</string>
+    <string name="current_temperature">%1$s°C</string>
+    <string name="pressure">الضغط الجوي</string>
+    <string name="clouds">الغيوم</string>
+    <string name="humadity">الرطوبة</string>
+    <string name="wind">الرياح</string>
+    <string name="visability">الرؤية</string>
+    <string name="weatherState">حالة الطقس</string>
+    <string name="unit_miles_per_hour">ميل/ساعة</string>
+
+
+    ></resources>

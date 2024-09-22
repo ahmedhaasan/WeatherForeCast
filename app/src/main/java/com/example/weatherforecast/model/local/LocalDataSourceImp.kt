@@ -3,6 +3,7 @@ package com.example.weatherforecast.model.local
 import com.example.weatherforecast.model.database.WeatherDao
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.DailyWeather
+import com.example.weatherforecast.model.pojos.Favorite
 import com.example.weatherforecast.model.pojos.HourlyWeather
 import kotlinx.coroutines.flow.Flow
 
@@ -43,5 +44,20 @@ class LocalDataSourceImp(val dao: WeatherDao) : LocalDataSourceContract {
 
     override suspend fun deleteDailyWeatehr(): Int {
         return dao.deleteDailyWeather()
+    }
+
+    /**
+     *      working on favorite
+     */
+    override suspend fun insertFavoriteLocation(fav_location: Favorite): Long {
+        return dao.insertFavoriteLocation(fav_location)
+    }
+
+    override suspend fun deleteFavoriteLocation(fav_id: String){
+        return dao.deleteFavoriteLocation(fav_id)
+    }
+
+    override suspend fun getAllFavoriteLocations(): Flow<List<Favorite>> {
+        return dao.getAllFavoriteLocations()
     }
 }

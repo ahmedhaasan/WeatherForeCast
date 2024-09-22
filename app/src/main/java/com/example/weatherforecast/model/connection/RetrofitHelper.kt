@@ -1,17 +1,29 @@
 package com.example.weatherforecast.model.connection
 
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetrofitHelper {
-
-    const val BASE_URL = "https://api.openweathermap.org/"
-    val retrofitInstance = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
         .build()
 
-        // get instance of this interface to deal with
+    private const val BASE_URL = "https://api.openweathermap.org/"
 
-        val service = retrofitInstance.create(WeatherApiService::class.java)
+    private val retrofitInstance: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client) // Pass the OkHttpClient instance here
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    // Lazily initialized service instance
+    val service: WeatherApiService by lazy {
+        retrofitInstance.create(WeatherApiService::class.java)
+    }
 }

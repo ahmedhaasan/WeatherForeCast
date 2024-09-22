@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-kapt")
+    // save args for navigation
+    id("androidx.navigation.safeargs.kotlin")
+
 
 }
 
@@ -93,6 +96,25 @@ dependencies {
 
     // google services
     implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    // floating action button
+    implementation ("com.google.android.material:material:1.10.0")
+    // Google Play Services Location
+    implementation ("com.google.android.gms:play-services-location:21.3.0")
+
+    // OSMDroid for Android
+    implementation ("org.osmdroid:osmdroid-android:6.1.14")
+    // AndroidX Navigation Components
+    implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
+    implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
+
+    // CircleImageView for circular images
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
+    // refresher
+    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")  // Optional
+
+
 
 
 

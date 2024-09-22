@@ -1,20 +1,30 @@
 package com.example.weatherforecast.model.checknetwork
 
+
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
+import android.net.NetworkCapabilities
+import android.os.Build
 
 class NetworkChangeReceiver(private val listener: NetworkChangeListener) : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        val connectivityManager =
-            context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-        val isConnected = activeNetwork?.isConnectedOrConnecting == true
+        context?.let {
+            val connectivityManager =
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        // Notify the listener about the network state
-        listener.onNetworkChanged(isConnected)
+            val isConnected = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val activeNetwork = connectivityManager.activeNetwork
+                val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+                networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+            } else {
+                val networkInfo = connectivityManager.activeNetworkInfo
+                networkInfo?.isConnectedOrConnecting == true
+            }
+
+            listener.onNetworkChanged(isConnected)
+        }
     }
 }

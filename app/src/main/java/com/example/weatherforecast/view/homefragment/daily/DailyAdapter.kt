@@ -7,17 +7,18 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.weatherforecast.R
 import com.example.weatherforecast.databinding.ItemDailyBinding
 import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.setIcon
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.TextStyle
+import java.time.DayOfWeek
 import java.util.Locale
 
 class DailyAdapter(val dailyWeather: List<DailyWeather>) :
     ListAdapter<DailyWeather, DailyAdapter.DailyViewHolder>(DailyDeffUtil()) {
-
 
     class DailyViewHolder(var itemBinding: ItemDailyBinding) :
         RecyclerView.ViewHolder(itemBinding.root)
@@ -39,17 +40,31 @@ class DailyAdapter(val dailyWeather: List<DailyWeather>) :
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate()
 
-            // Get the day of the week in full format
-            val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
+            // Map the day of the week to string resources
+            val context = holder.itemBinding.root.context
+            val dayOfWeekResourceId = when (date.dayOfWeek) {
+                DayOfWeek.SUNDAY -> R.string.sunday
+                DayOfWeek.MONDAY -> R.string.monday
+                DayOfWeek.TUESDAY -> R.string.tuesday
+                DayOfWeek.WEDNESDAY -> R.string.wednesday
+                DayOfWeek.THURSDAY -> R.string.thursday
+                DayOfWeek.FRIDAY -> R.string.friday
+                DayOfWeek.SATURDAY -> R.string.saturday
+            }
 
             // Set the day of the week and weather status
-            holder.itemBinding.tvDay.text = if (position == 0) "Tomorrow" else dayOfWeek
+            holder.itemBinding.tvDay.text = if (position == 0) {
+                context.getString(R.string.tomorrow)
+            } else {
+                context.getString(dayOfWeekResourceId)
+            }
+
             holder.itemBinding.tvStatus.text = current.weatherStatus
 
             // Set the icon
             setIcon(current.icon, holder.itemBinding.ivIcon)
 
-            // Format the temperatures
+            // Format the temperatures  , min and max degree
             holder.itemBinding.tvDegree.text = "${current.maxTemp.toInt()}°/${current.minTemp.toInt()}°"
         }
     }

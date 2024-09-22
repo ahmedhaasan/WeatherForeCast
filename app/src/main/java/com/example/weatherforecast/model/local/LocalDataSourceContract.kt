@@ -2,6 +2,7 @@ package com.example.weatherforecast.model.local
 
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.DailyWeather
+import com.example.weatherforecast.model.pojos.Favorite
 import com.example.weatherforecast.model.pojos.HourlyWeather
 import kotlinx.coroutines.flow.Flow
 
@@ -22,6 +23,15 @@ interface LocalDataSourceContract {
 
     suspend fun deleteCurrentWeather(): Int
     suspend fun deleteDailyWeatehr(): Int
+
+    /**
+     *  working on favorite
+     */
+
+    suspend fun insertFavoriteLocation(fav_location: Favorite): Long
+    suspend fun deleteFavoriteLocation(fav_id: String)
+    suspend fun getAllFavoriteLocations(): Flow<List<Favorite>>
+
 
 
 }
