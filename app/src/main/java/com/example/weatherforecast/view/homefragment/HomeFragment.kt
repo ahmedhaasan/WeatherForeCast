@@ -21,7 +21,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.Constants
@@ -206,7 +205,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         fetchWeatherData()
 
         if (isAdded) {
-            viewModel.currentWeather.observe(viewLifecycleOwner, Observer { weather ->
+            viewModel.currentWeatherState.observe(viewLifecycleOwner, Observer { weather ->
                 weather?.let {
                     val decimalFormat = DecimalFormat("#.##")
 
@@ -274,7 +273,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         }
         // try observe on hourly data
         if (isAdded) {
-            viewModel.hourlyWeather.observe(viewLifecycleOwner, Observer { hourlyWeather ->
+            viewModel.hourlyWeatherState.observe(viewLifecycleOwner, Observer { hourlyWeather ->
                 if (hourlyWeather != null && hourlyWeather.isNotEmpty()) {
                     hourlyAdapter.submitList(hourlyWeather)
 
@@ -293,7 +292,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         }
         // observe on daily data and check it
         if (isAdded) {
-            viewModel.dailyWeather.observe(viewLifecycleOwner, Observer { mapDailyWeather ->
+            viewModel.dailyWeatherState.observe(viewLifecycleOwner, Observer { mapDailyWeather ->
                 if (mapDailyWeather != null && mapDailyWeather.isNotEmpty()) {
                     // Drop the first item and submit the updated list
                     val listWithoutFirstItem = mapDailyWeather.drop(1)

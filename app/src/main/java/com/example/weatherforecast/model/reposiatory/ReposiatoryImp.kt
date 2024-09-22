@@ -9,30 +9,40 @@ import com.example.weatherforecast.model.pojos.HourlyWeather
 import com.example.weatherforecast.model.pojos.WeatherResponse
 import com.example.weatherforecast.model.remote.RemoteDataSourceImp
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
+/**
+ *      applaying Flow and Flow
+ */
 class ReposiatoryImp(
     private val remote: RemoteDataSourceImp,
     private val local: LocalDataSourceImp
 ) : ReposiatoryContract {
 
-    // remotly
+    // remotly applaying flow
     override suspend fun getCurrentWeatherRemotely(
         lat: Double,
         lon: Double,
         lang:String,
         unit: String
-    ): WeatherResponse? {
-        return remote.getCurrentWeather(lat, lon,lang, unit)
+    ): Flow<WeatherResponse> {
+        return flow {
+           val current =  remote.getCurrentWeather(lat, lon,lang, unit)
+            current?.let { emit(it) } // Emit the list of products
+        }
     }
 
-    // remotelyy
+    // remotely applaying flow
     override suspend fun getFiveDayWeather(
         lat: Double,
         lon: Double,
         lang:String,
         unit: String
-    ): FiveDayResponse? {
-        return remote.getFiveDayWeather(lat, lon,lang, unit)
+    ): Flow<FiveDayResponse>? {
+        return flow {
+            val fiveWeather = remote.getFiveDayWeather(lat, lon,lang, unit)
+            fiveWeather?.let { emit(it) }
+        }
     }
 
     override suspend fun getCurrentLocalWeather(): Flow<CurrentWeatherEntity> {
