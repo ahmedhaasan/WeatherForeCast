@@ -111,6 +111,10 @@ dependencies {
     // CircleImageView for circular images
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
+    // refresher
+    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")  // Optional
+
+
 
 
 

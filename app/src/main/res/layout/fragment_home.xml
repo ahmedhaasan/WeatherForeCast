@@ -7,6 +7,12 @@
     android:background="@color/black"
     android:label="@string/home_menu">
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
     <ScrollView
         android:id="@+id/homeScrollView"
         android:layout_width="match_parent"
@@ -18,6 +24,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/homeScreenView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
@@ -78,6 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
+                android:text="@string/weatherState"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="@id/tv_current_degree"
@@ -126,7 +134,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Pressure"
+                            android:text="@string/pressure"
                             android:textColor="@android:color/white" />
                     </LinearLayout>
 
@@ -162,7 +170,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Humidity"
+                            android:text="@string/humadity"
                             android:textColor="@android:color/white" />
                     </LinearLayout>
 
@@ -192,7 +200,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Wind"
+                            android:text="@string/wind"
                             android:textColor="@android:color/white" />
                     </LinearLayout>
 
@@ -227,7 +235,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Cloud"
+                            android:text="@string/clouds"
                             android:textColor="@android:color/white" />
                     </LinearLayout>
 
@@ -257,7 +265,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Visibility"
+                            android:text="@string/visability"
                             android:textColor="@android:color/white" />
                     </LinearLayout>
 
@@ -294,8 +302,10 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+
+<androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/permission_constrain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -361,6 +371,20 @@
 
 
     </androidx.cardview.widget.CardView>
+    <!-- ProgressBar -->
+    <ProgressBar
+        android:id="@+id/homeprogressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="148dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,5 @@
 package com.example.weatherforecast.view.homefragment
+
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -54,6 +55,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     private lateinit var hourlyAdapter: HourlyAdapter
     private lateinit var fusedLocation: FusedLocationProviderClient
     private lateinit var networkChangeReceiver: NetworkChangeReceiver
+
     // Observed settings for language and units
     private var selectedLanguage: String = "en"
     lateinit var settingViewModel: SettingViewModel
@@ -107,6 +109,22 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         super.onViewCreated(view, savedInstanceState)
         checkLocationStatus() // and update ui
         binding.allowLocationButton.setOnClickListener { requestLocationPermissions() }
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            // Call a method to refresh data or recreate the fragment
+            refreshFragment()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun refreshFragment() {
+        // Show refreshing animation
+        binding.swipeRefreshLayout.isRefreshing = true
+        fetchWeatherData()
+        loadWeatherData()
+
+        // Stop the refreshing animation after the fragment is recreated
+        binding.swipeRefreshLayout.isRefreshing = false
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -117,7 +135,11 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                 getFreshLocation()
             } else {
                 updateUI(false) // Show enable location prompt
-                Toast.makeText(requireContext(), "Please enable location services", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Please enable location services",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         } else {
             // Request permissions if not already granted
@@ -137,6 +159,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
             Constants.My_LOCATION_PERMISSION_ID
         )
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -150,7 +173,8 @@ class HomeFragment : Fragment(), NetworkChangeListener {
             } else {
                 // Permission denied
                 updateUI(false)
-                Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -160,6 +184,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         super.onResume()
         checkLocationStatus() // Check location status again
     }
+
     // check if the location is enabled then display the weather else display allow button
     private fun updateUI(isLocationEnabled: Boolean) {
         if (isLocationEnabled) {
@@ -178,39 +203,65 @@ class HomeFragment : Fragment(), NetworkChangeListener {
             Log.e("LocationError", "Lat/Lon are not set yet")
             return
         }
-        fetchWeatherData() // Call the refactored method here
-        // observe on language or wind or unit change
-        // Initialize SettingViewModel
+        fetchWeatherData()
 
-
-        //  var isToastShown = false
-        // check befor observing if the view is exists
-        // Check before observing if the view is added
         if (isAdded) {
             viewModel.currentWeather.observe(viewLifecycleOwner, Observer { weather ->
                 weather?.let {
                     val decimalFormat = DecimalFormat("#.##")
+
+                    // Set location name
                     binding.tvLocationName.text = weather.city
 
+                    // Format and set the date
                     val dateTime = Instant.ofEpochSecond(weather.date.toLong())
                         .atZone(ZoneId.systemDefault())
                         .toLocalDateTime()
                     val dateFormatter =
-                        DateTimeFormatter.ofPattern("EEEE, MMMM yyyy", Locale.ENGLISH)
+                        DateTimeFormatter.ofPattern("EEEE, MMMM yyyy", Locale.getDefault())
                     binding.tvCurrentDate.text = dateTime.format(dateFormatter)
 
+                    // Set weather status and temperature
                     binding.tvWeatherStatus.text = weather.weatherStatus
-                    binding.tvCurrentDegree.text = getString(R.string.degree_format, decimalFormat.format(weather.temperature))
+                    binding.tvCurrentDegree.text =
+                        decimalFormat.format(weather.temperature) + " " + getString(R.string.degree_format)
+
+                    // Set weather icon
                     setIcon(weather.weatherIcon, binding.ivWeatherIcon)
-                    binding.presser.text = getString(R.string.pressure_format, decimalFormat.format(weather.pressure))
-                    binding.humidity.text = getString(R.string.humidity_format, weather.humidity)
-                    binding.wind.text = getString(R.string.wind_speed_format, decimalFormat.format(weather.windSpeed))
-                    binding.clouds.text = getString(R.string.clouds_format, weather.clouds)
-                    binding.visability.text = getString(R.string.visibility_format, decimalFormat.format(weather.visibility / 1000))
-                    //isToastShown = false // Reset the toast flag when data is available
+
+                    // Set values for pressure, humidity, clouds, wind speed, and visibility using localized strings
+                    binding.presser.text =
+                        decimalFormat.format(weather.pressure) + " " + getString(R.string.unit_hpa)
+                    binding.humidity.text =
+                        weather.humidity.toString() + " " + getString(R.string.unit_percent)
+                    binding.clouds.text =
+                        weather.clouds.toString() + " " + getString(R.string.unit_percent)
+                    // observe on wind Status
+                    settingViewModel.windSetting.observe(requireActivity(), Observer { value ->
+                        val windSpeedText = when (value) {
+                            getString(R.string.mile_hour) -> {
+                                // Convert wind speed from m/s to mph
+                                val windSpeedMph = weather.windSpeed * 2.23694
+                                "${decimalFormat.format(windSpeedMph)} ${getString(R.string.unit_miles_per_hour)}"
+                            }
+
+                            getString(R.string.meter_second) -> {
+                                "${decimalFormat.format(weather.windSpeed)} ${getString(R.string.unit_meter_per_sec)}"
+                            }
+
+                            else -> "${decimalFormat.format(weather.windSpeed)} ${getString(R.string.unit_meter_per_sec)}" // Default case
+                        }
+
+                        binding.wind.text = windSpeedText
+                    })
+                    binding.visability.text =
+                        decimalFormat.format(weather.visibility / 1000) + " " + getString(R.string.unit_kilometer)
+                    binding.tvWeatherStatus.text =
+                        getString(R.string.weatherState) + " ::" + weather.weatherStatus
                 }
             })
         }
+
 
 
 
@@ -254,12 +305,14 @@ class HomeFragment : Fragment(), NetworkChangeListener {
             })
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
     private var snackbarShown = false
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun fetchWeatherData() {
         if (connected) {
-            if (!hasFetchedData && lat != 0.0 &&lon!=0.0) {
+            if (!hasFetchedData && lat != 0.0 && lon != 0.0) {
                 snackbarShown = false // Reset the flag when connected
 
                 // Fetch weather data
@@ -365,7 +418,6 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     }
 
 
-
     // un register the listener
     override fun onDestroy() {
         super.onDestroy()
@@ -374,7 +426,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun checkLanguageAndUnitChange(){
+    private fun checkLanguageAndUnitChange() {
         settingViewModel.languageSetting.observe(requireActivity(), Observer { language ->
             selectedLanguage = language
             fetchWeatherData()

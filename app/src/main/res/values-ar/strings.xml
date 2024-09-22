@@ -48,4 +48,18 @@
     <string name="favorite_menu">المفضله</string>
     <string name="alert_menu">التنبيهات</string>
     <string name="setting_menu">الإعدادات</string>
-></resources>
+    <string name="unit_hpa">هكتوباسكال</string>
+    <string name="unit_percent">%</string>
+    <string name="unit_meter_per_sec">م/ث</string>
+    <string name="unit_kilometer">كم</string>
+    <string name="current_temperature">%1$s°C</string>
+    <string name="pressure">الضغط الجوي</string>
+    <string name="clouds">الغيوم</string>
+    <string name="humadity">الرطوبة</string>
+    <string name="wind">الرياح</string>
+    <string name="visability">الرؤية</string>
+    <string name="weatherState">حالة الطقس</string>
+    <string name="unit_miles_per_hour">ميل/ساعة</string>
+
+
+    ></resources>

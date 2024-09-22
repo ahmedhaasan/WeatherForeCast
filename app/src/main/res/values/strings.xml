@@ -28,12 +28,11 @@
     <string name="weather_location"> %1$s</string>
     <string name="weather_date">%1$s</string>
     <string name="weather_status"> %1$s</string>
-    <string name="current_temperature"> %1$s°C</string>
+    <string name="clouds_format">%s%%</string>
     <string name="degree_format">%s°C</string>
     <string name="pressure_format">%s hPa</string>
     <string name="humidity_format">%s%%</string>
     <string name="wind_speed_format">%s m/s</string>
-    <string name="clouds_format">%s%%</string>
     <string name="visibility_format">%s km</string>
 
     <string name="sunday">Sunday</string>
@@ -49,7 +48,19 @@
     <string name="favorite_menu">Favorite</string>
     <string name="alert_menu">Alert</string>
     <string name="setting_menu">Setting</string>
-    <string name="LocationMap">Location Sh</string>
+    <string name="unit_hpa">hPa</string>
+    <string name="unit_percent">%</string>
+    <string name="unit_kilometer">km</string>
+    <string name="current_temperature"> %1$s°C</string>
+    <string name="pressure">pressure</string>
+    <string name="clouds">Clouds</string>
+    <string name="humadity">Humidity</string>
+    <string name="wind">Wind</string>
+    <string name="visability">Visability</string>
+    <string name="weatherState">weatherStatus</string>
+    <string name="unit_meter_per_sec">m/s</string>
+    <string name="unit_miles_per_hour">mph</string>
+
 
 
 </resources>

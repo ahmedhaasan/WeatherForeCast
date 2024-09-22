@@ -44,7 +44,7 @@ fun mapWeatherResponseToEntity(response: WeatherResponse): CurrentWeatherEntity 
     return CurrentWeatherEntity(
         city = response.name,                          // city name
         temperature = response.main.temp,              // current temperature
-        weatherStatus = response.weather[0].main,      // weather status (e.g., Rain)
+        weatherStatus = response.weather[0].description,      // weather status (e.g., Rain)
         weatherIcon = response.weather[0].icon,        // weather icon
         date = response.dt.toLong(),                   // timestamp (dt)
         lat = response.coord.lat,                      // latitude

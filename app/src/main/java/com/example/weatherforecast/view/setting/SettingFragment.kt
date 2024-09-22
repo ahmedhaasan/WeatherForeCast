@@ -48,6 +48,7 @@ class SettingFragment : Fragment() {
 
         // Set Wind Speed RadioGroup
         when (settingViewModel.windSetting.value) {
+
             getString(R.string.meter_second) -> binding.rbMeterSecond.isChecked = true
             getString(R.string.mile_hour) -> binding.rbMileHour.isChecked = true
         }
@@ -91,7 +92,11 @@ class SettingFragment : Fragment() {
                 R.id.rb_meter_second -> getString(R.string.meter_second)
                 R.id.rb_mile_hour -> getString(R.string.mile_hour)
                 else -> ""
+
             }
+            // reflect the changes in the sharedPrefrences
+            settingViewModel.saveWindPreference(windSpeed)
+
             settingViewModel.saveWindPreference(windSpeed)
             Toast.makeText(requireContext(), "Wind speed unit: $windSpeed", Toast.LENGTH_SHORT)
                 .show()

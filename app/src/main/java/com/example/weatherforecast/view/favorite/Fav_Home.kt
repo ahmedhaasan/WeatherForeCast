@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.Constants
+import com.example.weatherforecast.R
 import com.example.weatherforecast.databinding.FragmentFavHomeBinding
 import com.example.weatherforecast.model.database.WeatherDataBase
 import com.example.weatherforecast.model.local.LocalDataSourceImp
@@ -75,30 +76,43 @@ class Fav_Home : Fragment() {
             fav_homeViewModel.getHourlyWeatherRemotly(lat, lon,Constants.ENGLISH, Constants.METRIC_UNIT)
         }
         super.onViewCreated(view, savedInstanceState)
+
         if (isAdded) {
             fav_homeViewModel.currentWeather.observe(viewLifecycleOwner, Observer { weather ->
                 weather?.let {
                     val decimalFormat = DecimalFormat("#.##")
+
+                    // Set location name
                     binding.tvLocationName.text = weather.city
 
+                    // Format and set the date
                     val dateTime = Instant.ofEpochSecond(weather.date.toLong())
                         .atZone(ZoneId.systemDefault())
                         .toLocalDateTime()
                     val dateFormatter =
-                        DateTimeFormatter.ofPattern("EEEE, MMMM yyyy", Locale.ENGLISH)
+                        DateTimeFormatter.ofPattern("EEEE, MMMM yyyy", Locale.getDefault())
                     binding.tvCurrentDate.text = dateTime.format(dateFormatter)
 
+                    // Set weather status and temperature
                     binding.tvWeatherStatus.text = weather.weatherStatus
                     binding.tvCurrentDegree.text =
-                        "${decimalFormat.format(weather.temperature)}°C"
+                        decimalFormat.format(weather.temperature) + " " + getString(R.string.degree_format)
+
+                    // Set weather icon
                     setIcon(weather.weatherIcon, binding.ivWeatherIcon)
-                    binding.presser.text = "${decimalFormat.format(weather.pressure)} hPa"
-                    binding.humidity.text = "${weather.humidity}%"
-                    binding.wind.text = "${decimalFormat.format(weather.windSpeed)} m/s"
-                    binding.clouds.text = "${weather.clouds}%"
+
+                    // Set values for pressure, humidity, clouds, wind speed, and visibility using localized strings
+                    binding.presser.text =
+                        decimalFormat.format(weather.pressure) + " " + getString(R.string.unit_hpa)
+                    binding.humidity.text =
+                        weather.humidity.toString() + " " + getString(R.string.unit_percent)
+                    binding.clouds.text =
+                        weather.clouds.toString() + " " + getString(R.string.unit_percent)
+                    binding.wind.text =
+                        decimalFormat.format(weather.windSpeed) + " " + getString(R.string.unit_meter_per_sec)
                     binding.visability.text =
-                        "${decimalFormat.format(weather.visibility / 1000)} km"
-                    //isToastShown = false // Reset the toast flag when data is available
+                        decimalFormat.format(weather.visibility / 1000) + " " + getString(R.string.unit_kilometer)
+                    binding.tvWeatherStatus.text = weather.weatherStatus+ " " +getString(R.string.weatherState)
                 }
             })
         }
