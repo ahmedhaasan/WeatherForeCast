@@ -49,6 +49,7 @@
     <string name="favorite_menu">Favorite</string>
     <string name="alert_menu">Alert</string>
     <string name="setting_menu">Setting</string>
+    <string name="LocationMap">Location Sh</string>
 
 
 </resources>

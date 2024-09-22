@@ -41,6 +41,7 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
             val temp2 = tempWeather?.let { mapWeatherResponseToEntity(it) }
             withContext(Dispatchers.Main) {
                 _currentWeather.postValue(temp2)
+                Log.i("CurrentCall","CurrentData Fetched Remotly")
             }
             temp2?.let { repo.insertCurrentLocalWeather(it) }
         }

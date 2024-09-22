@@ -58,6 +58,8 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     private var selectedLanguage: String = "en"
     lateinit var settingViewModel: SettingViewModel
     private var selectedUnit: String = "metric"
+    private var hasFetchedData = false
+
 
     private var connected = true
     lateinit var viewModel: WeatherViewModel
@@ -77,6 +79,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // intialize viewModel
@@ -93,8 +96,9 @@ class HomeFragment : Fragment(), NetworkChangeListener {
 
         // intialzie the fuzed
         fusedLocation = LocationServices.getFusedLocationProviderClient(requireContext())
+        settingViewModel = ViewModelProvider(requireActivity()).get(SettingViewModel::class.java)
 
-
+        checkLanguageAndUnitChange()
     }
 
     @SuppressLint("SetTextI18n")
@@ -177,18 +181,8 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         fetchWeatherData() // Call the refactored method here
         // observe on language or wind or unit change
         // Initialize SettingViewModel
-        settingViewModel = ViewModelProvider(this).get(SettingViewModel::class.java)
 
-        // Observe language and unit changes
-        settingViewModel.languageSetting.observe(requireActivity(), Observer { language ->
-            selectedLanguage = language
-            fetchWeatherData() // Re-fetch data when the language changes
-        })
 
-        settingViewModel.unitSetting.observe(requireActivity(), Observer { unit ->
-            selectedUnit = unit
-            fetchWeatherData() // Re-fetch data when the unit changes
-        })
         //  var isToastShown = false
         // check befor observing if the view is exists
         // Check before observing if the view is added
@@ -265,11 +259,16 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun fetchWeatherData() {
         if (connected) {
-            snackbarShown = false // Reset the flag when connected
-            // Fetch weather data
-            viewModel.getCurrentWeatherRemotly(lat, lon,selectedLanguage, selectedUnit)
-            viewModel.getHourlyWeatherRemotly(lat, lon,selectedLanguage, selectedUnit)
-            viewModel.getDailyWeatherRemotly(lat, lon,selectedLanguage, selectedUnit)
+            if (!hasFetchedData && lat != 0.0 &&lon!=0.0) {
+                snackbarShown = false // Reset the flag when connected
+
+                // Fetch weather data
+                viewModel.getCurrentWeatherRemotly(lat, lon, selectedLanguage, selectedUnit)
+                viewModel.getHourlyWeatherRemotly(lat, lon, selectedLanguage, selectedUnit)
+                viewModel.getDailyWeatherRemotly(lat, lon, selectedLanguage, selectedUnit)
+
+                hasFetchedData = true // Set the flag to true after fetching
+            }
         } else {
             if (!snackbarShown) {
                 Snackbar.make(
@@ -279,7 +278,8 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                 ).show()
                 snackbarShown = true // Set the flag to true after showing
             }
-            // Toast.makeText(context,"Data is Shown in Offline Mode ",Toast.LENGTH_SHORT).show()
+
+            // Fetch local weather data
             viewModel.getCurrentWeatherLocally()
             viewModel.getHourlyWeatherLocally()
             viewModel.getDailyWeatehrLocally()
@@ -319,6 +319,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                 lat = locationResult.locations[0].latitude
                 lon = locationResult.locations[0].longitude
                 // Reload UI with the new location data
+
                 if (isAdded) {
                     loadWeatherData()
                 } else {
@@ -357,6 +358,10 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onNetworkChanged(isConnected: Boolean) {
         connected = isConnected
+        if (connected) {
+            hasFetchedData = false // Reset the flag to allow fetching when reconnected
+            fetchWeatherData() // Optionally fetch data when reconnected
+        }
     }
 
 
@@ -366,6 +371,19 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         super.onDestroy()
 
         requireActivity().unregisterReceiver(networkChangeReceiver)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun checkLanguageAndUnitChange(){
+        settingViewModel.languageSetting.observe(requireActivity(), Observer { language ->
+            selectedLanguage = language
+            fetchWeatherData()
+        })
+
+        settingViewModel.unitSetting.observe(requireActivity(), Observer { unit ->
+            selectedUnit = unit
+            fetchWeatherData()
+        })
     }
 
 }
