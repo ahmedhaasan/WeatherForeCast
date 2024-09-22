@@ -177,7 +177,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         fetchWeatherData() // Call the refactored method here
         // observe on language or wind or unit change
         // Initialize SettingViewModel
-        settingViewModel = ViewModelProvider(requireActivity()).get(SettingViewModel::class.java)
+        settingViewModel = ViewModelProvider(this).get(SettingViewModel::class.java)
 
         // Observe language and unit changes
         settingViewModel.languageSetting.observe(requireActivity(), Observer { language ->
@@ -319,7 +319,11 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                 lat = locationResult.locations[0].latitude
                 lon = locationResult.locations[0].longitude
                 // Reload UI with the new location data
-                loadWeatherData()
+                if (isAdded) {
+                    loadWeatherData()
+                } else {
+                    Log.e("HomeFragment", "Fragment not attached, skipping loadWeatherData")
+                }
             }
         }, Looper.myLooper())
     }

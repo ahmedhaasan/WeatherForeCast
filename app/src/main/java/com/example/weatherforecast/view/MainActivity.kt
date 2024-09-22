@@ -51,15 +51,19 @@ class MainActivity : AppCompatActivity() {
             navController
         ) // Use binding to access NavigationView
 
+        /**
+         *      below part is for change action bar language and menu items
+         */
         // Set custom icon for home (hamburger menu)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.menu)
-
         // Update the ActionBar title based on the menu item's title
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val menuItem = binding.navView.menu.findItem(destination.id)
             supportActionBar?.title = menuItem?.title ?: destination.label // Set ActionBar title
         }
+
     }
+
 
     // when start the application again so reset the last app language
     override fun onStart() {
@@ -67,6 +71,14 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         if (savedLanguage != null) {
             setLocale(this,savedLanguage)
+            binding.navView.menu.clear() // Clear the current menu
+            binding.navView.inflateMenu(R.menu.new_menu) // Reinflate the menu
+            // Update the ActionBar title based on the current fragment or destination
+            val currentDestination = navController.currentDestination
+            currentDestination?.let { destination ->
+                val menuItem = binding.navView.menu.findItem(destination.id)
+                supportActionBar?.title = menuItem?.title ?: destination.label
+            }
         }
 
     }
@@ -83,4 +95,5 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
+
 }
