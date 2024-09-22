@@ -21,8 +21,6 @@ import com.example.weatherforecast.model.remote.RemoteDataSourceImp
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModel
 import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModelFactory
-import com.example.weatherforecast.model.view_models.home.WeatherViewModel
-import com.example.weatherforecast.model.view_models.home.WeatherViewModelFactory
 import com.example.weatherforecast.setIcon
 import com.example.weatherforecast.view.homefragment.daily.DailyAdapter
 import com.example.weatherforecast.view.homefragment.hourly.HourlyAdapter
@@ -78,7 +76,7 @@ class Fav_Home : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         if (isAdded) {
-            fav_homeViewModel.currentWeather.observe(viewLifecycleOwner, Observer { weather ->
+            fav_homeViewModel.currentWeatherState.observe(viewLifecycleOwner, Observer { weather ->
                 weather?.let {
                     val decimalFormat = DecimalFormat("#.##")
 
@@ -126,7 +124,7 @@ class Fav_Home : Fragment() {
         }
         // try observe on hourly data
         if (isAdded) {
-            fav_homeViewModel.hourlyWeather.observe(viewLifecycleOwner, Observer { hourlyWeather ->
+            fav_homeViewModel.hourlyWeatherState.observe(viewLifecycleOwner, Observer { hourlyWeather ->
                 if (hourlyWeather != null && hourlyWeather.isNotEmpty()) {
                     hourlyAdapter.submitList(hourlyWeather)
 
@@ -145,7 +143,7 @@ class Fav_Home : Fragment() {
         }
         // observe on daily data and check it
         if (isAdded) {
-            fav_homeViewModel.dailyWeather.observe(viewLifecycleOwner, Observer { mapDailyWeather ->
+            fav_homeViewModel.dailyWeatherState.observe(viewLifecycleOwner, Observer { mapDailyWeather ->
                 if (mapDailyWeather != null && mapDailyWeather.isNotEmpty()) {
                     // Drop the first item and submit the updated list
                     val listWithoutFirstItem = mapDailyWeather.drop(1)
