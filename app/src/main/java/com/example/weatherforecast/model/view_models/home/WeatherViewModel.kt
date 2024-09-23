@@ -92,7 +92,10 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
                 repo.getFiveDayWeather(lat, lon, lang, unit)
                     ?.catch { error -> _dailyWeatherState.value = DailyApiState.Failure(error) }
                     ?.map { fiveDaily -> mapDailyWeather(fiveDaily) }
-                    ?.collect{ daily -> _dailyWeatherState.value = DailyApiState.Success(daily)}
+                    ?.collect { daily ->
+                        _dailyWeatherState.value = DailyApiState.Success(daily)
+                        repo.insertDailyWeatherLocally(daily) // then add the new one
+                    }
             } catch (e: Exception) {
                 Log.i(Constants.ERROR, "Error fetching daily weather: ${e.message}")
                 e.printStackTrace()
@@ -105,10 +108,17 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
     fun getCurrentWeatherLocally() {
         viewModelScope.launch(Dispatchers.IO) {
             repo.getCurrentLocalWeather()
-                .catch { error -> _currentWeatherState.value = WeatherApiState.Failure(error) }
+                .catch { error ->
+                    _currentWeatherState.value = WeatherApiState.Failure(error)
+                }
                 .collect { currentWeather ->
-                _currentWeatherState.value = WeatherApiState.Success(currentWeather)
-            }
+                    if (currentWeather != null) {
+                        _currentWeatherState.value = WeatherApiState.Success(currentWeather)
+                    } else {
+                        _currentWeatherState.value =
+                            WeatherApiState.Failure(Throwable("Current weather data is null"))
+                    }
+                }
         }
     }
 
@@ -117,8 +127,8 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
             repo.getHourlyWeatherLocally()
                 .catch { error -> _hourlyWeatherState.value = HourlyApiState.Failure(error) }
                 .collect { hourlyWeather ->
-                _hourlyWeatherState.value = HourlyApiState.Success(hourlyWeather)
-            }
+                    _hourlyWeatherState.value = HourlyApiState.Success(hourlyWeather)
+                }
         }
     }
 
@@ -128,8 +138,8 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
             repo.getDailyWeatherLocally()
                 .catch { error -> _dailyWeatherState.value = DailyApiState.Failure(error) }
                 .collect { dailyWeather ->
-                _dailyWeatherState.value = DailyApiState.Success(dailyWeather)
-            }
+                    _dailyWeatherState.value = DailyApiState.Success(dailyWeather)
+                }
 
         }
     }

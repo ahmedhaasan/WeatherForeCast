@@ -220,6 +220,8 @@ class Fav_Home : Fragment() {
             decimalFormat.format(weather.windSpeed) + " " + getString(R.string.unit_meter_per_sec)
         binding.visability.text =
             decimalFormat.format(weather.visibility / 1000) + " " + getString(R.string.unit_kilometer)
+        binding.tvWeatherStatus.text =
+            getString(R.string.weatherState) + " ::" + weather.weatherStatus
     }
 
     fun setUpAdapters() {
