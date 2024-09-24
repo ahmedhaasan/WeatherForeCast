@@ -11,17 +11,18 @@ object Constants {
     const val    My_LOCATION_PERMISSION_ID = 5005
 
     // needed for settings
-    const val GPS = "gps"
-    const val MAP = "map"
-    const val METER_SEC = "meterSec"
-    const val MILE_HOUR = "mileHour"
     const val ENGLISH = "en"
     const val ARABIC = "ar"
-    const val ENABLE = "enable"
-    const val DISABLE = "disable"
     const val CELSIUS = "metric"
     const val KELVIN = "standard"
     const val FAHRENHEIT = "imperial"
+    const val LATITUTE = "latitute"
+    const val LONGITUTE = "longitute"
+     const val LOCATIONPREFRENCES = "LocationPreference"
+    const val LOCATIONFLAG = "LocationFlag"
+    const val MapCaller = "MapCaller"
+    const val FAVORITESCREEN = "FAVORITE"
+    const val SETTINGSCREEN = "SETTING"
 
 
 

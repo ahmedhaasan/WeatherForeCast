@@ -23,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEmpty
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -121,9 +122,12 @@ class FavoriteViewModel(val repo: ReposiatoryImp) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             repo.getAllFavoriteLocations()
                 .catch { error -> _favoriteState.value = FavoriteRoomState.Failure(error) }
-                .
-            collect { favorites -> _favoriteState.value = FavoriteRoomState.Success(favorites)
-            }
+                .onEmpty {
+                    _favoriteState.value = FavoriteRoomState.Empty()
+                }
+                .collect { favorites ->
+                    _favoriteState.value = FavoriteRoomState.Success(favorites)
+                }
         }
 
     }

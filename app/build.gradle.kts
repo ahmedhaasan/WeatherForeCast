@@ -70,6 +70,8 @@ dependencies {
 
 // CircleImageView (latest stable version)
     implementation("de.hdodenhof:circleimageview:3.1.0")
+    implementation("com.airbnb.android:lottie:6.0.0")
+
 
     // glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
@@ -107,9 +109,6 @@ dependencies {
     // AndroidX Navigation Components
     implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
     implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
-
-    // CircleImageView for circular images
-    implementation("de.hdodenhof:circleimageview:3.1.0")
 
     // refresher
     implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")  // Optional

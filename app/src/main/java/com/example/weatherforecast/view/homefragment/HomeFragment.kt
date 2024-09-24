@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.ConnectivityManager
@@ -22,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.databinding.FragmentHomeBinding
@@ -67,7 +69,6 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     private var selectedUnit: String = "metric"
     private var hasFetchedData = false
 
-
     private var connected = true
     lateinit var viewModel: WeatherViewModel
 
@@ -78,11 +79,15 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     private var lastLon = 0.0
     private var lastLanguage = ""
     private var lastUnit = ""
+    var locationStatus: String = "Map"
+
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
 
@@ -107,12 +112,17 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         fusedLocation = LocationServices.getFusedLocationProviderClient(requireContext())
         settingViewModel = ViewModelProvider(requireActivity()).get(SettingViewModel::class.java)
 
+
     }
 
     @SuppressLint("SetTextI18n")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sharedPreferences =
+            requireContext().getSharedPreferences("WeatherAppPrefs", Context.MODE_PRIVATE)
+        locationStatus = sharedPreferences.getString(Constants.LOCATIONPREFRENCES, "GPS").toString()
+
         setUpAdapters()
         checkLocationStatus() // and update ui
         binding.allowLocationButton.setOnClickListener { requestLocationPermissions() }
@@ -122,7 +132,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         }
         checkLanguageAndUnitChange()
 
-        // here some code
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -135,7 +145,12 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         if (checkPermissions(requireContext())) {
             if (isLocationEnabled(requireContext())) {
                 updateUI(true) // Location is enabled, show weather data
-                getFreshLocation()
+                if (locationStatus == getString(R.string.map)) {
+                    // listen for any change Gps or Map location
+                    getSentMapLocation()
+                    fetchWeatherData()
+                } else
+                    getFreshLocation()
             } else {
                 updateUI(false) // Show enable location prompt
                 enableLocationServices()
@@ -211,8 +226,8 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                 viewModel.currentWeatherState.collectLatest { current ->
                     when (current) {
                         is WeatherApiState.Loading -> {
-                            binding.homeScreenView.visibility = View.GONE
                             binding.homeprogressBar.visibility = View.VISIBLE
+                            binding.homeScreenView.visibility = View.GONE
                         }
 
                         is WeatherApiState.Failure -> {
@@ -222,7 +237,6 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-
                         is WeatherApiState.Success -> {
                             binding.homeScreenView.visibility = View.VISIBLE
                             binding.homeprogressBar.visibility = View.GONE
@@ -251,13 +265,8 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-
                         is HourlyApiState.Loading -> {
-                            Toast.makeText(
-                                requireContext(),
-                                "Data is Loading",
-                                Toast.LENGTH_SHORT
-                            ).show()
+
                         }
                     }
                 }
@@ -274,7 +283,6 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                         is DailyApiState.Success -> {
                             dailyAdapter.submitList(daily.dailyWeatehr)
                         }
-
                         is DailyApiState.Failure -> {
                             Toast.makeText(
                                 requireContext(),
@@ -284,11 +292,6 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                         }
 
                         is DailyApiState.Loading -> {
-                            Toast.makeText(
-                                requireContext(),
-                                "Data is Loading",
-                                Toast.LENGTH_SHORT
-                            ).show()
                         }
                     }
                 }
@@ -320,8 +323,16 @@ class HomeFragment : Fragment(), NetworkChangeListener {
             weather.humidity.toString() + " " + getString(R.string.unit_percent)
         binding.clouds.text =
             weather.clouds.toString() + " " + getString(R.string.unit_percent)
-        binding.wind.text =
-            decimalFormat.format(weather.windSpeed) + " " + getString(R.string.unit_meter_per_sec)
+        // Observe windSetting LiveData
+        settingViewModel.windSetting.observe(viewLifecycleOwner, Observer { status ->
+            if (status == getString(R.string.meter_second)) {
+                binding.wind.text =
+                    decimalFormat.format(weather.windSpeed) + " " + getString(R.string.meter_second)
+            } else {
+                binding.wind.text =
+                    decimalFormat.format(weather.windSpeed) + " " + getString(R.string.mile_hour)
+            }
+        })
         binding.visability.text =
             decimalFormat.format(weather.visibility / 1000) + " " + getString(R.string.unit_kilometer)
         binding.tvWeatherStatus.text =
@@ -430,22 +441,23 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     // implementation for network BroadCastReciver
     @RequiresApi(Build.VERSION_CODES.O)
     private var snackbarOnlineShown = false // For online mode
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onNetworkChanged(isConnected: Boolean) {
         connected = isConnected
-        if (connected && !snackbarOnlineShown) {
-            // Show the Snackbar when the device goes online and it has not been shown yet
-            Snackbar.make(requireView(), "You are now online", Snackbar.LENGTH_SHORT).show()
-            snackbarOnlineShown = true
-            snackbarShown = false // Reset offline Snackbar
-        } else if (!connected && !snackbarShown) {
-            // Show the Snackbar when the device goes offline and it has not been shown yet
-            Snackbar.make(requireView(), "You are offline", Snackbar.LENGTH_SHORT).show()
-            snackbarShown = true
-            snackbarOnlineShown = false // Reset online Snackbar
+        if (view != null) { // Check if the view is available
+            if (connected && !snackbarOnlineShown) {
+                Snackbar.make(requireView(), "You are now online", Snackbar.LENGTH_SHORT).show()
+                snackbarOnlineShown = true
+                snackbarShown = false // Reset offline Snackbar
+            } else if (!connected && !snackbarShown) {
+                Snackbar.make(requireView(), "You are offline", Snackbar.LENGTH_SHORT).show()
+                snackbarShown = true
+                snackbarOnlineShown = false // Reset online Snackbar
+            }
         }
     }
-
 
     // un register the listener
     override fun onDestroy() {
@@ -461,6 +473,12 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         settingViewModel.unitSetting.observe(requireActivity(), Observer { unit ->
             selectedUnit = unit
         })
+    }
+
+    fun getSentMapLocation() {
+        lat = sharedPreferences.getString(Constants.LATITUTE, "0.0")!!.toDouble()
+        lon = sharedPreferences.getString(Constants.LONGITUTE, "0.0")?.toDouble()!!
+
     }
 
 }

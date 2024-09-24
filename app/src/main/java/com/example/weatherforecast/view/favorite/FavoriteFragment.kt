@@ -29,12 +29,14 @@ import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModel
 import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModelFactory
 import androidx.navigation.fragment.findNavController
+import com.example.weatherforecast.Constants
 import com.example.weatherforecast.R
 import com.example.weatherforecast.model.apistate.FavoriteRoomState
 import com.example.weatherforecast.model.checknetwork.NetworkChangeListener
 import com.example.weatherforecast.model.checknetwork.NetworkChangeReceiver
 import com.example.weatherforecast.model.view_models.home.WeatherViewModel
 import com.example.weatherforecast.model.view_models.home.WeatherViewModelFactory
+import com.example.weatherforecast.model.view_models.setting.SettingViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -46,6 +48,7 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
     lateinit var fav_binding: FragmentFavoriteBinding
     lateinit var favoriteAdapter: FavoriteAdapter
     var isConnected: Boolean? = null
+    lateinit var settingViewModel: SettingViewModel
     private lateinit var networkChangeReceiver: NetworkChangeReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,6 +79,8 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
         val factory = FavoriteViewModelFactory(repo)
         // now view Model
         val favoriteViewModel = ViewModelProvider(this, factory).get(FavoriteViewModel::class.java)
+        settingViewModel = ViewModelProvider(requireActivity()).get(SettingViewModel::class.java)
+
 
         /**
          *      intialize home viw model to use when updating the data
@@ -142,22 +147,36 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
         favoriteViewModel.getAllFavotiteLccations()
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                favoriteViewModel.favoriteState.collectLatest { favorites ->
+                favoriteViewModel.favoriteState.collect { favorites ->
                     when (favorites) {
                         is FavoriteRoomState.Loading -> {
-                            fav_binding.favoriteRecycler.visibility = View.GONE
                             fav_binding.favProgressBar.visibility = View.VISIBLE
+                            fav_binding.favoriteRecycler.visibility = View.GONE
+                            fav_binding.lvNoFavourites.visibility = View.GONE
                         }
+
                         is FavoriteRoomState.Success -> {
-                            favoriteAdapter.submitList(favorites.favorites)
-                            fav_binding.favoriteRecycler.visibility = View.VISIBLE
+                            fav_binding.lvNoFavourites.visibility = View.GONE
                             fav_binding.favProgressBar.visibility = View.GONE
+                            fav_binding.favoriteRecycler.visibility = View.VISIBLE
+                            favoriteAdapter.submitList(favorites.favorites)
                         }
-                        is FavoriteRoomState.Failure -> {    Toast.makeText(
-                            requireContext(),
-                            "Failed to load data: ${favorites.msg.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()}
+
+                        is FavoriteRoomState.Failure -> {
+                            Toast.makeText(
+                                requireContext(),
+                                "Failed to load data: ${favorites.msg.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        is FavoriteRoomState.Empty -> {
+
+                            fav_binding.lvNoFavourites.visibility = View.VISIBLE
+                            fav_binding.favoriteRecycler.visibility = View.GONE
+                            fav_binding.favProgressBar.visibility = View.GONE
+
+                        }
                     }
 // Process item
                 }
@@ -169,8 +188,8 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
          */
 
         fav_binding.favoriteFabButton.setOnClickListener {
+            settingViewModel.saveMapCallerPrefrence(Constants.FAVORITESCREEN) // who is caller the map
             val action = FavoriteFragmentDirections.actionFavoriteFragmentToMapFragment()
-
             findNavController().navigate(action)
 
         }

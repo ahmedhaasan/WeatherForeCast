@@ -3,12 +3,15 @@ package com.example.weatherforecast.view.setting
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.LocaleHelper.setLocale
 import com.example.weatherforecast.R
@@ -37,6 +40,7 @@ class SettingFragment : Fragment() {
         initializeRadioGroups()
 
         setupListeners()
+
     }
 
     private fun initializeRadioGroups() {
@@ -77,8 +81,27 @@ class SettingFragment : Fragment() {
         // Location RadioGroup
         binding.rgLocation.setOnCheckedChangeListener { _, checkedId ->
             val location = when (checkedId) {
-                R.id.rb_gps -> getString(R.string.gps)
-                R.id.rb_map -> getString(R.string.map)
+                R.id.rb_gps -> {
+                    settingViewModel.saveLocationFlag("1")
+                    settingViewModel.saveLocationPreference(getString(R.string.gps))
+                    getString(R.string.gps)
+                }
+
+                R.id.rb_map -> {
+                    settingViewModel.saveLocationPreference(getString(R.string.map))
+                    settingViewModel.locationFlag.observe(viewLifecycleOwner, Observer { flag ->
+                        Log.d("SettingFragment", "locationFlag observed: $flag")
+                        if (flag == "1") {
+                            Log.d("SettingFragment", "Navigating to MapFragment")
+                            // navigate to map Fragment
+                            settingViewModel.saveMapCallerPrefrence(Constants.SETTINGSCREEN) // who is caller to map
+                            val action = SettingFragmentDirections.actionSettingFragmentToMapFragment()
+                            findNavController().navigate(action)
+                        }
+                    })
+                    getString(R.string.map)
+                }
+
                 else -> ""
             }
             settingViewModel.saveLocationPreference(location)
@@ -95,8 +118,6 @@ class SettingFragment : Fragment() {
 
             }
             // reflect the changes in the sharedPrefrences
-            settingViewModel.saveWindPreference(windSpeed)
-
             settingViewModel.saveWindPreference(windSpeed)
             Toast.makeText(requireContext(), "Wind speed unit: $windSpeed", Toast.LENGTH_SHORT)
                 .show()
@@ -122,6 +143,7 @@ class SettingFragment : Fragment() {
                 setLocale(it, lang)
                 // Only call recreate() if 'context' is an instance of Activity
                 if (it is Activity) {
+                    findNavController().popBackStack(R.id.homeFragment, false)
                     it.recreate()
                 }
             } // change the language in the all application
