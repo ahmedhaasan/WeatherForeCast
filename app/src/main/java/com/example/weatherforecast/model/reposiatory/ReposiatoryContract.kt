@@ -43,7 +43,7 @@ interface ReposiatoryContract {
     /**
      *      lets start with alarm
      */
-    suspend fun insert(alarm: AlarmEntity)
+    suspend fun insertAlarmLocally(alarm: AlarmEntity)
     suspend fun deleteAlarm(alarm: AlarmEntity)
     fun getAllAlarms(): Flow<List<AlarmEntity>>
 

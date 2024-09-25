@@ -9,6 +9,9 @@ object Constants {
     const val   ERROR :String = "error"
     const val   SUCCESS :String = "SUCCESS"
     const val    My_LOCATION_PERMISSION_ID = 5005
+    const val REQUEST_OVERLAY_PERMISSION_CODE = 102
+    const val REQUEST_NOTIFICATION_PERMISSION_CODE = 101
+
 
     // needed for settings
     const val ENGLISH = "en"
@@ -23,6 +26,11 @@ object Constants {
     const val MapCaller = "MapCaller"
     const val FAVORITESCREEN = "FAVORITE"
     const val SETTINGSCREEN = "SETTING"
+
+    const val NOTIFICATION = "notification"
+    const val ALERT = "alert"
+    const val ENABLED = "enabled"
+    const val DISABLED = "DISABLED"
 
 
 

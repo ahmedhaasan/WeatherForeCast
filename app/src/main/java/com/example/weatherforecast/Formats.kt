@@ -1,5 +1,8 @@
 package com.example.weatherforecast
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.location.Geocoder
 import android.os.Build
 import android.util.Log
 import android.widget.ImageView
@@ -9,10 +12,14 @@ import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.FiveDayResponse
 import com.example.weatherforecast.model.pojos.HourlyWeather
 import com.example.weatherforecast.model.pojos.WeatherResponse
+import java.text.SimpleDateFormat
 
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 fun setIcon(id: String, iv: ImageView) {
     when (id) {
@@ -187,4 +194,49 @@ fun mapDailyWeather(response: FiveDayResponse): List<DailyWeather> {
     }
 
     return dailyMap.values.toList()
+}
+
+
+// very improtant functions to me
+
+fun formatMillisToDateTimeString(dateTimeInMillis: Long, pattern: String): String {
+    val resultFormat = SimpleDateFormat(pattern, Locale.getDefault())
+    val date = Date(dateTimeInMillis)
+    return resultFormat.format(date)
+}
+
+fun dateTimeStringToMillis(date: String, time: String): Long {
+    val dateTimeFormat = SimpleDateFormat("dd MMM yyyy hh:mm a", Locale.getDefault())
+    val dateTimeString = "$date $time"
+    val dateTime = dateTimeFormat.parse(dateTimeString)
+    return dateTime?.time ?: -1
+}
+
+fun formatHourMinuteToString(hour: Int, minute: Int): String {
+    val calendar = Calendar.getInstance()
+    calendar.set(Calendar.HOUR_OF_DAY, hour)
+    calendar.set(Calendar.MINUTE, minute)
+    val dateFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+    return dateFormat.format(calendar.time)
+}
+
+
+@SuppressLint("SetTextI18n")
+fun setLocationNameByGeoCoder(weatherResponse: CurrentWeatherEntity, context: Context): String {
+    try {
+        val x =
+            Geocoder(context).getFromLocation(
+                weatherResponse.lat,
+                weatherResponse.lon,
+                5
+            )
+
+        return if (x != null && x[0].locality != null) {
+            x[0].locality
+        } else {
+            weatherResponse.date.toString()
+        }
+    } catch (e: Exception) {
+        return weatherResponse.toString()
+    }
 }

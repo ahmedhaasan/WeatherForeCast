@@ -4,12 +4,21 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.Favorite
 import com.example.weatherforecast.model.pojos.HourlyWeather
 
-@Database(entities = arrayOf(CurrentWeatherEntity::class,HourlyWeather::class,DailyWeather::class,Favorite::class), version = 1 ,exportSchema = false)
+@Database(
+    entities = arrayOf(
+        CurrentWeatherEntity::class,
+        HourlyWeather::class,
+        DailyWeather::class,
+        Favorite::class,
+        AlarmEntity::class
+    ), version = 1, exportSchema = false
+)
 abstract class WeatherDataBase : RoomDatabase() {
     abstract fun getWeatherDao(): WeatherDao
 

@@ -64,6 +64,8 @@
     <string name="ask_for_permission">We can\'t provide location for you right now. Please allow location.</string>
     <string name="add_alarm">Add Alarm</string>
     <string name="alert">Alert</string>
+    <string name="time">Time</string>
+    <string name="date">Date</string>
 
 
 </resources>

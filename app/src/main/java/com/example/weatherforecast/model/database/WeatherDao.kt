@@ -73,6 +73,6 @@ interface WeatherDao {
     @Delete
     suspend fun deleteAlarm(alarm: AlarmEntity)
 
-    @Query("SELECT * FROM alarm_table ORDER BY createdAt DESC")
+    @Query("SELECT * FROM alarm_table")
     fun getAllAlarms(): Flow<List<AlarmEntity>>
 }

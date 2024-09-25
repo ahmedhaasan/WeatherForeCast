@@ -155,12 +155,12 @@ class SettingFragment : Fragment() {
         binding.rgNotification.setOnCheckedChangeListener { _, checkedId ->
             val notification = when (checkedId) {
                 R.id.rb_enable -> {
-                    settingViewModel.saveNotificationPreference("enabled")
+                    settingViewModel.saveNotificationPreference(Constants.ENABLED)
                     getString(R.string.enable)
                 }
 
                 R.id.rb_disable -> {
-                    settingViewModel.saveNotificationPreference("disabled")
+                    settingViewModel.saveNotificationPreference(Constants.DISABLED)
                     getString(R.string.disable)
                 }
 

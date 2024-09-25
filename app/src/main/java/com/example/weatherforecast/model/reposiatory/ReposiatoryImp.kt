@@ -1,5 +1,6 @@
 package com.example.weatherforecast.model.reposiatory
 
+import android.util.Log
 import com.example.weatherforecast.model.local.LocalDataSourceImp
 import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
@@ -105,7 +106,7 @@ class ReposiatoryImp(
     /**
      *
      */
-    override suspend fun insert(alarm: AlarmEntity) {
+    override suspend fun insertAlarmLocally(alarm: AlarmEntity) {
        local.insertAlarm(alarm)
     }
 
@@ -114,6 +115,8 @@ class ReposiatoryImp(
     }
 
     override fun getAllAlarms(): Flow<List<AlarmEntity>> {
-       return local.getAllAlarms()
+        val alarms = local.getAllAlarms()
+        Log.d("Repository", "Fetched alarms: $alarms")
+        return alarms
     }
 }

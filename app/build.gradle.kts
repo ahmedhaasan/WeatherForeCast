@@ -116,6 +116,10 @@ dependencies {
     //Work Manager
     implementation("androidx.work:work-runtime:2.9.1")
 
+    // easy permissinos for alarm
+    implementation ("pub.devrel:easypermissions:3.0.0")
+
+
 
 
 
