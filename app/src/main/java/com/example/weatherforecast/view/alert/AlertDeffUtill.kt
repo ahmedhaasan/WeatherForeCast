@@ -5,7 +5,7 @@ import com.example.weatherforecast.model.pojos.AlarmEntity
 
 class AlertDeffUtill : DiffUtil.ItemCallback<AlarmEntity>() {
     override fun areItemsTheSame(oldItem: AlarmEntity, newItem: AlarmEntity): Boolean {
-        return oldItem.time == newItem.time
+        return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: AlarmEntity, newItem: AlarmEntity): Boolean {

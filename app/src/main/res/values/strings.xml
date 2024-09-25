@@ -66,6 +66,7 @@
     <string name="alert">Alert</string>
     <string name="time">Time</string>
     <string name="date">Date</string>
+    <string name="ZoneName">Zone name</string>
 
 
 </resources>

@@ -4,6 +4,16 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#aeb6bf</color>
     <color name="sky">#3498db</color>
+    <color name="coral">#FF6F61</color>
+    <color name="sunset_orange">#FF4500</color>
+    <color name="golden_yellow">#FFC107</color>
+    <color name="mint_green">#2ECC71</color>
+    <color name="lavender">#E6E6FA</color>
+    <color name="plum">#8E44AD</color>
+    <color name="charcoal">#34495E</color>
+    <color name="turquoise">#1ABC9C</color>
+    <color name="crimson">#DC143C</color>
+    <color name="steel_blue">#4682B4</color>
     <!-- Custom Colors -->
     <color name="your_color">#FF5733</color> <!-- Replace with your desired color -->
 

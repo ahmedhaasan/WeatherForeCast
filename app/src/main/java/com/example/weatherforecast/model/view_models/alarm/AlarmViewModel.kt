@@ -20,9 +20,8 @@ class AlarmViewModel(val repo : ReposiatoryImp) :ViewModel() {
     /**
      *      start with alarm view model
      */
-    private val _alarmsMutableStateFlow: MutableStateFlow<List<AlarmEntity>> =
-        MutableStateFlow(emptyList())
-    val alarmsStateFlow= _alarmsMutableStateFlow
+    private val _alarmsStateFlow = MutableStateFlow<List<AlarmEntity>>(emptyList())
+    val alarmsStateFlow: StateFlow<List<AlarmEntity>> = _alarmsStateFlow
 
 
     private val _currentWeatherState = MutableStateFlow<WeatherApiState>(WeatherApiState.Loading())
@@ -65,7 +64,7 @@ class AlarmViewModel(val repo : ReposiatoryImp) :ViewModel() {
             repo.getAllAlarms().collect{ alarms ->
                 Log.d("ViewModel", "Alarms from DB: $alarms")
 
-                _alarmsMutableStateFlow.value = alarms
+                _alarmsStateFlow.value = alarms
             }
         }
     }

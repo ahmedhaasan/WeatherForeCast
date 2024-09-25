@@ -22,6 +22,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.databinding.AlertDialogBinding
 import com.example.weatherforecast.databinding.FragmentAlertBinding
@@ -50,18 +51,18 @@ import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.EasyPermissions
 import java.util.Calendar
 
-class AlertFragment : Fragment(),EasyPermissions.PermissionCallbacks { // important note
+class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // important note
 
 
     //
     lateinit var settingViewModel: SettingViewModel
-    lateinit var binding : FragmentAlertBinding
+    lateinit var binding: FragmentAlertBinding
     private lateinit var dialogAlertBinding: AlertDialogBinding
 
     private lateinit var alarmAdapter: AlarmAdapter  // alert adapter
 
 
-    lateinit var  alarmViewModel: AlarmViewModel
+    lateinit var alarmViewModel: AlarmViewModel
 
     private var currentLatitude: Double = 0.0
     private var currentLongitude: Double = 0.0
@@ -70,8 +71,6 @@ class AlertFragment : Fragment(),EasyPermissions.PermissionCallbacks { // import
     var isNotificationEnabled = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        alarmViewModel.getAllAlarmsLocally()  // observe on data befor access it
-        alarmViewModel.getCurrentWeatherLocally()
 
     }
 
@@ -80,7 +79,7 @@ class AlertFragment : Fragment(),EasyPermissions.PermissionCallbacks { // import
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = FragmentAlertBinding.inflate(inflater,container,false)
+        binding = FragmentAlertBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -92,30 +91,42 @@ class AlertFragment : Fragment(),EasyPermissions.PermissionCallbacks { // import
         alarmAdapter = AlarmAdapter()
         binding.alertRecycler.adapter = alarmAdapter
 
+        binding.alertRecycler.apply {
+            adapter = alarmAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+
         // creating instance form alarmViewModel
         val db = WeatherDataBase.getInstance(requireContext())
         val dao = db.getWeatherDao()
         val repo = ReposiatoryImp(RemoteDataSourceImp(), LocalDataSourceImp(dao))
         val factory = AlarmFactory(repo)
         // now view Model
-        alarmViewModel = ViewModelProvider(this, factory).get(AlarmViewModel::class.java)
+        alarmViewModel = ViewModelProvider(
+            requireActivity(),
+            factory
+        ).get(AlarmViewModel::class.java) // take care her to listen to alarms in db
         settingViewModel = ViewModelProvider(requireActivity()).get(SettingViewModel::class.java)
 
 
         //  step 1 listen if notification is Enabled
-        settingViewModel.notificationSetting.observe(viewLifecycleOwner, Observer {  notificationStatus ->
-            val value  = if(notificationStatus==Constants.ENABLED) true else false
-            this.isNotificationEnabled = value  // check if the notification is enabled or not
+        settingViewModel.notificationSetting.observe(
+            viewLifecycleOwner,
+            Observer { notificationStatus ->
+                val value = if (notificationStatus == Constants.ENABLED) true else false
+                this.isNotificationEnabled = value  // check if the notification is enabled or not
 
-        })
-
-
+            })
         setListeners() // listen when the add button is pressed
+
+        alarmViewModel.getAllAlarmsLocally()  // observe on data befor access it
+        alarmViewModel.getCurrentWeatherLocally()
+
 
         binding.alertRecycler
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                alarmViewModel.currentWeatherState.collectLatest {
+                alarmViewModel.currentWeatherState.collect() {
                     if (it is WeatherApiState.Success) {
                         currentLatitude = it.currentWeather.lat
                         currentLongitude = it.currentWeather.lon
@@ -126,29 +137,23 @@ class AlertFragment : Fragment(),EasyPermissions.PermissionCallbacks { // import
                 }
             }
         }
+
         //
+
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 alarmViewModel.alarmsStateFlow.collect { alarms ->
+                    Log.d("Fragment", "Collected alarms: $alarms") // Log alarms here
                     if (alarms.isEmpty()) {
-                        Log.d("Alarms", "Received alarms: $alarms")
-                        Log.d("ViewModel", "Alarms from DB: $alarms")
-
-                        /*     binding.lvNoFavourites.visibility = View.VISIBLE
-                             binding.rvAlerts.visibility = View.GONE*/
+                        Log.d("Fragment", "No alarms in DB")
                     } else {
-                        /*  binding.lvNoFavourites.visibility = View.GONE
-                          binding.rvAlerts.visibility = View.VISIBLE*/
-                        val gotAlarms = alarms
+                        Log.d("Fragment", "Alarms received: $alarms")
                         alarmAdapter.submitList(alarms)
                     }
                 }
             }
-            // observe on current weather to get the lat and lon and  city name
-
-
-
-        }}
+        }
+    }
 
 
     // here if notification is not enabled from setting will ask user to enable it frist
@@ -162,11 +167,14 @@ class AlertFragment : Fragment(),EasyPermissions.PermissionCallbacks { // import
                     requestNotificationPermission(requireActivity())
                 }
             } else {
-                Toast.makeText(context,"You need to enable notifications from settings first",Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    "You need to enable notifications from settings first",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
-
 
 
     private fun showWeatherAlertDialog() {
@@ -184,7 +192,7 @@ class AlertFragment : Fragment(),EasyPermissions.PermissionCallbacks { // import
         dialogAlertBinding.tvFromTimeDialog.text =
             formatMillisToDateTimeString(currentTimeInMillis + 60 * 1000, "hh:mm a")
         dialogAlertBinding.cvAlarmTime.setOnClickListener {
-            showDatePicker()
+            showDatePicker()  // when press to select day and time
         }
 
         dialogAlertBinding.btnSaveDialog.setOnClickListener {
@@ -196,14 +204,20 @@ class AlertFragment : Fragment(),EasyPermissions.PermissionCallbacks { // import
 
             if (time > currentTimeInMillis) { // when time greater than current time
                 val kindId = dialogAlertBinding.radioGroupAlertDialog.checkedRadioButtonId
-
                 val kind =
                     if (kindId == dialogAlertBinding.radioAlert.id)
                         Constants.ALERT
                     else Constants.NOTIFICATION
 
                 val weatherAlarm =   // create an instance of the alarm
-                    AlarmEntity(id= 0,time, kind, currentLatitude, currentLongitude, currentZoneName)
+                    AlarmEntity(
+                        id = 0,
+                        time,
+                        kind,
+                        currentLatitude,
+                        currentLongitude,
+                        currentZoneName
+                    )
 
                 if (kind == Constants.ALERT && !Settings.canDrawOverlays(requireContext())) {
                     requestOverlayPermission()
