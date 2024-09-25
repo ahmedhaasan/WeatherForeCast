@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.mapDailyWeather
-import com.example.weatherforecast.mapHourlyWeatherForToday
+import com.example.weatherforecast.mapHourlyWeatherForTwoDays
 import com.example.weatherforecast.mapWeatherResponseToEntity
 import com.example.weatherforecast.model.apistate.DailyApiState
 import com.example.weatherforecast.model.apistate.FavoriteRoomState
@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
  */
 class FavoriteViewModel(val repo: ReposiatoryImp) : ViewModel() {
 
-    private val _favoriteState = MutableStateFlow<FavoriteRoomState>(FavoriteRoomState.Loading())
+    private val _favoriteState = MutableStateFlow<FavoriteRoomState>(FavoriteRoomState.Empty())
     val favoriteState = _favoriteState
 
     private val _currentWeatherState = MutableStateFlow<WeatherApiState>(WeatherApiState.Loading())
@@ -69,7 +69,7 @@ class FavoriteViewModel(val repo: ReposiatoryImp) : ViewModel() {
                 repo.getFiveDayWeather(lat, lon, lang, unit)
                     ?.catch { error -> _hourlyWeatherState.value = HourlyApiState.Failure(error) }
                     ?.map { fiveDaily -> // map the five Daily into Hourly
-                        mapHourlyWeatherForToday(fiveDaily)
+                        mapHourlyWeatherForTwoDays(fiveDaily)
                     }?.collect { hourly ->
                         _hourlyWeatherState.value = HourlyApiState.Success(hourly)
                         repo.insertHourlyWeatherLocally(hourly) // then add the new one

@@ -123,27 +123,27 @@ fun mapHourlyWeatherForToday(response: FiveDayResponse): List<HourlyWeatherEntit
 */
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun mapHourlyWeatherForToday(response: FiveDayResponse): List<HourlyWeather> {
-    // Get the current date in the timezone
+fun mapHourlyWeatherForTwoDays(response: FiveDayResponse): List<HourlyWeather> {
+    // Get the current date and the next date in the timezone
     val currentDate = LocalDate.now(ZoneId.systemDefault())
+    val nextDate = currentDate.plusDays(1)
 
-    // Find hourly data for today
-    val hourlyDataForToday = response.list.filter { item ->
+    // Find hourly data for today and the next day
+    val hourlyDataForTwoDays = response.list.filter { item ->
         val forecastDate = Instant.ofEpochSecond(item.dt)
             .atZone(ZoneId.systemDefault())
             .toLocalDate()
-        forecastDate == currentDate
+        forecastDate == currentDate || forecastDate == nextDate
     }
 
-    // Check if there is data for today
-    if (hourlyDataForToday.isEmpty()) {
-        Log.i(Constants.ERROR, "No hourly data available for today")
-        // Handle the case where there is no data for today
-        // For example, you could return a default message or use the next day's data
-        // return empty list or default data
+    // Check if there is data for today or the next day
+    if (hourlyDataForTwoDays.isEmpty()) {
+        Log.i(Constants.ERROR, "No hourly data available for today or tomorrow")
+        // Handle the case where there is no data for today or tomorrow
+        return emptyList()
     }
 
-    return hourlyDataForToday.map { item ->
+    return hourlyDataForTwoDays.map { item ->
         HourlyWeather(
             day = item.dt, // timestamp in seconds
             icon = item.weather[0].icon,
@@ -151,6 +151,7 @@ fun mapHourlyWeatherForToday(response: FiveDayResponse): List<HourlyWeather> {
         )
     }
 }
+
 
 
 

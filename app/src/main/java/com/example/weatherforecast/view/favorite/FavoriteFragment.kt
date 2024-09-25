@@ -150,18 +150,22 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
                 favoriteViewModel.favoriteState.collect { favorites ->
                     when (favorites) {
                         is FavoriteRoomState.Loading -> {
-                            fav_binding.favProgressBar.visibility = View.VISIBLE
                             fav_binding.favoriteRecycler.visibility = View.GONE
                             fav_binding.lvNoFavourites.visibility = View.GONE
+                            // Optionally show a loading indicator here
                         }
-
                         is FavoriteRoomState.Success -> {
-                            fav_binding.lvNoFavourites.visibility = View.GONE
-                            fav_binding.favProgressBar.visibility = View.GONE
-                            fav_binding.favoriteRecycler.visibility = View.VISIBLE
-                            favoriteAdapter.submitList(favorites.favorites)
+                            if (favorites.favorites.isEmpty()) {
+                                // Show no favorites view
+                                fav_binding.lvNoFavourites.visibility = View.VISIBLE
+                                fav_binding.favoriteRecycler.visibility = View.GONE
+                            } else {
+                                // Show the recycler view
+                                fav_binding.lvNoFavourites.visibility = View.GONE
+                                fav_binding.favoriteRecycler.visibility = View.VISIBLE
+                                favoriteAdapter.submitList(favorites.favorites)
+                            }
                         }
-
                         is FavoriteRoomState.Failure -> {
                             Toast.makeText(
                                 requireContext(),
@@ -169,19 +173,16 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-
                         is FavoriteRoomState.Empty -> {
-
+                            // Show no favorites view
                             fav_binding.lvNoFavourites.visibility = View.VISIBLE
                             fav_binding.favoriteRecycler.visibility = View.GONE
-                            fav_binding.favProgressBar.visibility = View.GONE
-
                         }
                     }
-// Process item
                 }
             }
         }
+
 
         /**
          *          now action when press on floating button to select favorite llocation

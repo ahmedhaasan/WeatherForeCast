@@ -1,5 +1,6 @@
 package com.example.weatherforecast.model.reposiatory
 
+import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.Favorite
@@ -39,5 +40,13 @@ interface ReposiatoryContract {
     suspend fun deleteFavoriteLocation(fav_id: String)
     suspend fun getAllFavoriteLocations(): Flow<List<Favorite>>
 
+    /**
+     *      lets start with alarm
+     */
+    suspend fun insert(alarm: AlarmEntity)
+    suspend fun deleteAlarm(alarm: AlarmEntity)
+    fun getAllAlarms(): Flow<List<AlarmEntity>>
 
-}
+
+
+    }

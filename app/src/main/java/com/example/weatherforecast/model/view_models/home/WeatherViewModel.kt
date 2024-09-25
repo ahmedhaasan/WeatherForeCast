@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.mapDailyWeather
-import com.example.weatherforecast.mapHourlyWeatherForToday
+import com.example.weatherforecast.mapHourlyWeatherForTwoDays
 import com.example.weatherforecast.mapWeatherResponseToEntity
 import com.example.weatherforecast.model.apistate.DailyApiState
 import com.example.weatherforecast.model.apistate.HourlyApiState
@@ -68,7 +68,7 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
                 repo.getFiveDayWeather(lat, lon, lang, unit)
                     ?.catch { error -> _hourlyWeatherState.value = HourlyApiState.Failure(error) }
                     ?.map { fiveDaily -> // map the five Daily into Hourly
-                        mapHourlyWeatherForToday(fiveDaily)
+                        mapHourlyWeatherForTwoDays(fiveDaily)
                     }?.collect { hourly ->
                         _hourlyWeatherState.value = HourlyApiState.Success(hourly)
                         repo.insertHourlyWeatherLocally(hourly) // then add the new one

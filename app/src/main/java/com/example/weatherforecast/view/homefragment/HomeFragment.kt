@@ -281,7 +281,8 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                 viewModel.dailyWeatherState.collectLatest { daily ->
                     when (daily) {
                         is DailyApiState.Success -> {
-                            dailyAdapter.submitList(daily.dailyWeatehr)
+                            val updated = daily.dailyWeatehr.drop(1)
+                            dailyAdapter.submitList(updated)
                         }
                         is DailyApiState.Failure -> {
                             Toast.makeText(

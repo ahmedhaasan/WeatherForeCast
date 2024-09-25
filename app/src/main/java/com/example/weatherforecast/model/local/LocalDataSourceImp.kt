@@ -1,6 +1,7 @@
 package com.example.weatherforecast.model.local
 
 import com.example.weatherforecast.model.database.WeatherDao
+import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.Favorite
@@ -53,11 +54,28 @@ class LocalDataSourceImp(val dao: WeatherDao) : LocalDataSourceContract {
         return dao.insertFavoriteLocation(fav_location)
     }
 
-    override suspend fun deleteFavoriteLocation(fav_id: String){
+    override suspend fun deleteFavoriteLocation(fav_id: String) {
         return dao.deleteFavoriteLocation(fav_id)
     }
 
     override suspend fun getAllFavoriteLocations(): Flow<List<Favorite>> {
         return dao.getAllFavoriteLocations()
+    }
+
+
+    /**
+     *      functons from alarm
+     */
+    override suspend fun insertAlarm(alarm: AlarmEntity) {
+        dao.insertAlarm(alarm)
+    }
+
+    override suspend fun deleteAlarm(alarm: AlarmEntity) {
+        dao.deleteAlarm(alarm)
+    }
+
+    override fun getAllAlarms(): Flow<List<AlarmEntity>> {
+
+        return dao.getAllAlarms()
     }
 }

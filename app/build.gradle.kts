@@ -113,6 +113,9 @@ dependencies {
     // refresher
     implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")  // Optional
 
+    //Work Manager
+    implementation("androidx.work:work-runtime:2.9.1")
+
 
 
 

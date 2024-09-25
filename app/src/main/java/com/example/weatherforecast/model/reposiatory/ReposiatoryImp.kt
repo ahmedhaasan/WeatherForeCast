@@ -1,6 +1,7 @@
 package com.example.weatherforecast.model.reposiatory
 
 import com.example.weatherforecast.model.local.LocalDataSourceImp
+import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.Favorite
@@ -98,5 +99,21 @@ class ReposiatoryImp(
 
     override suspend fun getAllFavoriteLocations(): Flow<List<Favorite>> {
         return local.getAllFavoriteLocations()
+    }
+
+
+    /**
+     *
+     */
+    override suspend fun insert(alarm: AlarmEntity) {
+       local.insertAlarm(alarm)
+    }
+
+    override suspend fun deleteAlarm(alarm: AlarmEntity) {
+        local.deleteAlarm(alarm)
+    }
+
+    override fun getAllAlarms(): Flow<List<AlarmEntity>> {
+       return local.getAllAlarms()
     }
 }
