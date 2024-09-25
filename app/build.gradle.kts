@@ -67,6 +67,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.3")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.3")
 
+    implementation ("androidx.core:core-ktx:1.6.0")// or latest version
 
 // CircleImageView (latest stable version)
     implementation("de.hdodenhof:circleimageview:3.1.0")

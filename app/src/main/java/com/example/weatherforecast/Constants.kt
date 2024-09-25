@@ -33,5 +33,11 @@ object Constants {
     const val DISABLED = "DISABLED"
 
 
+    const val WEATHER_ALARM = "weather_alarm"
+    const val NOTIFICATION_ID = 1
+
+
+
+
 
 }
