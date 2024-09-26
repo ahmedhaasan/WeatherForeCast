@@ -1,4 +1,4 @@
-package com.example.weatherforecast.view.alert
+package com.example.weatherforecast.view.alert.view
 
 import android.Manifest
 import android.app.Activity
@@ -24,6 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.Constants
+import com.example.weatherforecast.checkNotificationPermission
 import com.example.weatherforecast.databinding.AlertDialogBinding
 import com.example.weatherforecast.databinding.FragmentAlertBinding
 import com.example.weatherforecast.dateTimeStringToMillis
@@ -37,16 +38,16 @@ import com.example.weatherforecast.model.remote.RemoteDataSourceImp
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import com.example.weatherforecast.model.view_models.alarm.AlarmFactory
 import com.example.weatherforecast.model.view_models.alarm.AlarmViewModel
-import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModelFactory
 import com.example.weatherforecast.model.view_models.setting.SettingViewModel
+import com.example.weatherforecast.requestNotificationPermission
 import com.example.weatherforecast.setLocationNameByGeoCoder
+import com.example.weatherforecast.view.alert.AlarmScheduler
+import com.example.weatherforecast.view.alert.AlarmSchedulerImpl
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.EasyPermissions
 import java.util.Calendar
@@ -54,7 +55,6 @@ import java.util.Calendar
 class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // important note
 
 
-    //
     lateinit var settingViewModel: SettingViewModel
     lateinit var binding: FragmentAlertBinding
     private lateinit var dialogAlertBinding: AlertDialogBinding
@@ -85,12 +85,9 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
         // Initialize the alert adapter
         alarmAdapter = AlarmAdapter()
         binding.alertRecycler.adapter = alarmAdapter
-
         binding.alertRecycler.apply {
             adapter = alarmAdapter
             layoutManager = LinearLayoutManager(context)
@@ -318,20 +315,6 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
     }
 
 
-    /**
-     *        //  easy permissions it is important  ( * Note*)
-     */
-    private fun checkNotificationPermission(context: Context): Boolean {
-        return EasyPermissions.hasPermissions(context, Manifest.permission.POST_NOTIFICATIONS)
-    }
 
-    private fun requestNotificationPermission(activity: Activity) {
-        EasyPermissions.requestPermissions(
-            activity,
-            "We need your permission to show notifications",
-            Constants.REQUEST_NOTIFICATION_PERMISSION_CODE,
-            Manifest.permission.POST_NOTIFICATIONS
-        )
-    }
 
 }

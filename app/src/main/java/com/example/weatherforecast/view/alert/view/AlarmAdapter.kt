@@ -1,12 +1,10 @@
-package com.example.weatherforecast.view.alert
+package com.example.weatherforecast.view.alert.view
 
-import com.example.weatherforecast.databinding.AlertDialogBinding
 import com.example.weatherforecast.formatMillisToDateTimeString
 
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherforecast.databinding.AlertItemBinding

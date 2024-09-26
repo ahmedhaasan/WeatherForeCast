@@ -1,4 +1,4 @@
-package com.example.weatherforecast.view.alert
+package com.example.weatherforecast.view.alert.view
 
 import androidx.recyclerview.widget.DiffUtil
 import com.example.weatherforecast.model.pojos.AlarmEntity

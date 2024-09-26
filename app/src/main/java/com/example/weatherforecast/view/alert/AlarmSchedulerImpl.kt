@@ -8,15 +8,39 @@ import android.content.Intent
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.model.pojos.AlarmEntity
 
-class AlarmSchedulerImpl(private val application: Application) : AlarmScheduler {
-    private val alarmManager = application.getSystemService(AlarmManager::class.java)
+class AlarmSchedulerImpl private constructor(private val application: Application) :
+    AlarmScheduler {
+    private val alarmManager: AlarmManager by lazy {
+        application.getSystemService(AlarmManager::class.java)
+    }
 
     /**
      *      this class Alarm SchedularImp has Two function s create and calcel  alarm
+     *      we make it singltone class
      */
+
+    companion object {
+        private var instance: AlarmSchedulerImpl? = null
+        fun getInstance(application: Application): AlarmSchedulerImpl =
+            instance ?: synchronized(this) {
+                instance ?: AlarmSchedulerImpl(application).also {
+                    instance = it
+                }
+            }
+    }
 
     @SuppressLint("ScheduleExactAlarm")
     override fun create(alarmItem: AlarmEntity) {
+        /* // Check if the OS version is Android 12 or higher and if exact alarm permission is granted
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+             if (!alarmManager.canScheduleExactAlarms()) {
+                 val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                 application.startActivity(intent)
+                 return // Exit early if permission is not granted
+             }
+         }*/
+
         val intent = Intent(application, AlarmReceiver::class.java)
         intent.apply {
             putExtra(
@@ -27,10 +51,10 @@ class AlarmSchedulerImpl(private val application: Application) : AlarmScheduler 
 
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
-            alarmItem.time.toInt().toLong(),
+            alarmItem.time,
             PendingIntent.getBroadcast(
                 application,
-                alarmItem.hashCode(),
+               alarmItem.time.toInt(),
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
@@ -38,12 +62,11 @@ class AlarmSchedulerImpl(private val application: Application) : AlarmScheduler 
 
     }
 
-
     override fun cancel(alarmItem: AlarmEntity) {
         alarmManager.cancel(
             PendingIntent.getBroadcast(
                 application,
-                alarmItem.hashCode(),
+                alarmItem.time.toInt(),
                 Intent(application, AlarmReceiver::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:label="@string/favorite_menu"
-    tools:context=".view.alert.AlertFragment">
+    tools:context=".view.alert.view.AlertFragment">
 
 
     <androidx.recyclerview.widget.RecyclerView
