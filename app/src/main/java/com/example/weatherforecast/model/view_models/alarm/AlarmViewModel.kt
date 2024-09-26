@@ -7,6 +7,7 @@ import com.example.weatherforecast.mapWeatherResponseToEntity
 import com.example.weatherforecast.model.apistate.WeatherApiState
 import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
+import com.example.weatherforecast.view.alert.AlarmScheduler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,8 +27,6 @@ class AlarmViewModel(val repo : ReposiatoryImp) :ViewModel() {
 
     private val _currentWeatherState = MutableStateFlow<WeatherApiState>(WeatherApiState.Loading())
     val currentWeatherState = _currentWeatherState
-
-
 
     // get the currentWeatehrLocally
     fun getCurrentWeatherLocally() {
@@ -56,6 +55,7 @@ class AlarmViewModel(val repo : ReposiatoryImp) :ViewModel() {
     fun deleteAlarmLocally( alarm : AlarmEntity){
         viewModelScope.launch(Dispatchers.IO) {
             repo.deleteAlarm(alarm)
+
         }
     }
 

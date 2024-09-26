@@ -7,6 +7,7 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 
+/*
 class AlarmApp :Application() {
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -23,4 +24,4 @@ class AlarmApp :Application() {
         )
         notificationManager.createNotificationChannel(channel)
     }
-}
+}*/

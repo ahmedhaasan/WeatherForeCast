@@ -1,9 +1,6 @@
 package com.example.weatherforecast.view.alert.view
 
-import android.Manifest
-import android.app.Activity
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -43,6 +40,7 @@ import com.example.weatherforecast.requestNotificationPermission
 import com.example.weatherforecast.setLocationNameByGeoCoder
 import com.example.weatherforecast.view.alert.AlarmScheduler
 import com.example.weatherforecast.view.alert.AlarmSchedulerImpl
+import com.example.weatherforecast.view.alert.NotificationManager
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -58,15 +56,17 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
     lateinit var settingViewModel: SettingViewModel
     lateinit var binding: FragmentAlertBinding
     private lateinit var dialogAlertBinding: AlertDialogBinding
-
     private lateinit var alarmAdapter: AlarmAdapter  // alert adapter
-
-
     lateinit var alarmViewModel: AlarmViewModel
 
     private var currentLatitude: Double = 0.0
     private var currentLongitude: Double = 0.0
     private var currentZoneName = ""
+
+    /**
+     *      instance from alarm Schedular to use in create and calcel alarm
+     */
+    lateinit var  alarmScheduler: AlarmScheduler
 
     var isNotificationEnabled = false
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +85,11 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        NotificationManager.createNotificationChannel(requireContext())  // notification Channerl
         // Initialize the alert adapter
+
+        alarmScheduler = AlarmSchedulerImpl.getInstance(requireActivity().application)
         alarmAdapter = AlarmAdapter()
         binding.alertRecycler.adapter = alarmAdapter
         binding.alertRecycler.apply {
@@ -222,6 +226,7 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
                 }
 
                 alarmViewModel.insertAlarmLocally(weatherAlarm)
+               alarmScheduler.create(weatherAlarm) // create an alarm
 
                 dialog.dismiss()
             } else {
@@ -313,8 +318,6 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
                 .show()
         }
     }
-
-
 
 
 }

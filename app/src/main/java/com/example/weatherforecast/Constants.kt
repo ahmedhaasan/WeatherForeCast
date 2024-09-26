@@ -35,6 +35,12 @@ object Constants {
 
     const val WEATHER_ALARM = "weather_alarm"
     const val NOTIFICATION_ID = 1
+    const val CHANNEL_ID = "123"
+    const val CHANNEL_NAME= "weather"
+    const val CHANNEL_DESCRIPTION = "weather notification"
+    const val WEATHER_STATUS = "Weather Status Today "
+
+
 
 
 
