@@ -54,7 +54,7 @@ class ReposiatoryImpTest {
     )
 
     // for current Weatehr
-    val currentWeather = CurrentWeatherEntity(
+    val fakeCurrentWeather = CurrentWeatherEntity(
         city = "New York",
         temperature = 25.3,
         weatherStatus = "Clear",
@@ -78,14 +78,14 @@ class ReposiatoryImpTest {
     // setUP
     @Before
     fun intializeObjects() {
-        fakeLocalDataSource = FakeLocalDataSource(fakeFavoriteList, fakeAlarmList, currentWeather)
+        fakeLocalDataSource = FakeLocalDataSource(fakeFavoriteList, fakeAlarmList, fakeCurrentWeather)
         fakeRemoteDataSource = FakeRemoteDataSource()
         repo = ReposiatoryImp(fakeRemoteDataSource, fakeLocalDataSource)  // take care of this part
     }
 
+    // test to get all favorites
     @Test
     fun getFavorites_listFavoriteParam_gotFlowFavorites() = runTest {
-
         // when part
         // Act
         // frist here collect the frist value and completes the flow
@@ -94,6 +94,30 @@ class ReposiatoryImpTest {
 
         // then
         Assert.assertEquals(favouritePlaces,fakeFavoriteList)
+    }
+
+
+    // test to get all alarms
+    @Test
+    fun getAlarms_listOfAlarms_gotFlowAlarms() = runTest{
+        // when
+        val alarmsFlow = repo.getAllAlarms()
+        val alarmResults = alarmsFlow.first()
+        // then
+        Assert.assertEquals(alarmResults,fakeAlarmList)
+    }
+
+
+    // test to get the current weather
+
+    @Test
+    fun getCurrentWeather_oneCurrent_gotOneCurrent() = runTest{
+
+        // when
+        val currentFlow = repo.getCurrentLocalWeather()
+        val weather = currentFlow.first()
+        // then part
+        Assert.assertEquals(weather,fakeCurrentWeather)
     }
 
 

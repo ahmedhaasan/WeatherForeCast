@@ -118,7 +118,6 @@ class ReposiatoryImp(
 
     override fun getAllAlarms(): Flow<List<AlarmEntity>> {
         val alarms = local.getAllAlarms()
-        Log.d("Repository", "Fetched alarms: $alarms")
         return alarms
     }
 }
