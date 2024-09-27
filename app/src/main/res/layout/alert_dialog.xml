@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:backgroundTint="@color/sky"
+    android:background="@drawable/gradient_background"
     app:cardCornerRadius="20dp"
     app:cardElevation="3dp"
     app:cardUseCompatPadding="true"
@@ -13,6 +13,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:background="@drawable/gradient_background"
         android:layout_height="match_parent"
         android:paddingVertical="10dp">
 
@@ -20,6 +21,7 @@
             android:id="@+id/title_alert_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_bold_italic"
             android:text="@string/add_alarm"
             android:textColor="@color/black"
             android:textSize="25sp"
@@ -33,7 +35,7 @@
             android:id="@+id/cv_alarm_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/black"
+            android:backgroundTint="@color/sky"
             android:clickable="true"
             app:cardCornerRadius="25dp"
             app:cardElevation="3dp"
@@ -55,7 +57,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="12:00 AM"
-                    android:textColor="@color/white"
+                    android:fontFamily="@font/poppins_extralight"
+                    android:textColor="@color/black"
                     android:textSize="18sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -65,8 +68,9 @@
                     android:id="@+id/tv_from_date_dialog"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_bold_italic"
                     tools:text="9 SEP 1999"
-                    android:textColor="@color/white"
+                    android:textColor="@color/black"
                     android:textSize="11sp"
                     app:layout_constraintEnd_toEndOf="@id/tv_from_time_dialog"
                     app:layout_constraintStart_toStartOf="@id/tv_from_time_dialog"
@@ -93,7 +97,7 @@
                 android:layout_height="match_parent"
                 android:paddingEnd="20dp"
                 android:text="@string/alert"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 tools:ignore="RtlSymmetry" />
 
             <RadioButton
@@ -101,14 +105,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/notification"
-                android:textColor="@color/white" />
+                android:textColor="@color/black" />
         </RadioGroup>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/btn_save_dialog"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:backgroundTint="@color/black"
+            android:backgroundTint="@color/sky"
             android:clickable="true"
             android:elevation="3dp"
             app:cardCornerRadius="30dp"
@@ -116,14 +120,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/radioGroup_Alert_dialog"
-            app:rippleColor="@color/sky "
             app:strokeWidth="0dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/save"
+                android:text="@string/save_alarm"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherforecast.databinding.AlertItemBinding
 import com.example.weatherforecast.model.pojos.AlarmEntity
 
-class AlarmAdapter : ListAdapter<AlarmEntity, AlarmAdapter.AlarmViewHolder>(AlertDeffUtill()) {
+class AlarmAdapter( val listener : (AlarmEntity)-> Unit) : ListAdapter<AlarmEntity, AlarmAdapter.AlarmViewHolder>(AlertDeffUtill()) {
 
     inner class AlarmViewHolder( val binding: AlertItemBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -30,6 +30,11 @@ class AlarmAdapter : ListAdapter<AlarmEntity, AlarmAdapter.AlarmViewHolder>(Aler
 
         holder.binding.tvFromTime.text =
             formatMillisToDateTimeString(alarm.time, "hh:mm a")
+
+        // action when delete the alarm
+        holder.binding.calcelAlarmButton.setOnClickListener{
+            listener.invoke(alarm)
+        }
     }
 
 

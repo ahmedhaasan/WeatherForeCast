@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecast.mapWeatherResponseToEntity
+import com.example.weatherforecast.model.apistate.AlarmState
 import com.example.weatherforecast.model.apistate.WeatherApiState
 import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
@@ -13,16 +14,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEmpty
 import kotlinx.coroutines.launch
 
 class AlarmViewModel(val repo : ReposiatoryImp) :ViewModel() {
 
+    lateinit var  alarmScheduler: AlarmScheduler
 
     /**
      *      start with alarm view model
      */
-    private val _alarmsStateFlow = MutableStateFlow<List<AlarmEntity>>(emptyList())
-    val alarmsStateFlow: StateFlow<List<AlarmEntity>> = _alarmsStateFlow
+    private val _alarmsStateFlow = MutableStateFlow<AlarmState>(AlarmState.Loading())
+    val alarmsStateFlow= _alarmsStateFlow
 
 
     private val _currentWeatherState = MutableStateFlow<WeatherApiState>(WeatherApiState.Loading())
@@ -52,20 +55,30 @@ class AlarmViewModel(val repo : ReposiatoryImp) :ViewModel() {
         }
     }
 
-    fun deleteAlarmLocally( alarm : AlarmEntity){
+    fun deleteAlarmLocally( alarm_id : Int){
         viewModelScope.launch(Dispatchers.IO) {
-            repo.deleteAlarm(alarm)
+            repo.deleteAlarm(alarm_id)
 
         }
     }
 
-    fun getAllAlarmsLocally(){
+    fun getAllAlarmsLocally() {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.getAllAlarms().collect{ alarms ->
-                Log.d("ViewModel", "Alarms from DB: $alarms")
+            repo.getAllAlarms()
+                .catch { error ->
+                    _alarmsStateFlow.value = AlarmState.Failure(error)
+                }
+                .collect { alarms ->
+                    Log.d("ViewModel", "Alarms from DB: $alarms")
 
-                _alarmsStateFlow.value = alarms
-            }
+                    // Check if the alarms list is empty
+                    if (alarms.isEmpty()) {
+                        _alarmsStateFlow.value = AlarmState.Empty()
+                    } else {
+                        _alarmsStateFlow.value = AlarmState.Success(alarms)
+                    }
+                }
         }
     }
+
 }

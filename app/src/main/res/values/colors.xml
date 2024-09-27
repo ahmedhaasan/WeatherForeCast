@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
     <color name="gray">#aeb6bf</color>
     <color name="sky">#3498db</color>
     <color name="coral">#FF6F61</color>
@@ -14,11 +13,15 @@
     <color name="turquoise">#1ABC9C</color>
     <color name="crimson">#DC143C</color>
     <color name="steel_blue">#4682B4</color>
+    <color name="primaryColor">#008080</color>
+    <color name="primaryColorDark">#005f5f</color>
+    <color name="accent">#FF4081</color>
+    <color name="white">#FFFFFF</color>
     <!-- Custom Colors -->
-    <color name="your_color">#FF5733</color> <!-- Replace with your desired color -->
+    <color name="your_color">#FF5733</color>
 
     <!-- Card Background Colors -->
-    <color name="card_background_color">#007BFF</color> <!-- A vibrant blue -->
-    <color name="card_background_color2">#F5F5F5</color> <!-- A light gray -->
-    <color name="card_background_color3">#003366</color> <!-- A deep navy blue -->
+    <color name="card_background_color">#007BFF</color>
+    <color name="card_background_color2">#F5F5F5</color>
+    <color name="card_background_color3">#003366</color>
 </resources>

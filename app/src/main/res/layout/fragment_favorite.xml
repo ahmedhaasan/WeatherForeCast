@@ -40,6 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:indeterminateTint="@color/sky"
         android:layout_margin="148dp"
         android:indeterminate="true"
         android:visibility="gone"

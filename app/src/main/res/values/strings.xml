@@ -67,6 +67,11 @@
     <string name="time">Time</string>
     <string name="date">Date</string>
     <string name="ZoneName">Zone name</string>
+    <string name="cityName">City Name</string>
+    <string name="weatherAlarm">Weather Alarm</string>
+    <string name="weatherStatus">"Weather Status "</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="save_alarm">Save Now</string>
 
 
 </resources>

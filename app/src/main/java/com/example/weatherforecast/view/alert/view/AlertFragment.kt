@@ -1,5 +1,6 @@
 package com.example.weatherforecast.view.alert.view
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -27,6 +28,7 @@ import com.example.weatherforecast.databinding.FragmentAlertBinding
 import com.example.weatherforecast.dateTimeStringToMillis
 import com.example.weatherforecast.formatHourMinuteToString
 import com.example.weatherforecast.formatMillisToDateTimeString
+import com.example.weatherforecast.model.apistate.AlarmState
 import com.example.weatherforecast.model.apistate.WeatherApiState
 import com.example.weatherforecast.model.database.WeatherDataBase
 import com.example.weatherforecast.model.local.LocalDataSourceImp
@@ -44,8 +46,11 @@ import com.example.weatherforecast.view.alert.NotificationManager
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.EasyPermissions
 import java.util.Calendar
@@ -66,7 +71,7 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
     /**
      *      instance from alarm Schedular to use in create and calcel alarm
      */
-    lateinit var  alarmScheduler: AlarmScheduler
+    lateinit var alarmScheduler: AlarmScheduler
 
     var isNotificationEnabled = false
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +95,10 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
         // Initialize the alert adapter
 
         alarmScheduler = AlarmSchedulerImpl.getInstance(requireActivity().application)
-        alarmAdapter = AlarmAdapter()
+        alarmAdapter = AlarmAdapter() { alarm ->
+
+            deleteTheAlarm(alarm)
+        }
         binding.alertRecycler.adapter = alarmAdapter
         binding.alertRecycler.apply {
             adapter = alarmAdapter
@@ -143,14 +151,36 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                alarmViewModel.alarmsStateFlow.collect { alarms ->
-                    Log.d("Fragment", "Collected alarms: $alarms") // Log alarms here
-                    if (alarms.isEmpty()) {
-                        Log.d("Fragment", "No alarms in DB")
-                    } else {
-                        Log.d("Fragment", "Alarms received: $alarms")
-                        alarmAdapter.submitList(alarms)
+                alarmViewModel.alarmsStateFlow.collectLatest{ results ->
+
+                    when (results) {
+                        is AlarmState.Success -> {
+                            binding.alarmProgressBar.visibility = View.GONE
+                            binding.alertRecycler.visibility = View.VISIBLE
+                            binding.lvNoAlarms.visibility = View.GONE
+                            alarmAdapter.submitList(results.alarms)
+                            Log.d("Fragment", "Alarms received: ${results.alarms}")
+
+                        }
+
+                        is AlarmState.Failure -> {
+                            Toast.makeText(
+                                context,
+                                "error got alarms : ${results.msg}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        is AlarmState.Loading  -> {
+                            binding.alarmProgressBar.visibility = View.VISIBLE
+
+                        }
+                        is AlarmState.Empty  -> {
+                            binding.alarmProgressBar.visibility = View.GONE
+                            binding.alertRecycler.visibility = View.GONE
+                            binding.lvNoAlarms.visibility = View.VISIBLE
+                        }
                     }
+
                 }
             }
         }
@@ -210,7 +240,7 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
                         Constants.ALERT
                     else Constants.NOTIFICATION
 
-                val weatherAlarm =   // create an instance of the alarm
+                val weatherAlarm =   // create an instance of the alarm with this data
                     AlarmEntity(
                         id = 0,
                         time,
@@ -226,7 +256,7 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
                 }
 
                 alarmViewModel.insertAlarmLocally(weatherAlarm)
-               alarmScheduler.create(weatherAlarm) // create an alarm
+                alarmScheduler.create(weatherAlarm) // create an alarm
 
                 dialog.dismiss()
             } else {
@@ -317,6 +347,32 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
             Toast.makeText(requireContext(), "Notification permission denied", Toast.LENGTH_SHORT)
                 .show()
         }
+    }
+
+    fun deleteTheAlarm(alarm: AlarmEntity) {
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle("Delete Favorite")
+            setMessage("Are you sure you want to delete the location ${alarm.zoneName} :Alarm ?")
+            setPositiveButton("Yes") { _, _ ->
+                // If user confirms, delete the location
+                alarmViewModel.deleteAlarmLocally(alarm.id.toInt()) // now deleted
+                alarmScheduler.cancel(alarm)
+                Snackbar.make(
+                    requireView(),
+                    "Deleted Location ${alarm.zoneName}",
+                    Snackbar.LENGTH_LONG
+                ).apply {
+                    setAction("Undo") {
+                        alarmViewModel.insertAlarmLocally(alarm)
+                        alarmScheduler.create(alarm)
+                    }
+                    show()
+                }
+            }
+            setNegativeButton("No", null) // Just dismiss the dialog
+            create().show() // Show the dialog
+        }
+
     }
 
 

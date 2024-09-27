@@ -25,11 +25,11 @@ class ReposiatoryImp(
     override suspend fun getCurrentWeatherRemotely(
         lat: Double,
         lon: Double,
-        lang:String,
+        lang: String,
         unit: String
     ): Flow<WeatherResponse> {
         return flow {
-           val current =  remote.getCurrentWeather(lat, lon,lang, unit)
+            val current = remote.getCurrentWeather(lat, lon, lang, unit)
             current?.let { emit(it) } // Emit the list of products
         }
     }
@@ -38,11 +38,11 @@ class ReposiatoryImp(
     override suspend fun getFiveDayWeather(
         lat: Double,
         lon: Double,
-        lang:String,
+        lang: String,
         unit: String
     ): Flow<FiveDayResponse>? {
         return flow {
-            val fiveWeather = remote.getFiveDayWeather(lat, lon,lang, unit)
+            val fiveWeather = remote.getFiveDayWeather(lat, lon, lang, unit)
             fiveWeather?.let { emit(it) }
         }
     }
@@ -107,11 +107,11 @@ class ReposiatoryImp(
      *
      */
     override suspend fun insertAlarmLocally(alarm: AlarmEntity) {
-       local.insertAlarm(alarm)
+        local.insertAlarm(alarm)
     }
 
-    override suspend fun deleteAlarm(alarm: AlarmEntity) {
-        local.deleteAlarm(alarm)
+    override suspend fun deleteAlarm(alarm_id: Int):Int {
+        return local.deleteAlarm(alarm_id)
     }
 
     override fun getAllAlarms(): Flow<List<AlarmEntity>> {
