@@ -354,7 +354,7 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
             setMessage("Are you sure you want to delete the location ${alarm.zoneName} :Alarm ?")
             setPositiveButton("Yes") { _, _ ->
                 // If user confirms, delete the location
-                alarmViewModel.deleteAlarmLocally(alarm.id.toInt()) // now deleted
+                alarmViewModel.deleteAlarmLocally(alarm.time.toInt()) // now deleted
                 alarmScheduler.cancel(alarm)
                 Snackbar.make(
                     requireView(),
