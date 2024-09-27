@@ -36,6 +36,7 @@ class AlarmReceiver : BroadcastReceiver(), NetworkChangeListener {
 
     var connected = true
     override fun onReceive(context: Context, intent: Intent?) {
+
         val alarm = intent?.getSerializableExtra(Constants.WEATHER_ALARM) as? AlarmEntity
         if (alarm == null) {
             Log.e("AlarmReceiver", "AlarmEntity is null")
@@ -47,7 +48,7 @@ class AlarmReceiver : BroadcastReceiver(), NetworkChangeListener {
 
         CoroutineScope(Dispatchers.IO).launch {
             val dao = WeatherDataBase.getInstance(context).getWeatherDao()
-            val rowsDeleted = dao.deleteAlarm(alarm.time.toInt()) // Use a valid ID
+            val rowsDeleted = dao.deleteAlarm(alarm) // Use a valid ID
             Log.d("TestDelete", "Rows deleted: $rowsDeleted")
 
 

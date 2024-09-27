@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:id="@+id/homeLayout"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background"
     android:label="@string/home_menu">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/gradient_background"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
     <ScrollView
@@ -28,7 +28,6 @@
             android:id="@+id/homeScreenView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             >
 
             <TextView
@@ -98,7 +97,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:background="@color/gray"
+                android:background="@drawable/gradient_background"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="8dp"
                 app:layout_constraintTop_toBottomOf="@+id/tv_weather_status">
@@ -107,7 +106,7 @@
 
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/gray"
+                    android:background="@color/sky"
                     android:padding="16dp">
 
                     <!-- Pressure -->
@@ -274,6 +273,7 @@
 
 
             </com.google.android.material.card.MaterialCardView>
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/hours_recycler"

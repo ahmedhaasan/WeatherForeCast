@@ -70,8 +70,8 @@ class LocalDataSourceImp(val dao: WeatherDao) : LocalDataSourceContract {
         dao.insertAlarm(alarm)
     }
 
-    override suspend fun deleteAlarm(alarm_id: Int):Int {
-        return dao.deleteAlarm(alarm_id)
+    override suspend fun deleteAlarm(alarm: AlarmEntity):Int {
+        return dao.deleteAlarm(alarm)
     }
 
     override fun getAllAlarms(): Flow<List<AlarmEntity>> {

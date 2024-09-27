@@ -7,6 +7,7 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
+        android:background="@drawable/gradient_background"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         app:cardCornerRadius="24dp"
@@ -20,51 +21,63 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/gradient_background"
             android:padding="16dp">
 
             <!-- City Name (Zone) -->
+
+            <!-- Main Weather Alarm Text -->
+
             <TextView
                 android:id="@+id/tv_alarm_zone_name"
                 android:layout_width="0dp"
+                android:fontFamily="@font/poppins_bold_italic"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
                 android:text="@string/cityName"
-                android:textSize="24sp"
                 android:textColor="@color/black"
+                android:textSize="24sp"
                 android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="New York" />
 
-            <!-- Main Weather Alarm Text -->
             <TextView
                 android:id="@+id/weather_alarm_mainText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/weatherAlarm"
+                android:textColor="@color/black"
                 android:textSize="30sp"
                 android:textStyle="bold|italic"
-                android:textColor="@color/black"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_alarm_zone_name"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:text="Severe Weather Alert!" />
 
             <!-- Weather Status Message -->
+
+            <!-- Dismiss Button -->
+
             <TextView
                 android:id="@+id/tv_alarm_status"
                 android:layout_width="0dp"
+                android:fontFamily="@font/poppins_semibolditalic"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="@string/weatherStatus"
+                android:textColor="@color/gray"
                 android:textSize="18sp"
                 android:textStyle="italic"
-                android:textColor="@color/gray"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/weather_alarm_mainText"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_alarm_zone_name"
                 tools:text="Clear skies expected" />
 
-            <!-- Dismiss Button -->
             <Button
                 android:id="@+id/dismiss_alarm_button"
                 android:layout_width="wrap_content"

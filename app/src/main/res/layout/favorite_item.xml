@@ -12,6 +12,7 @@
         android:id="@+id/favorite_item_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/gradient_background"
         android:padding="16dp"> <!-- Increased padding -->
 
         <TextView
@@ -19,6 +20,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="City Name"
+            android:fontFamily="@font/poppins_bold_italic"
             android:textColor="@android:color/black"
             android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
