@@ -242,12 +242,11 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
 
                 val weatherAlarm =   // create an instance of the alarm with this data
                     AlarmEntity(
-                        id = 0,
-                        time,
-                        kind,
-                        currentLatitude,
-                        currentLongitude,
-                        currentZoneName
+                        time = time,
+                        type = kind,
+                        latitude = currentLatitude,
+                        longitude = currentLongitude,
+                        zoneName = currentZoneName
                     )
 
                 if (kind == Constants.ALERT && !Settings.canDrawOverlays(requireContext())) {

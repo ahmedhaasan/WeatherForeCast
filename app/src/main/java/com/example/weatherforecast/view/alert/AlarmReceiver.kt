@@ -1,5 +1,6 @@
 package com.example.weatherforecast.view.alert
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -23,6 +24,7 @@ import com.example.weatherforecast.model.database.WeatherDataBase
 import com.example.weatherforecast.model.local.LocalDataSourceImp
 import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.remote.RemoteDataSourceImp
+import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -33,24 +35,21 @@ import kotlinx.coroutines.withContext
 class AlarmReceiver : BroadcastReceiver(), NetworkChangeListener {
 
     var connected = true
-
     override fun onReceive(context: Context, intent: Intent?) {
         val alarm = intent?.getSerializableExtra(Constants.WEATHER_ALARM) as? AlarmEntity
         if (alarm == null) {
             Log.e("AlarmReceiver", "AlarmEntity is null")
             return
         }
+        Log.d("TestDelete", "alarm id befor deleting: $alarm.id")
+
         var defaultMessage = " the weather in the best Condition"
 
         CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val rowsDeleted = LocalDataSourceImp(WeatherDataBase.getInstance(context).getWeatherDao())
-                    .deleteAlarm(alarm.id)
-                Log.d("AlarmReceiver", "Rows deleted: $rowsDeleted")
-                // Proceed with other operations (showing dialog/notification) if needed
-            } catch (e: Exception) {
-                Log.e("AlarmReceiver", "Error deleting alarm: ${e.message}")
-            }
+            val dao = WeatherDataBase.getInstance(context).getWeatherDao()
+            val rowsDeleted = dao.deleteAlarm(alarm.time.toInt()) // Use a valid ID
+            Log.d("TestDelete", "Rows deleted: $rowsDeleted")
+
 
             val apiMessage = getAlertWeatherStatusFromApi(context, alarm)
             if (!apiMessage.isNullOrBlank()) {
@@ -136,6 +135,7 @@ class AlarmReceiver : BroadcastReceiver(), NetworkChangeListener {
     /**'
      *      create a notification
      */
+    @SuppressLint("MissingPermission")
     private fun createNotification(context: Context, defaultMessage: String, zoneName: String) {
         val builder = NotificationManager.createNotification(context, defaultMessage, zoneName)
         with(NotificationManagerCompat.from(context)) {
