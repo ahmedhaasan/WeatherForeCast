@@ -1,5 +1,6 @@
 package com.example.weatherforecast.model.local
 
+import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.Favorite
@@ -32,6 +33,15 @@ interface LocalDataSourceContract {
     suspend fun deleteFavoriteLocation(fav_id: String)
     suspend fun getAllFavoriteLocations(): Flow<List<Favorite>>
 
+
+    /**
+     *  working with alert
+     */
+
+    suspend fun insertAlarm(alarm: AlarmEntity)
+
+    suspend fun deleteAlarm(alarm_id: Int):Int
+    fun getAllAlarms(): Flow<List<AlarmEntity>>
 
 
 }

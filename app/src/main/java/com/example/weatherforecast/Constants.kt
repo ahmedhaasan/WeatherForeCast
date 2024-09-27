@@ -9,19 +9,40 @@ object Constants {
     const val   ERROR :String = "error"
     const val   SUCCESS :String = "SUCCESS"
     const val    My_LOCATION_PERMISSION_ID = 5005
+    const val REQUEST_OVERLAY_PERMISSION_CODE = 102
+    const val REQUEST_NOTIFICATION_PERMISSION_CODE = 101
+
 
     // needed for settings
-    const val GPS = "gps"
-    const val MAP = "map"
-    const val METER_SEC = "meterSec"
-    const val MILE_HOUR = "mileHour"
     const val ENGLISH = "en"
     const val ARABIC = "ar"
-    const val ENABLE = "enable"
-    const val DISABLE = "disable"
     const val CELSIUS = "metric"
     const val KELVIN = "standard"
     const val FAHRENHEIT = "imperial"
+    const val LATITUTE = "latitute"
+    const val LONGITUTE = "longitute"
+     const val LOCATIONPREFRENCES = "LocationPreference"
+    const val LOCATIONFLAG = "LocationFlag"
+    const val MapCaller = "MapCaller"
+    const val FAVORITESCREEN = "FAVORITE"
+    const val SETTINGSCREEN = "SETTING"
+
+    const val NOTIFICATION = "notification"
+    const val ALERT = "alert"
+    const val ENABLED = "enabled"
+    const val DISABLED = "DISABLED"
+
+
+    const val WEATHER_ALARM = "weather_alarm"
+    const val NOTIFICATION_ID = 1
+    const val CHANNEL_ID = "123"
+    const val CHANNEL_NAME= "weather"
+    const val CHANNEL_DESCRIPTION = "weather notification"
+    const val WEATHER_STATUS = "Weather Status Today "
+
+
+
+
 
 
 

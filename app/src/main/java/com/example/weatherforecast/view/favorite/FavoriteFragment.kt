@@ -12,11 +12,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation.findNavController
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.databinding.FragmentFavoriteBinding
 import com.example.weatherforecast.model.database.WeatherDataBase
@@ -25,16 +28,18 @@ import com.example.weatherforecast.model.remote.RemoteDataSourceImp
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModel
 import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModelFactory
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.findNavController
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.R
+import com.example.weatherforecast.model.apistate.FavoriteRoomState
 import com.example.weatherforecast.model.checknetwork.NetworkChangeListener
 import com.example.weatherforecast.model.checknetwork.NetworkChangeReceiver
-import com.example.weatherforecast.model.pojos.Favorite
 import com.example.weatherforecast.model.view_models.home.WeatherViewModel
 import com.example.weatherforecast.model.view_models.home.WeatherViewModelFactory
+import com.example.weatherforecast.model.view_models.setting.SettingViewModel
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 class FavoriteFragment : Fragment(), NetworkChangeListener {
@@ -43,6 +48,7 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
     lateinit var fav_binding: FragmentFavoriteBinding
     lateinit var favoriteAdapter: FavoriteAdapter
     var isConnected: Boolean? = null
+    lateinit var settingViewModel: SettingViewModel
     private lateinit var networkChangeReceiver: NetworkChangeReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +79,8 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
         val factory = FavoriteViewModelFactory(repo)
         // now view Model
         val favoriteViewModel = ViewModelProvider(this, factory).get(FavoriteViewModel::class.java)
+        settingViewModel = ViewModelProvider(requireActivity()).get(SettingViewModel::class.java)
+
 
         /**
          *      intialize home viw model to use when updating the data
@@ -104,27 +112,26 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
                     create().show() // Show the dialog
                 }
             },  // when city is selected
-            onItemSelected = { place -> if (isConnected == true)
-            {
-                val fav_home = Fav_Home()
-                // Create a Bundle and put the necessary data
-                val bundle = Bundle()
-                bundle.putDouble("lat", place.lat)
-                bundle.putDouble("lon", place.lon)
-                // Set the arguments for the fragment
-                fav_home.arguments = bundle
+            onItemSelected = { place ->
+                if (isConnected == true) {
+                    val fav_home = Fav_Home()
+                    // Create a Bundle and put the necessary data
+                    val bundle = Bundle()
+                    bundle.putDouble("lat", place.lat)
+                    bundle.putDouble("lon", place.lon)
+                    // Set the arguments for the fragment
+                    fav_home.arguments = bundle
 
-                // Replace the fragment and add it to the back stack
-                childFragmentManager.beginTransaction()
-                    .replace(R.id.homeFragmentContainer, fav_home)
-                    .addToBackStack(null)
-                    .commit()
-                fav_binding.favoriteFabButton.visibility = View.GONE
+                    // Replace the fragment and add it to the back stack
+                    childFragmentManager.beginTransaction()
+                        .replace(R.id.homeFragmentContainer, fav_home)
+                        .addToBackStack(null)
+                        .commit()
+                    fav_binding.favoriteFabButton.visibility = View.GONE
 
-            }else
-            {
-                showNetworkDialog(requireContext())
-            }
+                } else {
+                    showNetworkDialog(requireContext())
+                }
             }
 
 
@@ -132,30 +139,58 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
 
 
 
-        fav_binding.recyclerView.apply {
+        fav_binding.favoriteRecycler.apply {
             adapter = favoriteAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
         // observe on favorites locally and pass them to the reciclerView
         favoriteViewModel.getAllFavotiteLccations()
-        favoriteViewModel.favorites.observe(viewLifecycleOwner, Observer { favorites ->
-            if (favorites != null) {
-                favoriteAdapter.submitList(favorites)
-                favoriteAdapter.notifyDataSetChanged() // Add this after submitList()
-
-                Log.d("FavoriteFragment", "Favorites list updated: $favorites")
-            } else {
-                Log.d("FavoriteFragment", "No favorites found.")
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                favoriteViewModel.favoriteState.collect { favorites ->
+                    when (favorites) {
+                        is FavoriteRoomState.Loading -> {
+                            fav_binding.favoriteRecycler.visibility = View.GONE
+                            fav_binding.lvNoFavourites.visibility = View.GONE
+                            // Optionally show a loading indicator here
+                        }
+                        is FavoriteRoomState.Success -> {
+                            if (favorites.favorites.isEmpty()) {
+                                // Show no favorites view
+                                fav_binding.lvNoFavourites.visibility = View.VISIBLE
+                                fav_binding.favoriteRecycler.visibility = View.GONE
+                            } else {
+                                // Show the recycler view
+                                fav_binding.lvNoFavourites.visibility = View.GONE
+                                fav_binding.favoriteRecycler.visibility = View.VISIBLE
+                                favoriteAdapter.submitList(favorites.favorites)
+                            }
+                        }
+                        is FavoriteRoomState.Failure -> {
+                            Toast.makeText(
+                                requireContext(),
+                                "Failed to load data: ${favorites.msg.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        is FavoriteRoomState.Empty -> {
+                            // Show no favorites view
+                            fav_binding.lvNoFavourites.visibility = View.VISIBLE
+                            fav_binding.favoriteRecycler.visibility = View.GONE
+                        }
+                    }
+                }
             }
-        })
+        }
+
 
         /**
          *          now action when press on floating button to select favorite llocation
          */
 
         fav_binding.favoriteFabButton.setOnClickListener {
+            settingViewModel.saveMapCallerPrefrence(Constants.FAVORITESCREEN) // who is caller the map
             val action = FavoriteFragmentDirections.actionFavoriteFragmentToMapFragment()
-
             findNavController().navigate(action)
 
         }

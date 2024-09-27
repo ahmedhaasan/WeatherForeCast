@@ -60,7 +60,18 @@
     <string name="weatherState">weatherStatus</string>
     <string name="unit_meter_per_sec">m/s</string>
     <string name="unit_miles_per_hour">mph</string>
-
+    <string name="allow">Allow</string>
+    <string name="ask_for_permission">We can\'t provide location for you right now. Please allow location.</string>
+    <string name="add_alarm">Add Alarm</string>
+    <string name="alert">Alert</string>
+    <string name="time">Time</string>
+    <string name="date">Date</string>
+    <string name="ZoneName">Zone name</string>
+    <string name="cityName">City Name</string>
+    <string name="weatherAlarm">Weather Alarm</string>
+    <string name="weatherStatus">"Weather Status "</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="save_alarm">Save Now</string>
 
 
 </resources>

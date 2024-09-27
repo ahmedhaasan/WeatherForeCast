@@ -1,5 +1,6 @@
 package com.example.weatherforecast.model.reposiatory
 
+import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.Favorite
@@ -10,10 +11,14 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface ReposiatoryContract {
-    suspend fun getCurrentWeatherRemotely(lat :Double,lon:Double,lang:String,unit:String): WeatherResponse?
+
+    /**
+     *  applaiying flow and state Flow
+     */
+    suspend fun getCurrentWeatherRemotely(lat :Double,lon:Double,lang:String,unit:String): Flow<WeatherResponse>?
+    suspend fun getFiveDayWeather(lat :Double , lon :Double ,lang: String, unit :String): Flow<FiveDayResponse>?
     suspend fun getCurrentLocalWeather(): Flow<CurrentWeatherEntity> // use flow when get data remotely
     suspend fun insertCurrentLocalWeather(c_weather:CurrentWeatherEntity):Long
-    suspend fun getFiveDayWeather(lat :Double , lon :Double ,lang: String, unit :String): FiveDayResponse?
 
     // daily and hourly
     suspend fun insertHourlyWeatherLocally(h_weather: List<HourlyWeather>): List<Long>
@@ -35,5 +40,13 @@ interface ReposiatoryContract {
     suspend fun deleteFavoriteLocation(fav_id: String)
     suspend fun getAllFavoriteLocations(): Flow<List<Favorite>>
 
+    /**
+     *      lets start with alarm
+     */
+    suspend fun insertAlarmLocally(alarm: AlarmEntity)
+    suspend fun deleteAlarm(alarm_id: Int):Int
+    fun getAllAlarms(): Flow<List<AlarmEntity>>
 
-}
+
+
+    }

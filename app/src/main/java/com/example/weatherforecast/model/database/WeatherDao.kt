@@ -1,10 +1,12 @@
 package com.example.weatherforecast.model.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 
 import com.example.weatherforecast.model.pojos.DailyWeather
@@ -59,4 +61,18 @@ interface WeatherDao {
     // Get all favorite locations as Flow
     @Query("SELECT * FROM FAVORITELOCATIONS")
     fun getAllFavoriteLocations(): Flow<List<Favorite>>
+
+
+    /**
+     *    // functions for alarm
+     */
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAlarm(alarm: AlarmEntity)
+
+    @Query("DELETE FROM alarm_table WHERE id = :alarm_id")
+    suspend fun deleteAlarm(alarm_id: Int):Int
+
+    @Query("SELECT * FROM alarm_table")
+    fun getAllAlarms(): Flow<List<AlarmEntity>>
 }

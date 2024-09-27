@@ -1,5 +1,7 @@
 package com.example.weatherforecast.view.map
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.location.Geocoder
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,6 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.weatherforecast.Constants
 import com.example.weatherforecast.R
 import com.example.weatherforecast.databinding.FragmentMapBinding
 import com.example.weatherforecast.model.database.WeatherDataBase
@@ -17,11 +22,10 @@ import com.example.weatherforecast.model.remote.RemoteDataSourceImp
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModel
 import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModelFactory
+import com.example.weatherforecast.model.view_models.setting.SettingViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.GeoPoint
@@ -38,11 +42,15 @@ class MapFragment : Fragment() {
     private var lat: Double? = null
     private var lon: Double? = null
     private var cityName: String? = null
+    lateinit var settingViewModel: SettingViewModel
+    lateinit var caller: String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Load OSMDroid configuration
-        Configuration.getInstance().load(requireContext(), requireContext().getSharedPreferences("osmdroid", 0))
+        Configuration.getInstance()
+            .load(requireContext(), requireContext().getSharedPreferences("osmdroid", 0))
 
         // Initialize ViewModel
         val db = WeatherDataBase.getInstance(requireContext())
@@ -50,6 +58,9 @@ class MapFragment : Fragment() {
         val repo = ReposiatoryImp(RemoteDataSourceImp(), LocalDataSourceImp(dao))
         val factory = FavoriteViewModelFactory(repo)
         viewModel = ViewModelProvider(this, factory).get(FavoriteViewModel::class.java)
+        settingViewModel =
+            ViewModelProvider(requireActivity()).get(SettingViewModel::class.java) // used to save selected lat and long case map selection
+
     }
 
     override fun onCreateView(
@@ -62,12 +73,18 @@ class MapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupMap()
         setupSaveLocationButton()  // get city name and lat and long
-
         // Add an initial marker at the default location (Giza coordinates)
         addMarkerAtLocation(GeoPoint(29.9792, 31.1342))
+
+        // observe on calleer
+        settingViewModel.mapCaller.observe(
+            viewLifecycleOwner,
+            androidx.lifecycle.Observer { caller ->  // observe who is calling the map to take an action
+                this.caller = caller
+            })
+
     }
 
     private fun setupMap() {
@@ -104,7 +121,11 @@ class MapFragment : Fragment() {
                     cityName?.let { name ->
                         Toast.makeText(requireContext(), "City: $name", Toast.LENGTH_SHORT).show()
                     } ?: run {
-                        Toast.makeText(requireContext(), "City not found at this location.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "City not found at this location.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
                 return true
@@ -149,14 +170,31 @@ class MapFragment : Fragment() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         val view = layoutInflater.inflate(R.layout.bottom_sheet_layout, null)
         bottomSheetDialog.setContentView(view)
-
         view.findViewById<View>(R.id.btnSure).setOnClickListener {
-            lat?.let { latValue ->
-                lon?.let { lonValue ->
-                    cityName?.let { city ->
-                        saveLocationToFavorites(latValue, lonValue, city)
+            // If the location is from map, navigate to the home screen
+
+            if (caller == Constants.SETTINGSCREEN) {
+
+                navigateHome(lat, lon)
+
+            } else if (caller == Constants.FAVORITESCREEN) {
+
+                lat?.let { it1 ->
+                    lon?.let { it2 ->
+                        cityName?.let { it3 ->
+                            saveLocationToFavorites(
+                                it1, it2,
+                                it3
+                            )
+                            Toast.makeText(
+                                requireContext(),
+                                "Added To Favorite",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
+
             }
             bottomSheetDialog.dismiss()
         }
@@ -166,6 +204,12 @@ class MapFragment : Fragment() {
         }
 
         bottomSheetDialog.show()
+    }
+
+    private fun navigateHome(lat: Double?, long: Double?) {
+        settingViewModel.saveLocationLatAndLong(lat.toString(), long.toString())
+        val action = MapFragmentDirections.actionMapFragmentToHomeFragment()
+        findNavController().navigate(action)
     }
 
     private fun saveLocationToFavorites(lat: Double, lon: Double, cityName: String) {

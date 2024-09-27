@@ -17,17 +17,14 @@ class RemoteDataSourceImp : RemoteDataSourceContract {
         return try {
             val response = RetrofitHelper.service.getCurrentWeather(lat, lon,lang, unit)
             if (response.isSuccessful) {
-                response.body() // Return the weather response body
+                response.body()
             } else {
                 null
             }
         } catch (e: UnknownHostException) {
-            // Handle network issues like no internet connection or DNS failure
-            // Log the error or show a "No internet connection" dialog
             null
         } catch (e: Exception) {
-            // Handle other exceptions
-            e.printStackTrace() // Log or handle other exceptions accordingly
+            e.printStackTrace()
             null
         }
     }
@@ -41,18 +38,14 @@ class RemoteDataSourceImp : RemoteDataSourceContract {
         return try {
             val response = RetrofitHelper.service.getFiveDayWeather(lat, lon,lang, unit)
             if (response.isSuccessful) {
-                response.body() // Return the 5-day weather response body
+                response.body()
             } else {
-                // Handle error responses from the API (e.g., 4xx or 5xx)
                 null
             }
         } catch (e: UnknownHostException) {
-            // Handle network issues like no internet connection or DNS failure
-            // Log the error or show a "No internet connection" dialog
             null
         } catch (e: Exception) {
-            // Handle other exceptions
-            e.printStackTrace() // Log or handle other exceptions accordingly
+            e.printStackTrace()
             null
         }
     }

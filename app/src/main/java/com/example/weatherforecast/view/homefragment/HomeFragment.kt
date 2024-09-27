@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.ConnectivityManager
@@ -12,7 +13,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,8 +21,9 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.databinding.FragmentHomeBinding
@@ -46,6 +47,12 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import com.example.weatherforecast.R
+import com.example.weatherforecast.model.apistate.DailyApiState
+import com.example.weatherforecast.model.apistate.HourlyApiState
+import com.example.weatherforecast.model.apistate.WeatherApiState
+import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 class HomeFragment : Fragment(), NetworkChangeListener {
@@ -62,22 +69,27 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     private var selectedUnit: String = "metric"
     private var hasFetchedData = false
 
-
     private var connected = true
     lateinit var viewModel: WeatherViewModel
-
 
     // lat and long
     var lat: Double = 0.0
     var lon: Double = 0.0
+    private var lastLat = 0.0
+    private var lastLon = 0.0
+    private var lastLanguage = ""
+    private var lastUnit = ""
+    var locationStatus: String = "Map"
+
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
-
 
     }
 
@@ -100,31 +112,32 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         fusedLocation = LocationServices.getFusedLocationProviderClient(requireContext())
         settingViewModel = ViewModelProvider(requireActivity()).get(SettingViewModel::class.java)
 
-        checkLanguageAndUnitChange()
+
     }
 
     @SuppressLint("SetTextI18n")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sharedPreferences =
+            requireContext().getSharedPreferences("WeatherAppPrefs", Context.MODE_PRIVATE)
+        locationStatus = sharedPreferences.getString(Constants.LOCATIONPREFRENCES, "GPS").toString()
+
+        setUpAdapters()
         checkLocationStatus() // and update ui
         binding.allowLocationButton.setOnClickListener { requestLocationPermissions() }
-
         binding.swipeRefreshLayout.setOnRefreshListener {
-            // Call a method to refresh data or recreate the fragment
             refreshFragment()
+            binding.swipeRefreshLayout.isRefreshing = false // Stop the animation
         }
+        checkLanguageAndUnitChange()
+
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun refreshFragment() {
-        // Show refreshing animation
-        binding.swipeRefreshLayout.isRefreshing = true
         fetchWeatherData()
-        loadWeatherData()
-
-        // Stop the refreshing animation after the fragment is recreated
-        binding.swipeRefreshLayout.isRefreshing = false
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -132,9 +145,15 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         if (checkPermissions(requireContext())) {
             if (isLocationEnabled(requireContext())) {
                 updateUI(true) // Location is enabled, show weather data
-                getFreshLocation()
+                if (locationStatus == getString(R.string.map)) {
+                    // listen for any change Gps or Map location
+                    getSentMapLocation()
+                    fetchWeatherData()
+                } else
+                    getFreshLocation()
             } else {
                 updateUI(false) // Show enable location prompt
+                enableLocationServices()
                 Toast.makeText(
                     requireContext(),
                     "Please enable location services",
@@ -143,8 +162,8 @@ class HomeFragment : Fragment(), NetworkChangeListener {
             }
         } else {
             // Request permissions if not already granted
-            //  requestLocationPermissions()
             updateUI(false)
+            //requestLocationPermissions()
         }
 
     }
@@ -167,8 +186,9 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         grantResults: IntArray
     ) {
         if (requestCode == Constants.My_LOCATION_PERMISSION_ID) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted
+            if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                // Permission granted for all
+                updateUI(true)
                 checkLocationStatus()
             } else {
                 // Permission denied
@@ -198,111 +218,141 @@ class HomeFragment : Fragment(), NetworkChangeListener {
 
     @SuppressLint("SetTextI18n")
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun loadWeatherData() {
-        if (lat == 0.0 && lon == 0.0) {
-            Log.e("LocationError", "Lat/Lon are not set yet")
-            return
-        }
-        fetchWeatherData()
 
+    fun observeCurrently() {
+        // Observe on current weather state
         if (isAdded) {
-            viewModel.currentWeather.observe(viewLifecycleOwner, Observer { weather ->
-                weather?.let {
-                    val decimalFormat = DecimalFormat("#.##")
-
-                    // Set location name
-                    binding.tvLocationName.text = weather.city
-
-                    // Format and set the date
-                    val dateTime = Instant.ofEpochSecond(weather.date.toLong())
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDateTime()
-                    val dateFormatter =
-                        DateTimeFormatter.ofPattern("EEEE, MMMM yyyy", Locale.getDefault())
-                    binding.tvCurrentDate.text = dateTime.format(dateFormatter)
-
-                    // Set weather status and temperature
-                    binding.tvWeatherStatus.text = weather.weatherStatus
-                    binding.tvCurrentDegree.text =
-                        decimalFormat.format(weather.temperature) + " " + getString(R.string.degree_format)
-
-                    // Set weather icon
-                    setIcon(weather.weatherIcon, binding.ivWeatherIcon)
-
-                    // Set values for pressure, humidity, clouds, wind speed, and visibility using localized strings
-                    binding.presser.text =
-                        decimalFormat.format(weather.pressure) + " " + getString(R.string.unit_hpa)
-                    binding.humidity.text =
-                        weather.humidity.toString() + " " + getString(R.string.unit_percent)
-                    binding.clouds.text =
-                        weather.clouds.toString() + " " + getString(R.string.unit_percent)
-                    // observe on wind Status
-                    settingViewModel.windSetting.observe(requireActivity(), Observer { value ->
-                        val windSpeedText = when (value) {
-                            getString(R.string.mile_hour) -> {
-                                // Convert wind speed from m/s to mph
-                                val windSpeedMph = weather.windSpeed * 2.23694
-                                "${decimalFormat.format(windSpeedMph)} ${getString(R.string.unit_miles_per_hour)}"
-                            }
-
-                            getString(R.string.meter_second) -> {
-                                "${decimalFormat.format(weather.windSpeed)} ${getString(R.string.unit_meter_per_sec)}"
-                            }
-
-                            else -> "${decimalFormat.format(weather.windSpeed)} ${getString(R.string.unit_meter_per_sec)}" // Default case
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.currentWeatherState.collectLatest { current ->
+                    when (current) {
+                        is WeatherApiState.Loading -> {
+                            binding.homeprogressBar.visibility = View.VISIBLE
+                            binding.homeScreenView.visibility = View.GONE
                         }
 
-                        binding.wind.text = windSpeedText
-                    })
-                    binding.visability.text =
-                        decimalFormat.format(weather.visibility / 1000) + " " + getString(R.string.unit_kilometer)
-                    binding.tvWeatherStatus.text =
-                        getString(R.string.weatherState) + " ::" + weather.weatherStatus
+                        is WeatherApiState.Failure -> {
+                            Toast.makeText(
+                                requireContext(),
+                                "Failed to load data: ${current.msg.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        is WeatherApiState.Success -> {
+                            binding.homeScreenView.visibility = View.VISIBLE
+                            binding.homeprogressBar.visibility = View.GONE
+                            setUpCurrentView(current.currentWeather) // give the weather to current
+
+                        }
+                    }
                 }
-            })
+            }
         }
+    }
+
+    fun observHourly() {
+        if (isAdded) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.hourlyWeatherState.collectLatest { hourly ->
+                    when (hourly) {
+                        is HourlyApiState.Success -> {
+                            hourlyAdapter.submitList(hourly.hourlyWeather)
+                        }
+
+                        is HourlyApiState.Failure -> {
+                            Toast.makeText(
+                                requireContext(),
+                                "Failed to load Hourly: ${hourly.msg.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        is HourlyApiState.Loading -> {
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun observDaily() {
+        // Observe on daily weather state
+        if (isAdded) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.dailyWeatherState.collectLatest { daily ->
+                    when (daily) {
+                        is DailyApiState.Success -> {
+                            val updated = daily.dailyWeatehr.drop(1)
+                            dailyAdapter.submitList(updated)
+                        }
+                        is DailyApiState.Failure -> {
+                            Toast.makeText(
+                                requireContext(),
+                                "Failed to load daily weather: ${daily.msg.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        is DailyApiState.Loading -> {
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun setUpCurrentView(weather: CurrentWeatherEntity) {
 
 
+        val decimalFormat = DecimalFormat("#.##")
+        binding.tvLocationName.text = weather.city
+        val dateTime = Instant.ofEpochSecond(weather.date.toLong())
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime()
+        val dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM yyyy", Locale.getDefault())
+        binding.tvCurrentDate.text = dateTime.format(dateFormatter)
 
+        binding.tvWeatherStatus.text = weather.weatherStatus
+        binding.tvCurrentDegree.text =
+            decimalFormat.format(weather.temperature) + " " + getString(R.string.degree_format)
 
+        setIcon(weather.weatherIcon, binding.ivWeatherIcon)
+
+        binding.presser.text =
+            decimalFormat.format(weather.pressure) + " " + getString(R.string.unit_hpa)
+        binding.humidity.text =
+            weather.humidity.toString() + " " + getString(R.string.unit_percent)
+        binding.clouds.text =
+            weather.clouds.toString() + " " + getString(R.string.unit_percent)
+        // Observe windSetting LiveData
+        settingViewModel.windSetting.observe(viewLifecycleOwner, Observer { status ->
+            if (status == getString(R.string.meter_second)) {
+                binding.wind.text =
+                    decimalFormat.format(weather.windSpeed) + " " + getString(R.string.meter_second)
+            } else {
+                binding.wind.text =
+                    decimalFormat.format(weather.windSpeed) + " " + getString(R.string.mile_hour)
+            }
+        })
+        binding.visability.text =
+            decimalFormat.format(weather.visibility / 1000) + " " + getString(R.string.unit_kilometer)
+        binding.tvWeatherStatus.text =
+            getString(R.string.weatherState) + " ::" + weather.weatherStatus
+
+    }
+
+    fun setUpAdapters() {
         hourlyAdapter = HourlyAdapter(emptyList())
         binding.hoursRecycler.apply {
             adapter = hourlyAdapter
-            // Set the layout manager to horizontal
             layoutManager =
-                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
-        // try observe on hourly data
-        if (isAdded) {
-            viewModel.hourlyWeather.observe(viewLifecycleOwner, Observer { hourlyWeather ->
-                if (hourlyWeather != null && hourlyWeather.isNotEmpty()) {
-                    hourlyAdapter.submitList(hourlyWeather)
 
-                    Log.i(Constants.SUCCESS, "HOURLY FETCHED successfuly $hourlyWeather")
-                } else {
-                    Log.i(Constants.ERROR, "Error fetch Hourly")
-
-                }
-            })
-        }
         dailyAdapter = DailyAdapter(emptyList())
         binding.daysRecyclerView.apply {
             adapter = dailyAdapter
-            layoutManager = LinearLayoutManager(context)
-
-        }
-        // observe on daily data and check it
-        if (isAdded) {
-            viewModel.dailyWeather.observe(viewLifecycleOwner, Observer { mapDailyWeather ->
-                if (mapDailyWeather != null && mapDailyWeather.isNotEmpty()) {
-                    // Drop the first item and submit the updated list
-                    val listWithoutFirstItem = mapDailyWeather.drop(1)
-                    dailyAdapter.submitList(listWithoutFirstItem)
-                    Log.i(Constants.SUCCESS, "Daily FETCHED successfully $listWithoutFirstItem")
-                } else {
-                    Log.i(Constants.ERROR, "Error fetching Hourly")
-                }
-            })
+            layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
@@ -312,30 +362,38 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun fetchWeatherData() {
         if (connected) {
-            if (!hasFetchedData && lat != 0.0 && lon != 0.0) {
+            observeCurrently()
+            observDaily()
+            observHourly()
+            if (!hasFetchedData || lat != lastLat || lon != lastLon || selectedLanguage != lastLanguage || selectedUnit != lastUnit) {
+                lastLat = lat
+                lastLon = lon
+                lastLanguage = selectedLanguage
+                lastUnit = selectedUnit
                 snackbarShown = false // Reset the flag when connected
-
-                // Fetch weather data
                 viewModel.getCurrentWeatherRemotly(lat, lon, selectedLanguage, selectedUnit)
                 viewModel.getHourlyWeatherRemotly(lat, lon, selectedLanguage, selectedUnit)
                 viewModel.getDailyWeatherRemotly(lat, lon, selectedLanguage, selectedUnit)
+                hasFetchedData = true
+                binding.swipeRefreshLayout.isRefreshing = false
 
-                hasFetchedData = true // Set the flag to true after fetching
+
             }
         } else {
             if (!snackbarShown) {
-                Snackbar.make(
-                    requireView(),
-                    "You see Weather Offline",
-                    Snackbar.LENGTH_SHORT
-                ).show()
-                snackbarShown = true // Set the flag to true after showing
+                Snackbar.make(requireView(), "You see Weather Offline", Snackbar.LENGTH_SHORT)
+                    .show()
+                snackbarShown = true
             }
 
-            // Fetch local weather data
             viewModel.getCurrentWeatherLocally()
             viewModel.getHourlyWeatherLocally()
             viewModel.getDailyWeatehrLocally()
+            observDaily()
+            observHourly()
+            observeCurrently()
+
+
         }
     }
 
@@ -365,63 +423,46 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
             .setMinUpdateIntervalMillis(5000)
             .build()
-        fusedLocation.requestLocationUpdates(locationRequest, object : LocationCallback() {
+
+        val locationCallback = object : LocationCallback() {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
                 lat = locationResult.locations[0].latitude
                 lon = locationResult.locations[0].longitude
-                // Reload UI with the new location data
-
-                if (isAdded) {
-                    loadWeatherData()
-                } else {
-                    Log.e("HomeFragment", "Fragment not attached, skipping loadWeatherData")
-                }
+                fetchWeatherData()  // after i got the lat and long then load the weather
+                // Stop location updates to avoid multiple triggers
+                fusedLocation.removeLocationUpdates(this)
             }
-        }, Looper.myLooper())
+        }
+        fusedLocation.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
     }
 
-    /*    // when comeBack to the same home fragment again
-        @RequiresApi(Build.VERSION_CODES.O)
-        override fun onResume() {
-            super.onResume()
-            // Check again if the location is enabled
-            if (checkPermissions(requireContext())) {
-                if (isLocationEnabled(requireContext())) {
-                    updateUI(true)
-                    getFreshLocation()
-                } else {
-                    updateUI(false)
-                }
-            } else {
-                // Request permissions if not granted
-                ActivityCompat.requestPermissions(
-                    requireActivity(),
-                    arrayOf(
-                        android.Manifest.permission.ACCESS_FINE_LOCATION,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION
-                    ),
-                    Constants.My_LOCATION_PERMISSION_ID
-                )
-            }
-        }*/
 
     // implementation for network BroadCastReciver
     @RequiresApi(Build.VERSION_CODES.O)
+    private var snackbarOnlineShown = false // For online mode
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onNetworkChanged(isConnected: Boolean) {
         connected = isConnected
-        if (connected) {
-            hasFetchedData = false // Reset the flag to allow fetching when reconnected
-            fetchWeatherData() // Optionally fetch data when reconnected
+        if (view != null) { // Check if the view is available
+            if (connected && !snackbarOnlineShown) {
+                Snackbar.make(requireView(), "You are now online", Snackbar.LENGTH_SHORT).show()
+                snackbarOnlineShown = true
+                snackbarShown = false // Reset offline Snackbar
+            } else if (!connected && !snackbarShown) {
+                Snackbar.make(requireView(), "You are offline", Snackbar.LENGTH_SHORT).show()
+                snackbarShown = true
+                snackbarOnlineShown = false // Reset online Snackbar
+            }
         }
     }
-
 
     // un register the listener
     override fun onDestroy() {
         super.onDestroy()
-
         requireActivity().unregisterReceiver(networkChangeReceiver)
     }
 
@@ -429,13 +470,16 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     private fun checkLanguageAndUnitChange() {
         settingViewModel.languageSetting.observe(requireActivity(), Observer { language ->
             selectedLanguage = language
-            fetchWeatherData()
         })
-
         settingViewModel.unitSetting.observe(requireActivity(), Observer { unit ->
             selectedUnit = unit
-            fetchWeatherData()
         })
+    }
+
+    fun getSentMapLocation() {
+        lat = sharedPreferences.getString(Constants.LATITUTE, "0.0")!!.toDouble()
+        lon = sharedPreferences.getString(Constants.LONGITUTE, "0.0")?.toDouble()!!
+
     }
 
 }
