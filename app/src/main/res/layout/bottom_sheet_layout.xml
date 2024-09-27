@@ -9,7 +9,7 @@
         android:id="@+id/tvMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Do you want to save this location?"
+        android:text="@string/do_you_want_to_save"
         android:textSize="16sp"
         android:paddingBottom="16dp" />
 
@@ -17,11 +17,13 @@
         android:id="@+id/btnSure"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Sure" />
+        android:backgroundTint="@color/sky"
+        android:text="@string/sure" />
 
     <Button
         android:id="@+id/btnCancel"
+        android:backgroundTint="@color/sky"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cancel" />
+        android:text="@string/cancel" />
 </LinearLayout>

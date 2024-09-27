@@ -1,6 +1,7 @@
 package com.example.weatherforecast.model.reposiatory
 
 import android.util.Log
+import com.example.weatherforecast.model.local.LocalDataSourceContract
 import com.example.weatherforecast.model.local.LocalDataSourceImp
 import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
@@ -9,6 +10,7 @@ import com.example.weatherforecast.model.pojos.Favorite
 import com.example.weatherforecast.model.pojos.FiveDayResponse
 import com.example.weatherforecast.model.pojos.HourlyWeather
 import com.example.weatherforecast.model.pojos.WeatherResponse
+import com.example.weatherforecast.model.remote.RemoteDataSourceContract
 import com.example.weatherforecast.model.remote.RemoteDataSourceImp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -17,8 +19,8 @@ import kotlinx.coroutines.flow.flow
  *      applaying Flow and Flow
  */
 class ReposiatoryImp(
-    private val remote: RemoteDataSourceImp,
-    private val local: LocalDataSourceImp
+    private val remote: RemoteDataSourceContract,
+    private val local: LocalDataSourceContract
 ) : ReposiatoryContract {
 
     // remotly applaying flow
@@ -110,8 +112,8 @@ class ReposiatoryImp(
         local.insertAlarm(alarm)
     }
 
-    override suspend fun deleteAlarm(alarm_id: Int):Int {
-        return local.deleteAlarm(alarm_id)
+    override  suspend fun deleteAlarm(alarm: AlarmEntity):Int {
+        return local.deleteAlarm(alarm)
     }
 
     override fun getAllAlarms(): Flow<List<AlarmEntity>> {

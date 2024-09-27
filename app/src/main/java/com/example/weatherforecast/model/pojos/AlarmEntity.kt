@@ -7,8 +7,7 @@ import java.io.Serializable
 
 @Entity(tableName = "alarm_table")
 data class AlarmEntity(
-   // @PrimaryKey(autoGenerate = true) var id: Int = 0,
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true) var id: Int = 0,
     val time: Long,
     val type: String, // 'notification' or 'alarm'
     val latitude: Double,

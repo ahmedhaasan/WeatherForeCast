@@ -40,7 +40,7 @@ interface LocalDataSourceContract {
 
     suspend fun insertAlarm(alarm: AlarmEntity)
 
-    suspend fun deleteAlarm(alarm_id: Int):Int
+    suspend fun deleteAlarm(alarm: AlarmEntity):Int
     fun getAllAlarms(): Flow<List<AlarmEntity>>
 
 

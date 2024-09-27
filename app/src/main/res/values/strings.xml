@@ -71,7 +71,10 @@
     <string name="weatherAlarm">Weather Alarm</string>
     <string name="weatherStatus">"Weather Status "</string>
     <string name="dismiss">Dismiss</string>
-    <string name="save_alarm">Save Now</string>
+    <string name="save_alarm">Save</string>
+    <string name="sure">Sure</string>
+    <string name="cancel">Cancel</string>
+    <string name="do_you_want_to_save">Do you want to save this location?</string>
 
 
 </resources>

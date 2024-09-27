@@ -55,9 +55,9 @@ class AlarmViewModel(val repo : ReposiatoryImp) :ViewModel() {
         }
     }
 
-    fun deleteAlarmLocally( alarm_id : Int){
+    fun deleteAlarmLocally( alarm: AlarmEntity){
         viewModelScope.launch(Dispatchers.IO) {
-            repo.deleteAlarm(alarm_id)
+            repo.deleteAlarm(alarm)
 
         }
     }
