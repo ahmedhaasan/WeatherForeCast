@@ -39,14 +39,14 @@ class ReposiatoryImpTest {
 
     // for alarms
     val alarm1 = AlarmEntity(
-        1,
+
         246852,
         "notification",
         10.10, 10.90,
         "elmanial"
     )
     val alarm2 = AlarmEntity(
-        1,
+
         246852,
         "notification",
         10.10, 10.90,

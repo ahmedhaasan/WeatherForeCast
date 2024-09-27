@@ -14,6 +14,7 @@ import com.example.weatherforecast.model.apistate.HourlyApiState
 import com.example.weatherforecast.model.apistate.WeatherApiState
 import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.HourlyWeather
+import com.example.weatherforecast.model.reposiatory.ReposiatoryContract
 
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +28,7 @@ import kotlinx.coroutines.withContext
 /**
  *      applaying stateFlow Here instead of liveData
  */
-class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
+class WeatherViewModel(private val repo: ReposiatoryContract) : ViewModel() {
     // intialState For current Weather is loading
     private val _currentWeatherState = MutableStateFlow<WeatherApiState>(WeatherApiState.Loading())
     val currentWeatherState = _currentWeatherState
@@ -47,10 +48,10 @@ class WeatherViewModel(private val repo: ReposiatoryImp) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             repo.deleteCurrentLocalWeather()  // delete the current weather frist
             repo.getCurrentWeatherRemotely(lat, lon, lang, unit)
-                .catch { e -> _currentWeatherState.value = WeatherApiState.Failure(e) }
+                ?.catch { e -> _currentWeatherState.value = WeatherApiState.Failure(e) }
                 // Take the CurrentWeather From The Response
-                .map { weatherResponse -> mapWeatherResponseToEntity(weatherResponse) }
-                .collect { weather ->
+                ?.map { weatherResponse -> mapWeatherResponseToEntity(weatherResponse) }
+                ?.collect { weather ->
                     _currentWeatherState.value = WeatherApiState.Success(weather)
                     repo.insertCurrentLocalWeather(weather) // the insert the new one
                 }

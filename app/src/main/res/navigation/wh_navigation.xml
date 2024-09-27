@@ -8,13 +8,13 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.weatherforecast.view.homefragment.HomeFragment"
-        android:label="fragment_home"
+        android:label="@string/home"
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/favoriteFragment"
         android:name="com.example.weatherforecast.view.favorite.FavoriteFragment"
-        android:label="fragment_favorite"
-        tools:layout="@layout/fragment_favorite" >
+        android:label="@string/favorites"
+        tools:layout="@layout/fragment_favorite">
         <action
             android:id="@+id/action_favoriteFragment_to_mapFragment"
             app:destination="@id/mapFragment" />
@@ -22,13 +22,13 @@
     <fragment
         android:id="@+id/alertFragment"
         android:name="com.example.weatherforecast.view.alert.view.AlertFragment"
-        android:label="fragment_alert"
+        android:label="@string/alerts"
         tools:layout="@layout/fragment_alert" />
     <fragment
         android:id="@+id/settingFragment"
         android:name="com.example.weatherforecast.view.setting.SettingFragment"
-        android:label="fragment_setting"
-        tools:layout="@layout/fragment_setting" >
+        android:label="@string/settings"
+        tools:layout="@layout/fragment_setting">
         <action
             android:id="@+id/action_settingFragment_to_mapFragment"
             app:destination="@id/mapFragment"
@@ -37,8 +37,8 @@
     <fragment
         android:id="@+id/mapFragment"
         android:name="com.example.weatherforecast.view.map.MapFragment"
-        android:label="fragment_map"
-        tools:layout="@layout/fragment_map" >
+        android:label="@string/MapScreen"
+        tools:layout="@layout/fragment_map">
         <action
             android:id="@+id/action_mapFragment_to_homeFragment"
             app:destination="@id/homeFragment"

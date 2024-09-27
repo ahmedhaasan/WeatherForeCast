@@ -1,21 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">توقعات الطقس</string>
-    <string name="hello_blank_fragment">مرحباً  صفحه فارغه</string>
-    <string name="open">فتح  </string>
-    <string name="close">إغلاق  </string>
+    <string name="hello_blank_fragment">مرحباً صفحة فارغة</string>
+    <string name="open">فتح القائمة</string>
+    <string name="close">إغلاق القائمة</string>
     <string name="giza">الجيزة</string>
     <string name="sunny_day">يوم مشمس</string>
     <string name="day_degree">درجة الحرارة</string>
-    <string name="save">حفظ </string>
+    <string name="save">حفظ الموقع</string>
     <string name="locationText">الموقع</string>
     <string name="gps">نظام تحديد المواقع</string>
     <string name="map">الخريطة</string>
     <string name="setting">إعدادات التطبيق</string>
     <string name="location">الموقع</string>
     <string name="wind_speed">سرعة الرياح</string>
-    <string name="meter_second">متر / ثانية</string>
-    <string name="mile_hour">ميل / ساعة</string>
+    <string name="meter_second">متر/ثانية</string>
+    <string name="mile_hour">ميل/ساعة</string>
     <string name="language">لغة التطبيق</string>
     <string name="english">الإنجليزية</string>
     <string name="arabic">العربية</string>
@@ -31,7 +30,7 @@
     <string name="weather_status">الحالة: %1$s</string>
     <string name="degree_format">%s°C</string>
     <string name="pressure_format">%s هكتوباسكال</string>
-    <string name="humidity_format">%s%% رطوبة</string>
+    <string name="humidity_format">%s%%</string>
     <string name="wind_speed_format">%s م/ث</string>
     <string name="clouds_format">%s%% غيوم</string>
     <string name="visibility_format">%s كم</string>
@@ -44,8 +43,8 @@
     <string name="saturday">السبت</string>
     <string name="tomorrow">غداً</string>
     <string name="hour_format">%02d:00</string>
-    <string name="home_menu">الرئيسيه</string>
-    <string name="favorite_menu">المفضله</string>
+    <string name="home_menu">الرئيسية</string>
+    <string name="favorite_menu">المفضلة</string>
     <string name="alert_menu">التنبيهات</string>
     <string name="setting_menu">الإعدادات</string>
     <string name="unit_hpa">هكتوباسكال</string>
@@ -60,6 +59,25 @@
     <string name="visability">الرؤية</string>
     <string name="weatherState">حالة الطقس</string>
     <string name="unit_miles_per_hour">ميل/ساعة</string>
+    <string name="allow">السماح</string>
+    <string name="ask_for_permission">لا يمكننا تحديد الموقع حالياً. يرجى السماح بتحديد الموقع.</string>
+    <string name="add_alarm">إضافة تنبيه</string>
+    <string name="alert">التنبيه</string>
+    <string name="time">الوقت</string>
+    <string name="date">التاريخ</string>
+    <string name="ZoneName">اسم المنطقة</string>
+    <string name="cityName">اسم المدينة</string>
+    <string name="weatherAlarm">تنبيه الطقس</string>
+    <string name="dismiss">تجاهل</string>
+    <string name="save_alarm">حفظ</string>
+    <string name="sure">تأكيد</string>
+    <string name="cancel">إلغاء</string>
+    <string name="MapScreen">خريطة الشاشة</string>
+    <string name="do_you_want_to_save">هل تريد حفظ هذا الموقع؟</string>
+    <string name="alerts">التنبيهات</string>
+    <string name="favorites">المفضله</string>
+    <string name="home">الرئيسيه</string>
+    <string name="settings">الاعدادات</string>
+    <string name="weatherStatus">حالة الطقس  </string>
 
-
-    ></resources>
+</resources>
