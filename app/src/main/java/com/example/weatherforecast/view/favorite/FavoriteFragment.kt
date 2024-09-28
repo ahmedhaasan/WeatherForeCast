@@ -96,7 +96,7 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
                     setMessage("Are you sure you want to delete the location ${place.locationName}?")
                     setPositiveButton("Yes") { _, _ ->
                         // If user confirms, delete the location
-                        favoriteViewModel.deleteFavoriteLocation(place.locationName)
+                        favoriteViewModel.deleteFavoriteLocation(place)
                         Snackbar.make(
                             requireView(),
                             "Deleted Location ${place.locationName}",

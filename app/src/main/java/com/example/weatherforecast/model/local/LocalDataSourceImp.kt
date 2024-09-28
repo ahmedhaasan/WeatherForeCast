@@ -54,8 +54,8 @@ class LocalDataSourceImp(val dao: WeatherDao) : LocalDataSourceContract {
         return dao.insertFavoriteLocation(fav_location)
     }
 
-    override suspend fun deleteFavoriteLocation(fav_id: String) {
-        return dao.deleteFavoriteLocation(fav_id)
+    override     suspend fun deleteFavoriteLocation(favorite:Favorite):Int{
+        return dao.deleteFavoriteLocation(favorite)
     }
 
     override suspend fun getAllFavoriteLocations(): Flow<List<Favorite>> {

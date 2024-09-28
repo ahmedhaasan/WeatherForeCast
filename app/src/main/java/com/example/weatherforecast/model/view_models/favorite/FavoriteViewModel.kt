@@ -18,6 +18,7 @@ import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.Favorite
 import com.example.weatherforecast.model.pojos.HourlyWeather
+import com.example.weatherforecast.model.reposiatory.ReposiatoryContract
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +31,7 @@ import kotlinx.coroutines.withContext
 /**
  *      this is the viwModel for Favorites
  */
-class FavoriteViewModel(val repo: ReposiatoryImp) : ViewModel() {
+class FavoriteViewModel(val repo: ReposiatoryContract) : ViewModel() {
 
     private val _favoriteState = MutableStateFlow<FavoriteRoomState>(FavoriteRoomState.Empty())
     val favoriteState = _favoriteState
@@ -48,10 +49,10 @@ class FavoriteViewModel(val repo: ReposiatoryImp) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             repo.deleteCurrentLocalWeather()  // delete the current weather frist
             repo.getCurrentWeatherRemotely(lat, lon, lang, unit)
-                .catch { e -> _currentWeatherState.value = WeatherApiState.Failure(e) }
+                ?.catch { e -> _currentWeatherState.value = WeatherApiState.Failure(e) }
                 // Take the CurrentWeather From The Response
-                .map { weatherResponse -> mapWeatherResponseToEntity(weatherResponse) }
-                .collect { weather ->
+                ?.map { weatherResponse -> mapWeatherResponseToEntity(weatherResponse) }
+                ?.collect { weather ->
                     _currentWeatherState.value = WeatherApiState.Success(weather)
                     repo.insertCurrentLocalWeather(weather) // the insert the new one
                 }
@@ -110,9 +111,9 @@ class FavoriteViewModel(val repo: ReposiatoryImp) : ViewModel() {
         }
     }
 
-    fun deleteFavoriteLocation(fav_id: String) {
+    fun deleteFavoriteLocation(favorite:Favorite) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.deleteFavoriteLocation(fav_id)
+            repo.deleteFavoriteLocation(favorite)
 
         }
     }

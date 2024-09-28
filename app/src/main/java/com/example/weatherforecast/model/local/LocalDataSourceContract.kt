@@ -30,7 +30,7 @@ interface LocalDataSourceContract {
      */
 
     suspend fun insertFavoriteLocation(fav_location: Favorite): Long
-    suspend fun deleteFavoriteLocation(fav_id: String)
+    suspend fun deleteFavoriteLocation(favorite:Favorite):Int
     suspend fun getAllFavoriteLocations(): Flow<List<Favorite>>
 
 
