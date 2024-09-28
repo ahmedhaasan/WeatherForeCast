@@ -9,6 +9,7 @@ import com.example.weatherforecast.model.pojos.FiveDayResponse
 import com.example.weatherforecast.model.pojos.HourlyWeather
 import com.example.weatherforecast.model.pojos.WeatherResponse
 import com.example.weatherforecast.model.reposiatory.ReposiatoryContract
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -18,23 +19,24 @@ import kotlinx.coroutines.flow.flowOf
 /**
  *      here in this exmple i will test two functions
  */
-class FakeReposiatory(
-    var currentWeather: CurrentWeatherEntity,
-    val hourlyList: List<HourlyWeather>
+class FakeRepository(
 ) : ReposiatoryContract {
+    private val favorites: MutableList<Favorite> = mutableListOf()
 
-    val fakeCurrentWeater : Flow<CurrentWeatherEntity> = emptyFlow()
-    val fakeHourlyWeather : Flow<List<HourlyWeather>> = emptyFlow()
-
-    override suspend fun getCurrentLocalWeather(): Flow<CurrentWeatherEntity> {
-
-        return flowOf(currentWeather) // will return flow
+    override suspend fun insertFavoriteLocation(fav_location: Favorite): Long {
+        favorites.add(fav_location)
+        return 1 // Simulating a successful insertion
     }
 
-
-    override suspend fun getHourlyWeatherLocally(): Flow<List<HourlyWeather>> {
-        return flowOf(hourlyList)
+    override suspend fun getAllFavoriteLocations(): Flow<List<Favorite>> {
+        return flowOf(favorites)
     }
+
+    override suspend fun deleteFavoriteLocation(favorite:Favorite):Int {
+         favorites.remove(favorite)
+        return 1
+    }
+
 
     override suspend fun getCurrentWeatherRemotely(
         lat: Double,
@@ -54,17 +56,21 @@ class FakeReposiatory(
         TODO("Not yet implemented")
     }
 
+    override suspend fun getCurrentLocalWeather(): Flow<CurrentWeatherEntity> {
+        TODO("Not yet implemented")
+    }
 
     override suspend fun insertCurrentLocalWeather(c_weather: CurrentWeatherEntity): Long {
         TODO("Not yet implemented")
-
-
     }
 
     override suspend fun insertHourlyWeatherLocally(h_weather: List<HourlyWeather>): List<Long> {
         TODO("Not yet implemented")
     }
 
+    override suspend fun getHourlyWeatherLocally(): Flow<List<HourlyWeather>> {
+        TODO("Not yet implemented")
+    }
 
     override suspend fun insertDailyWeatherLocally(d_weather: List<DailyWeather>): List<Long> {
         TODO("Not yet implemented")
@@ -86,17 +92,6 @@ class FakeReposiatory(
         TODO("Not yet implemented")
     }
 
-    override suspend fun insertFavoriteLocation(fav_location: Favorite): Long {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteFavoriteLocation(fav_id: String) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getAllFavoriteLocations(): Flow<List<Favorite>> {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun insertAlarmLocally(alarm: AlarmEntity) {
         TODO("Not yet implemented")
@@ -109,4 +104,5 @@ class FakeReposiatory(
     override fun getAllAlarms(): Flow<List<AlarmEntity>> {
         TODO("Not yet implemented")
     }
+
 }

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 
-class FakeLocalDataSource(
+    class FakeLocalDataSource(
     val favorites: List<Favorite>,
     val alarms: List<AlarmEntity>,
     currentWeather : CurrentWeatherEntity
@@ -84,7 +84,7 @@ class FakeLocalDataSource(
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteFavoriteLocation(fav_id: String) {
+    override suspend fun deleteFavoriteLocation(favorite: Favorite):Int {
         TODO("Not yet implemented")
     }
 

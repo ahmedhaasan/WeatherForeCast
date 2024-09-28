@@ -121,33 +121,37 @@ dependencies {
     implementation ("pub.devrel:easypermissions:3.0.0")
     // Dependencies for local unit tests
 // Dependencies for local unit tests
+
+// Unit Testing Libraries
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.hamcrest:hamcrest-all:1.3")
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
     testImplementation("org.robolectric:robolectric:4.10.3")
 
-// AndroidX Test - JVM testing
+// AndroidX Test - JVM Testing
     testImplementation("androidx.test:core-ktx:1.5.0")
 
-// AndroidX Test - Instrumented testing
-    androidTestImplementation("androidx.test.ext:junit-ktx:1.1.6")
+// AndroidX Test - Instrumented Testing
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-// Timber
+// Timber for Logging
     implementation("com.jakewharton.timber:timber:5.0.1")
 
-// Hamcrest
+// Hamcrest Libraries
     testImplementation("org.hamcrest:hamcrest:2.2")
     testImplementation("org.hamcrest:hamcrest-library:2.2")
     androidTestImplementation("org.hamcrest:hamcrest:2.2")
     androidTestImplementation("org.hamcrest:hamcrest-library:2.2")
 
-// InstantTaskExecutorRule
+// AndroidX Test and Robolectric
+    testImplementation("androidx.test.ext:junit-ktx:1.1.5")
+
+// InstantTaskExecutorRule for LiveData testing
     testImplementation("androidx.arch.core:core-testing:2.1.0")
     androidTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
-
-    // kotlinx-coroutines
+// Kotlin Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")

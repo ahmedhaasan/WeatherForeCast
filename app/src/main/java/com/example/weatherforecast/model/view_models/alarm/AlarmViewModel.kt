@@ -7,6 +7,7 @@ import com.example.weatherforecast.mapWeatherResponseToEntity
 import com.example.weatherforecast.model.apistate.AlarmState
 import com.example.weatherforecast.model.apistate.WeatherApiState
 import com.example.weatherforecast.model.pojos.AlarmEntity
+import com.example.weatherforecast.model.reposiatory.ReposiatoryContract
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import com.example.weatherforecast.view.alert.AlarmScheduler
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEmpty
 import kotlinx.coroutines.launch
 
-class AlarmViewModel(val repo : ReposiatoryImp) :ViewModel() {
+class AlarmViewModel(val repo : ReposiatoryContract) :ViewModel() {
 
     lateinit var  alarmScheduler: AlarmScheduler
 
