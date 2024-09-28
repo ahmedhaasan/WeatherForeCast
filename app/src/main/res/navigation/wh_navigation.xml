@@ -32,6 +32,7 @@
         <action
             android:id="@+id/action_settingFragment_to_mapFragment"
             app:destination="@id/mapFragment"
+            app:popUpTo="@id/settingFragment"
             app:popUpToInclusive="false" />
     </fragment>
     <fragment
@@ -42,7 +43,7 @@
         <action
             android:id="@+id/action_mapFragment_to_homeFragment"
             app:destination="@id/homeFragment"
-            app:popUpTo="@id/settingFragment"
-            app:popUpToInclusive="true" />
+            app:popUpTo="@id/mapFragment"
+            app:popUpToInclusive="false" />
     </fragment>
 </navigation>

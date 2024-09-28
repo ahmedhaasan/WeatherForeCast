@@ -46,7 +46,8 @@ class WeatherViewModel(private val repo: ReposiatoryContract) : ViewModel() {
 
     fun getCurrentWeatherRemotly(lat: Double, lon: Double, lang: String, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.deleteCurrentLocalWeather()  // delete the current weather frist
+
+
             repo.getCurrentWeatherRemotely(lat, lon, lang, unit)
                 ?.catch { e -> _currentWeatherState.value = WeatherApiState.Failure(e) }
                 // Take the CurrentWeather From The Response
@@ -89,13 +90,16 @@ class WeatherViewModel(private val repo: ReposiatoryContract) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Clear the DB before adding new data
-                repo.deleteDailyWeatehr()
+                val deletion = repo.deleteDailyWeatehr()
+                Log.i("Deletion","items deleted : $deletion ")
                 repo.getFiveDayWeather(lat, lon, lang, unit)
                     ?.catch { error -> _dailyWeatherState.value = DailyApiState.Failure(error) }
                     ?.map { fiveDaily -> mapDailyWeather(fiveDaily) }
                     ?.collect { daily ->
                         _dailyWeatherState.value = DailyApiState.Success(daily)
-                        repo.insertDailyWeatherLocally(daily) // then add the new one
+                       val insertion=  repo.insertDailyWeatherLocally(daily) // then add the new one
+                        Log.i("Deletion","items inserted : $insertion ")
+
                     }
             } catch (e: Exception) {
                 Log.i(Constants.ERROR, "Error fetching daily weather: ${e.message}")
