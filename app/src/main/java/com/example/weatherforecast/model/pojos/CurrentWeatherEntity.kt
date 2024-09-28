@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "currentWeather")
 data class CurrentWeatherEntity(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true) var id :Int = 0,
     val city: String,
     val temperature: Double,
     val weatherStatus :String,

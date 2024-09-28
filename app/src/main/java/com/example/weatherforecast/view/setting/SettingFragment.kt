@@ -46,15 +46,15 @@ class SettingFragment : Fragment() {
     private fun initializeRadioGroups() {
         // Set Location RadioGroup
         when (settingViewModel.locationSetting.value) {
-            getString(R.string.gps) -> binding.rbGps.isChecked = true
-            getString(R.string.map) -> binding.rbMap.isChecked = true
+            Constants.GPS -> binding.rbGps.isChecked = true
+            Constants.MAP -> binding.rbMap.isChecked = true
         }
 
         // Set Wind Speed RadioGroup
         when (settingViewModel.windSetting.value) {
 
-            getString(R.string.meter_second) -> binding.rbMeterSecond.isChecked = true
-            getString(R.string.mile_hour) -> binding.rbMileHour.isChecked = true
+            Constants.METER_SECOND -> binding.rbMeterSecond.isChecked = true
+            Constants.MILE_HOUR -> binding.rbMileHour.isChecked = true
         }
 
         // Set Language RadioGroup
@@ -65,8 +65,8 @@ class SettingFragment : Fragment() {
 
         // Set Notification RadioGroup
         when (settingViewModel.notificationSetting.value) {
-            "enabled" -> binding.rbEnable.isChecked = true
-            "disabled" -> binding.rbDisable.isChecked = true
+            Constants.ENABLED -> binding.rbEnable.isChecked = true
+            Constants.DISABLED -> binding.rbDisable.isChecked = true
         }
 
         // Set Temperature RadioGroup
@@ -78,42 +78,43 @@ class SettingFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        // Location RadioGroup
         binding.rgLocation.setOnCheckedChangeListener { _, checkedId ->
             val location = when (checkedId) {
                 R.id.rb_gps -> {
                     settingViewModel.saveLocationFlag("1")
-                    settingViewModel.saveLocationPreference(getString(R.string.gps))
-                    getString(R.string.gps)
+                    settingViewModel.saveLocationPreference(Constants.GPS)
+                    Constants.GPS
                 }
 
                 R.id.rb_map -> {
-                    settingViewModel.saveLocationPreference(getString(R.string.map))
+                    val selectedLocation = Constants.MAP
+                    settingViewModel.saveLocationPreference(Constants.MAP)
                     settingViewModel.locationFlag.observe(viewLifecycleOwner, Observer { flag ->
                         Log.d("SettingFragment", "locationFlag observed: $flag")
-                        if (flag == "1") {
+                        if ((selectedLocation == Constants.MAP) && (flag =="1")) {
                             Log.d("SettingFragment", "Navigating to MapFragment")
-                            // navigate to map Fragment
                             settingViewModel.saveMapCallerPrefrence(Constants.SETTINGSCREEN) // who is caller to map
                             val action = SettingFragmentDirections.actionSettingFragmentToMapFragment()
                             findNavController().navigate(action)
+
+                            // Reset the location flag after navigating
+                            settingViewModel.saveLocationFlag("0")
                         }
                     })
-                    getString(R.string.map)
+                    Constants.MAP
                 }
 
                 else -> ""
             }
             settingViewModel.saveLocationPreference(location)
-            Toast.makeText(requireContext(), "Location set to: $location", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(requireContext(), "Location set to: $location", Toast.LENGTH_SHORT).show()
         }
 
         // Wind Speed RadioGroup
         binding.radioGroupSettingWind.setOnCheckedChangeListener { _, checkedId ->
             val windSpeed = when (checkedId) {
-                R.id.rb_meter_second -> getString(R.string.meter_second)
-                R.id.rb_mile_hour -> getString(R.string.mile_hour)
+                R.id.rb_meter_second -> Constants.METER_SECOND
+                R.id.rb_mile_hour -> Constants.MILE_HOUR
                 else -> ""
 
             }
@@ -128,22 +129,21 @@ class SettingFragment : Fragment() {
             val language = when (checkedId) {
                 R.id.rb_english -> {
                     settingViewModel.saveLanguagePreference(Constants.ENGLISH)
-                    getString(R.string.english)
+                    Constants.ENGLISH
                 }
 
                 R.id.rb_arabic -> {
                     settingViewModel.saveLanguagePreference(Constants.ARABIC)
-                    getString(R.string.arabic)
+                    Constants.ARABIC
                 }
-
                 else -> "en"
             }
-            val lang = if (language == getString(R.string.arabic)) "ar" else "en"
+            val lang = if (language == Constants.ARABIC) "ar" else "en"
             context?.let {
                 setLocale(it, lang)
                 // Only call recreate() if 'context' is an instance of Activity
                 if (it is Activity) {
-                    findNavController().popBackStack(R.id.homeFragment, false)
+                    //findNavController().popBackStack(R.id.homeFragment, false)
                     it.recreate()
                 }
             } // change the language in the all application
@@ -156,12 +156,12 @@ class SettingFragment : Fragment() {
             val notification = when (checkedId) {
                 R.id.rb_enable -> {
                     settingViewModel.saveNotificationPreference(Constants.ENABLED)
-                    getString(R.string.enable)
+                    Constants.ENABLED
                 }
 
                 R.id.rb_disable -> {
                     settingViewModel.saveNotificationPreference(Constants.DISABLED)
-                    getString(R.string.disable)
+                    Constants.DISABLED
                 }
 
                 else -> ""

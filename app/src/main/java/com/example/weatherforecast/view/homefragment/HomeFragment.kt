@@ -121,7 +121,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         super.onViewCreated(view, savedInstanceState)
         sharedPreferences =
             requireContext().getSharedPreferences("WeatherAppPrefs", Context.MODE_PRIVATE)
-        locationStatus = sharedPreferences.getString(Constants.LOCATIONPREFRENCES, "GPS").toString()
+        locationStatus = sharedPreferences.getString(Constants.LOCATIONPREFRENCES, getString(R.string.map)).toString()
 
         setUpAdapters()
         checkLocationStatus() // and update ui
@@ -145,10 +145,9 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         if (checkPermissions(requireContext())) {
             if (isLocationEnabled(requireContext())) {
                 updateUI(true) // Location is enabled, show weather data
-                if (locationStatus == getString(R.string.map)) {
+                if (locationStatus == Constants.MAP) {
                     // listen for any change Gps or Map location
                     getSentMapLocation()
-                    fetchWeatherData()
                 } else
                     getFreshLocation()
             } else {
@@ -476,9 +475,12 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         })
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getSentMapLocation() {
         lat = sharedPreferences.getString(Constants.LATITUTE, "0.0")!!.toDouble()
         lon = sharedPreferences.getString(Constants.LONGITUTE, "0.0")?.toDouble()!!
+        fetchWeatherData()
+
 
     }
 

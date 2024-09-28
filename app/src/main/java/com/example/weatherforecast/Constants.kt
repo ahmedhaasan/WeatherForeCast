@@ -30,7 +30,7 @@ object Constants {
     const val NOTIFICATION = "notification"
     const val ALERT = "alert"
     const val ENABLED = "enabled"
-    const val DISABLED = "DISABLED"
+    const val DISABLED = "disabled"
 
 
     const val WEATHER_ALARM = "weather_alarm"
@@ -39,6 +39,12 @@ object Constants {
     const val CHANNEL_NAME= "weather"
     const val CHANNEL_DESCRIPTION = "weather notification"
     const val WEATHER_STATUS = "Weather Status Today "
+
+    const val MAP = "MAP"
+    const val GPS = "GPS"
+
+    const val METER_SECOND = "meter_second"
+    const val MILE_HOUR = "mile_houre"
 
 
 
