@@ -1,5 +1,6 @@
 package com.example.weatherforecast.model.view_models.home
 
+import androidx.room.Delete
 import com.example.weatherforecast.model.apistate.WeatherApiState
 import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
@@ -22,7 +23,13 @@ import kotlinx.coroutines.flow.flowOf
 class FakeRepository(
 ) : ReposiatoryContract {
     private val favorites: MutableList<Favorite> = mutableListOf()
+    private lateinit var currentWeather: CurrentWeatherEntity
+    private var hourlyWeather: MutableList<HourlyWeather> = mutableListOf()
+    private val dailyWeather: MutableList<DailyWeather> = mutableListOf()
 
+    /**
+     *      frist part related to test Favorites
+     */
     override suspend fun insertFavoriteLocation(fav_location: Favorite): Long {
         favorites.add(fav_location)
         return 1 // Simulating a successful insertion
@@ -32,11 +39,61 @@ class FakeRepository(
         return flowOf(favorites)
     }
 
-    override suspend fun deleteFavoriteLocation(favorite:Favorite):Int {
-         favorites.remove(favorite)
+    override suspend fun deleteFavoriteLocation(favorite: Favorite): Int {
+        favorites.remove(favorite)
         return 1
     }
 
+
+    /**
+     *      second part related to test Current , houly , daily
+     */
+
+    override suspend fun getCurrentLocalWeather(): Flow<CurrentWeatherEntity> {
+        return flowOf(currentWeather)
+    }
+
+    override suspend fun insertCurrentLocalWeather(c_weather: CurrentWeatherEntity): Long {
+        currentWeather = c_weather
+        return 1 // memic is inserted
+    }
+
+    override suspend fun insertHourlyWeatherLocally(h_weather: List<HourlyWeather>): List<Long> {
+        hourlyWeather.addAll(h_weather)
+        return listOf(1)
+    }
+
+    override suspend fun getHourlyWeatherLocally(): Flow<List<HourlyWeather>> {
+        return flowOf(hourlyWeather)
+    }
+
+    override suspend fun insertDailyWeatherLocally(d_weather: List<DailyWeather>): List<Long> {
+        dailyWeather.addAll(d_weather)
+        return listOf(1)
+    }
+
+    override suspend fun getDailyWeatherLocally(): Flow<List<DailyWeather>> {
+        return flowOf(dailyWeather)
+    }
+
+    override suspend fun deleteHourlyWeather(): Int {
+        hourlyWeather.clear()
+        return 1
+    }
+
+    override suspend fun deleteDailyWeatehr(): Int {
+
+        dailyWeather.clear()
+        return 1
+    }
+
+    override suspend fun deleteCurrentLocalWeather(): Int {
+
+        return 1
+    }
+
+
+    /////////////
 
     override suspend fun getCurrentWeatherRemotely(
         lat: Double,
@@ -53,42 +110,6 @@ class FakeRepository(
         lang: String,
         unit: String
     ): Flow<FiveDayResponse>? {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getCurrentLocalWeather(): Flow<CurrentWeatherEntity> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun insertCurrentLocalWeather(c_weather: CurrentWeatherEntity): Long {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun insertHourlyWeatherLocally(h_weather: List<HourlyWeather>): List<Long> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getHourlyWeatherLocally(): Flow<List<HourlyWeather>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun insertDailyWeatherLocally(d_weather: List<DailyWeather>): List<Long> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getDailyWeatherLocally(): Flow<List<DailyWeather>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteHourlyWeather(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteDailyWeatehr(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteCurrentLocalWeather(): Int {
         TODO("Not yet implemented")
     }
 

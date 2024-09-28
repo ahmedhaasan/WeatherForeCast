@@ -86,7 +86,7 @@ class FavouritesViewModelTest {
         // this is the exepectd Result i've put
         val expectedFavorites = reposiatory.getAllFavoriteLocations().first()
 
-        // here im collecting the fristValue got by viewModel
+        // here im collecting the fristValue got by viewModel once it success
         val flowValue = favoriteViewModel.favoriteState.first { it is FavoriteRoomState.Success }
 
         // Assert
