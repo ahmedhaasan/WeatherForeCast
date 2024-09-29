@@ -3,10 +3,15 @@ package com.example.weatherforecast.view
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.example.weatherforecast.LocaleHelper.setLocale
@@ -50,10 +55,6 @@ class MainActivity : AppCompatActivity() {
             binding.navView,
             navController
         ) // Use binding to access NavigationView
-
-        /**
-         *      below part is for change action bar language and menu items
-         */
         // Set custom icon for home (hamburger menu)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.menu)
         // Update the ActionBar title based on the menu item's title
@@ -61,16 +62,33 @@ class MainActivity : AppCompatActivity() {
             val menuItem = binding.navView.menu.findItem(destination.id)
             supportActionBar?.title = menuItem?.title ?: destination.label // Set ActionBar title
         }
-
+        supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.rounded_action_bar))
     }
 
+
+
+    // Handle item selections
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Pass the selection to the drawer toggle
+        return when (item.itemId) {
+            android.R.id.home -> {
+                if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    binding.drawerLayout.openDrawer(GravityCompat.START)
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
     // when start the application again so reset the last app language
     override fun onStart() {
         val savedLanguage = sharedPreferences.getString("LanguagePreference", "en")
         super.onStart()
         if (savedLanguage != null) {
-            setLocale(this,savedLanguage)
+            setLocale(this, savedLanguage)
             binding.navView.menu.clear() // Clear the current menu
             binding.navView.inflateMenu(R.menu.new_menu) // Reinflate the menu
             // Update the ActionBar title based on the current fragment or destination
@@ -80,11 +98,12 @@ class MainActivity : AppCompatActivity() {
                 supportActionBar?.title = menuItem?.title ?: destination.label
             }
         }
-
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        return NavigationUI.navigateUp(navController, binding.drawerLayout) || super.onSupportNavigateUp()
+        val navController = findNavController(R.id.nav_host_fragment)
+        val navigateUp = NavigationUI.navigateUp(navController, binding.drawerLayout)
+        return navigateUp || super.onSupportNavigateUp()
     }
 
     // Handle back button when the drawer is open
@@ -95,5 +114,4 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
-
 }

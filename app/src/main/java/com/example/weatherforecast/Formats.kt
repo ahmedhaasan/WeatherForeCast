@@ -234,7 +234,7 @@ fun setLocationNameByGeoCoder(weatherResponse: CurrentWeatherEntity, context: Co
         return if (x != null && x[0].locality != null) {
             x[0].locality
         } else {
-            weatherResponse.date.toString()
+            weatherResponse.city
         }
     } catch (e: Exception) {
         return weatherResponse.toString()

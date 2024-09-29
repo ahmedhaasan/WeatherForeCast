@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:background="@drawable/gradient_background"
     android:layout_height="match_parent"
-    android:label="@string/home_menu"
+
 >
 
     <ScrollView
@@ -81,7 +81,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/tv_current_degree"
                 app:layout_constraintTop_toBottomOf="@id/tv_current_degree"
                 tools:text="Sunny Day" />

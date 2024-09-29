@@ -67,7 +67,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.3")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.3")
 
-    implementation ("androidx.core:core-ktx:1.6.0")// or latest version
+    implementation("androidx.core:core-ktx:1.6.0")// or latest version
 
 // CircleImageView (latest stable version)
     implementation("de.hdodenhof:circleimageview:3.1.0")
@@ -91,34 +91,34 @@ dependencies {
     kapt("androidx.room:room-compiler:2.6.1")
 
     //ViewModel
-    implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
+    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
 
     // matirial card view
-    implementation ("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.9.0")
 
     // google services
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
     // floating action button
-    implementation ("com.google.android.material:material:1.10.0")
+    implementation("com.google.android.material:material:1.10.0")
     // Google Play Services Location
-    implementation ("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 
     // OSMDroid for Android
-    implementation ("org.osmdroid:osmdroid-android:6.1.14")
+    implementation("org.osmdroid:osmdroid-android:6.1.14")
     // AndroidX Navigation Components
     implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
     implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
 
     // refresher
-    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")  // Optional
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")  // Optional
 
     //Work Manager
     implementation("androidx.work:work-runtime:2.9.1")
 
     // easy permissinos for alarm
-    implementation ("pub.devrel:easypermissions:3.0.0")
+    implementation("pub.devrel:easypermissions:3.0.0")
     // Dependencies for local unit tests
 // Dependencies for local unit tests
 
@@ -155,7 +155,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-
+    // GSon
+    implementation("com.google.code.gson:gson:2.11.0")
 
 
 

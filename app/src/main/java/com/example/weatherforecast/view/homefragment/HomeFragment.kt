@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -325,10 +326,10 @@ class HomeFragment : Fragment(), NetworkChangeListener {
             weather.clouds.toString() + " " + getString(R.string.unit_percent)
         // Observe windSetting LiveData
         settingViewModel.windSetting.observe(viewLifecycleOwner, Observer { status ->
-            if (status == getString(R.string.meter_second)) {
+            if (status == Constants.METER_SECOND) {
                 binding.wind.text =
                     decimalFormat.format(weather.windSpeed) + " " + getString(R.string.meter_second)
-            } else {
+            } else if(status == Constants.MILE_HOUR) {
                 binding.wind.text =
                     decimalFormat.format(weather.windSpeed) + " " + getString(R.string.mile_hour)
             }
@@ -475,12 +476,21 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         })
     }
 
+    @SuppressLint("SuspiciousIndentation")
     @RequiresApi(Build.VERSION_CODES.O)
     fun getSentMapLocation() {
-        lat = sharedPreferences.getString(Constants.LATITUTE, "0.0")!!.toDouble()
-        lon = sharedPreferences.getString(Constants.LONGITUTE, "0.0")?.toDouble()!!
-        fetchWeatherData()
 
+        val latitudeStr = sharedPreferences.getString(Constants.LATITUTE, "0.0")!!.toDouble()
+        val longitudeStr =sharedPreferences.getString(Constants.LONGITUTE, "0.0")?.toDouble()!!
+            if (latitudeStr != null && longitudeStr != null) {
+                 lat = latitudeStr
+                 lon = longitudeStr
+                // Use latitude and longitude
+            } else {
+                // Handle the case where latitude or longitude is null
+                Log.e("HomeFragment", "Latitude or Longitude is null")
+            }
+        fetchWeatherData()
 
     }
 

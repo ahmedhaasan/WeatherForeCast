@@ -1,12 +1,13 @@
 package com.example.weatherforecast.model.database
 
-import Clouds
-import Coord
-import Main
-import Sys
-import Weather
-import Wind
+
 import androidx.room.TypeConverter
+import com.example.weatherforecast.model.pojos.Clouds
+import com.example.weatherforecast.model.pojos.Coord
+import com.example.weatherforecast.model.pojos.Main
+import com.example.weatherforecast.model.pojos.Sys
+import com.example.weatherforecast.model.pojos.Weather
+import com.example.weatherforecast.model.pojos.Wind
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

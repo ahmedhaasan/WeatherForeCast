@@ -3,6 +3,7 @@ package com.example.weatherforecast.model.reposiatory.fakedatasources
 import com.example.weatherforecast.model.pojos.FiveDayResponse
 import com.example.weatherforecast.model.pojos.WeatherResponse
 import com.example.weatherforecast.model.remote.RemoteDataSourceContract
+import kotlinx.coroutines.flow.Flow
 
 class FakeRemoteDataSource : RemoteDataSourceContract {
     override suspend fun getCurrentWeather(
@@ -10,7 +11,7 @@ class FakeRemoteDataSource : RemoteDataSourceContract {
         lon: Double,
         lang: String,
         unit: String
-    ): WeatherResponse? {
+    ): Flow<WeatherResponse> {
         TODO("Not yet implemented")
     }
 
@@ -19,7 +20,7 @@ class FakeRemoteDataSource : RemoteDataSourceContract {
         lon: Double,
         lang: String,
         unit: String
-    ): FiveDayResponse? {
+    ): Flow<FiveDayResponse> {
         TODO("Not yet implemented")
     }
 }

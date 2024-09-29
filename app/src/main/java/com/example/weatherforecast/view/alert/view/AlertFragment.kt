@@ -22,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.Constants
+import com.example.weatherforecast.R
 import com.example.weatherforecast.checkNotificationPermission
 import com.example.weatherforecast.databinding.AlertDialogBinding
 import com.example.weatherforecast.databinding.FragmentAlertBinding
@@ -279,10 +280,10 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
             MaterialDatePicker.Builder.datePicker()
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .setCalendarConstraints(constraintsBuilder.build())
-                .setTitleText("Select Date")
+                .setTitleText(getString(R.string.selectDate))
                 .build()
 
-        datePicker.show(parentFragmentManager, "date")
+        datePicker.show(parentFragmentManager, getString(R.string.date))
 
         datePicker.addOnPositiveButtonClickListener { date ->
             dialogAlertBinding.tvFromDateDialog.text =
@@ -301,10 +302,10 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
                 .setTimeFormat(TimeFormat.CLOCK_12H)
                 .setHour(currentHour)
                 .setMinute(currentMinute + 1)
-                .setTitleText("Select Appointment time")
+                .setTitleText(R.string.selectAppoinmentTime)
                 .build()
 
-        timePicker.show(parentFragmentManager, "time")
+        timePicker.show(parentFragmentManager, getString(R.string.time))
         timePicker.addOnPositiveButtonClickListener {
             dialogAlertBinding.tvFromTimeDialog.text =
                 formatHourMinuteToString(timePicker.hour, timePicker.minute)
@@ -350,9 +351,9 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
 
     fun deleteTheAlarm(alarm: AlarmEntity) {
         AlertDialog.Builder(requireContext()).apply {
-            setTitle("Delete Favorite")
-            setMessage("Are you sure you want to delete the location ${alarm.zoneName} :Alarm ?")
-            setPositiveButton("Yes") { _, _ ->
+            setTitle(getString(R.string.deleteFavoriteDialog))
+            setMessage("${getString(R.string.areYouSureDeleteLocation)}${alarm.zoneName} :${getString(R.string.alarm)} ?")
+            setPositiveButton(getString(R.string.yes)) { _, _ ->
                 // If user confirms, delete the location
                 alarmViewModel.deleteAlarmLocally(alarm) // now deleted
                 alarmScheduler.cancel(alarm)

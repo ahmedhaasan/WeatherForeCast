@@ -51,12 +51,15 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
     lateinit var settingViewModel: SettingViewModel
     private lateinit var networkChangeReceiver: NetworkChangeReceiver
 
+    private var isFabVisible = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // register the BroadCast here to listen for network Changes
         networkChangeReceiver = NetworkChangeReceiver(this)
         val intentFilter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
         requireActivity().registerReceiver(networkChangeReceiver, intentFilter)
+
     }
 
     override fun onCreateView(
@@ -64,14 +67,16 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        Log.d("FavoriteFragment", "onCreateView called")
         fav_binding = FragmentFavoriteBinding.inflate(inflater, container, false)
         return fav_binding.root
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        Log.d("FavoriteFragment", "onViewCreated called")
 
+        super.onViewCreated(view, savedInstanceState)
         // creating instance form viewModel
         val db = WeatherDataBase.getInstance(requireContext())
         val dao = db.getWeatherDao()
@@ -80,6 +85,7 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
         // now view Model
         val favoriteViewModel = ViewModelProvider(this, factory).get(FavoriteViewModel::class.java)
         settingViewModel = ViewModelProvider(requireActivity()).get(SettingViewModel::class.java)
+        isFabVisible = true // Set initial visibility state
 
 
         /**
@@ -114,7 +120,8 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
             },  // when city is selected
             onItemSelected = { place ->
                 if (isConnected == true) {
-                    val fav_home = Fav_Home()
+                    val fav_home = Fav_Home()  // im calling this to hide the fab when show details of favorite
+                    fav_home.hideFB(fav_binding.favoriteFabButton)
                     // Create a Bundle and put the necessary data
                     val bundle = Bundle()
                     bundle.putDouble("lat", place.lat)
@@ -127,7 +134,6 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
                         .replace(R.id.homeFragmentContainer, fav_home)
                         .addToBackStack(null)
                         .commit()
-                    fav_binding.favoriteFabButton.visibility = View.GONE
 
                 } else {
                     showNetworkDialog(requireContext())
@@ -154,6 +160,7 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
                             fav_binding.lvNoFavourites.visibility = View.GONE
                             // Optionally show a loading indicator here
                         }
+
                         is FavoriteRoomState.Success -> {
                             if (favorites.favorites.isEmpty()) {
                                 // Show no favorites view
@@ -166,6 +173,7 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
                                 favoriteAdapter.submitList(favorites.favorites)
                             }
                         }
+
                         is FavoriteRoomState.Failure -> {
                             Toast.makeText(
                                 requireContext(),
@@ -173,6 +181,7 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
+
                         is FavoriteRoomState.Empty -> {
                             // Show no favorites view
                             fav_binding.lvNoFavourites.visibility = View.VISIBLE
@@ -196,14 +205,20 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
         }
     }
 
+
+
     override fun onResume() {
-        super.onResume()  // enable the fabButton again
-        fav_binding.favoriteFabButton.visibility = View.VISIBLE
+        super.onResume()
+        Log.d("FavoriteFragment", "onResume called, showing FAB")
+      //  fav_binding.favoriteFabButton.visibility = View.VISIBLE
+
     }
+
 
     override fun onNetworkChanged(isConnected: Boolean) {
         this.isConnected = isConnected
     }
+
 
     fun showNetworkDialog(context: Context) {
         val builder = AlertDialog.Builder(context)
@@ -224,12 +239,6 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
         // Create and show the dialog
         val dialog = builder.create()
         dialog.show()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        requireActivity().unregisterReceiver(networkChangeReceiver)
     }
 
 

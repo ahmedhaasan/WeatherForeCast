@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="auto_complete_margin">10dp</dimen>
+    <dimen name="auto_complete_padding">16dp</dimen>
+</resources>

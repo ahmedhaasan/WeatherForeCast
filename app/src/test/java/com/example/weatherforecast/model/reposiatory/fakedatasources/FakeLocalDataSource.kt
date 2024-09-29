@@ -10,93 +10,116 @@ import com.example.weatherforecast.model.pojos.Favorite
 import com.example.weatherforecast.model.pojos.HourlyWeather
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flow
 
-    class FakeLocalDataSource(
-    val favorites: List<Favorite>,
-    val alarms: List<AlarmEntity>,
-    currentWeather : CurrentWeatherEntity
-) :
-    LocalDataSourceContract {
+class FakeLocalDataSource(
+    var favorites: MutableList<Favorite>,
+    val alarms: MutableList<AlarmEntity>,
+    val currentWeather: CurrentWeatherEntity
+) : LocalDataSourceContract {
+
+    private var fakeFavorites = favorites
+    private var fakeAlarms = alarms
+    private var fakeCurrentWeather = currentWeather
+
+    private var fakeHourlyWeatherList = mutableListOf<HourlyWeather>()
+    private var fakeDailyWeather = mutableListOf<DailyWeather>()
+
 
     /**
-     *      intialize the functions that i will test with
-     *      i've used just tow functions only
+     *      insert Functions
+     */
+    // Insert current weather
+    override suspend fun insertCurrentWeather(c_weather: CurrentWeatherEntity): Long {
+        fakeCurrentWeather = c_weather
+        return 1L
+    }
+    // Insert daily weather
+    override suspend fun insertDailyWeatherLocally(d_weather: List<DailyWeather>): List<Long> {
+        fakeDailyWeather.addAll(d_weather)
+        return d_weather.map { 1L } // Simulate insertion return values
+    }
+
+    // Insert hourly weather
+    override suspend fun insertHourlyWeatherLocally(h_weather: List<HourlyWeather>): List<Long> {
+        fakeHourlyWeatherList = h_weather.toMutableList()
+        return h_weather.map { 1L } // Simulate insertion return values
+    }
+    // Insert alarm
+    override suspend fun insertAlarm(alarm: AlarmEntity) {
+        fakeAlarms.add(alarm)
+    }
+    // Insert favorite location
+    override suspend fun insertFavoriteLocation(fav_location: Favorite): Long {
+        fakeFavorites.add(fav_location)
+        return 1L
+    }
+
+    /**
+     *      get Functions
+     */
+    // Get hourly weather
+    override suspend fun getHorlyWeatherLocally(): Flow<List<HourlyWeather>> {
+        return flow {
+            emit(fakeHourlyWeatherList)
+        }
+    }
+    // For alarms
+    override fun getAllAlarms(): Flow<List<AlarmEntity>> {
+        return flow {
+            emit(fakeAlarms)
+        }
+    }
+
+    // For favorites
+    override suspend fun getAllFavoriteLocations(): Flow<List<Favorite>> {
+        return flow { emit(fakeFavorites) }
+    }
+
+    // For current weather
+    override suspend fun getCurrentWeather(): Flow<CurrentWeatherEntity> {
+        return flow { emit(fakeCurrentWeather) }
+    }
+
+    // Get daily weather
+    override suspend fun getDailyWeatherLocally(): Flow<List<DailyWeather>> {
+        return flow {
+            emit(fakeDailyWeather)
+        }
+    }
+
+    /**
+     *      delete Functions
      */
 
-    //private val fakeFavorites = MutableStateFlow(favorites)
-    private val fakeFavorites = MutableStateFlow<List<Favorite>>(favorites)
-
-    private val fakeAlarms = MutableStateFlow(alarms)
-    private  val fakeCurrentWeather = MutableStateFlow(currentWeather)
-
-
-    override fun getAllAlarms(): Flow<List<AlarmEntity>> {
-        return fakeAlarms
-    }
-
-    override suspend fun getAllFavoriteLocations(): Flow<List<Favorite>> {
-
-        return fakeFavorites
-    }
-
-    override suspend fun getCurrentWeather(): Flow<CurrentWeatherEntity> {
-        return fakeCurrentWeather
-    }
-
-
-    //////////////
-    override suspend fun insertCurrentWeather(c_weather: CurrentWeatherEntity): Long {
-        TODO("Not yet implemented")
-    }
-
-
-
-    override suspend fun insertHourlyWeatherLocally(h_weather: List<HourlyWeather>): List<Long> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getHorlyWeatherLocally(): Flow<List<HourlyWeather>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun insertDailyWeatherLocally(d_weather: List<DailyWeather>): List<Long> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getDailyWeatherLocally(): Flow<List<DailyWeather>> {
-        TODO("Not yet implemented")
-    }
-
+    // Delete hourly weather
     override suspend fun deleteHourlyWeather(): Int {
-        TODO("Not yet implemented")
+        fakeHourlyWeatherList = mutableListOf()
+        return 1
     }
 
+    // Delete current weather
     override suspend fun deleteCurrentWeather(): Int {
-        TODO("Not yet implemented")
+        fakeCurrentWeather  // Reset the current weather
+        return 1
     }
 
+    // Delete daily weather
     override suspend fun deleteDailyWeatehr(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun insertFavoriteLocation(fav_location: Favorite): Long {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteFavoriteLocation(favorite: Favorite):Int {
-        TODO("Not yet implemented")
+        fakeDailyWeather.clear()
+        return 1
     }
 
 
-
-    override suspend fun insertAlarm(alarm: AlarmEntity) {
-        TODO("Not yet implemented")
+    // Delete favorite location
+    override suspend fun deleteFavoriteLocation(favorite: Favorite): Int {
+        fakeFavorites.remove(favorite)
+        return 1
     }
 
+    // Delete alarm
     override suspend fun deleteAlarm(alarm: AlarmEntity): Int {
-        TODO("Not yet implemented")
+        fakeAlarms.remove(alarm)
+        return 1
     }
-
-
 }

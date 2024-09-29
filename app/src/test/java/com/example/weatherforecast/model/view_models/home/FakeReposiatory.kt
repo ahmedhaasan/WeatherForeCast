@@ -13,6 +13,7 @@ import com.example.weatherforecast.model.reposiatory.ReposiatoryContract
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -21,11 +22,14 @@ import kotlinx.coroutines.flow.flowOf
  *      here in this exmple i will test two functions
  */
 class FakeRepository(
+
 ) : ReposiatoryContract {
+
     private val favorites: MutableList<Favorite> = mutableListOf()
     private lateinit var currentWeather: CurrentWeatherEntity
     private var hourlyWeather: MutableList<HourlyWeather> = mutableListOf()
     private val dailyWeather: MutableList<DailyWeather> = mutableListOf()
+    private val alarms:MutableList<AlarmEntity> = mutableListOf()
 
     /**
      *      frist part related to test Favorites
@@ -100,7 +104,7 @@ class FakeRepository(
         lon: Double,
         lang: String,
         unit: String
-    ): Flow<WeatherResponse>? {
+    ): Flow<WeatherResponse> {
         TODO("Not yet implemented")
     }
 
@@ -109,21 +113,22 @@ class FakeRepository(
         lon: Double,
         lang: String,
         unit: String
-    ): Flow<FiveDayResponse>? {
+    ): Flow<FiveDayResponse> {
         TODO("Not yet implemented")
     }
 
 
     override suspend fun insertAlarmLocally(alarm: AlarmEntity) {
-        TODO("Not yet implemented")
+        alarms.add(alarm)
     }
 
     override suspend fun deleteAlarm(alarm: AlarmEntity): Int {
-        TODO("Not yet implemented")
+        alarms.remove(alarm)
+        return 1
     }
 
     override fun getAllAlarms(): Flow<List<AlarmEntity>> {
-        TODO("Not yet implemented")
+        return flowOf(alarms)
     }
 
 }

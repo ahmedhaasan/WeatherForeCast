@@ -29,6 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -158,8 +159,9 @@ class AlarmReceiver : BroadcastReceiver(), NetworkChangeListener {
             if (connected) {
                 val weatherResponse = RemoteDataSourceImp()
                     .getCurrentWeather(alarmItem.latitude, alarmItem.longitude, "en", "metric")
-                if (weatherResponse != null)
-                    message = weatherResponse.weather[0].description ?: " "
+                weatherResponse.collect{ it ->
+                   message= it.weather[0].description
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()

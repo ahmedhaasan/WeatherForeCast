@@ -1,37 +1,43 @@
 package com.example.weatherforecast.view.map
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.location.Geocoder
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.R
 import com.example.weatherforecast.databinding.FragmentMapBinding
+import com.example.weatherforecast.model.connection.map.nominatimApi
 import com.example.weatherforecast.model.database.WeatherDataBase
 import com.example.weatherforecast.model.local.LocalDataSourceImp
 import com.example.weatherforecast.model.pojos.Favorite
+import com.example.weatherforecast.model.pojos.NominatimResponse
+import com.example.weatherforecast.model.pojos.Search
 import com.example.weatherforecast.model.remote.RemoteDataSourceImp
 import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
 import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModel
 import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModelFactory
 import com.example.weatherforecast.model.view_models.setting.SettingViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.IOException
 import java.util.*
 
 class MapFragment : Fragment() {
@@ -42,9 +48,11 @@ class MapFragment : Fragment() {
     private var lat: Double? = null
     private var lon: Double? = null
     private var cityName: String? = null
-    lateinit var settingViewModel: SettingViewModel
-    lateinit var caller: String
+    private lateinit var settingViewModel: SettingViewModel
+    private lateinit var caller: String
 
+    private lateinit var cityAdapter: CityAdapter
+    private val cityList = mutableListOf<Search>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,9 +66,7 @@ class MapFragment : Fragment() {
         val repo = ReposiatoryImp(RemoteDataSourceImp(), LocalDataSourceImp(dao))
         val factory = FavoriteViewModelFactory(repo)
         viewModel = ViewModelProvider(this, factory).get(FavoriteViewModel::class.java)
-        settingViewModel =
-            ViewModelProvider(requireActivity()).get(SettingViewModel::class.java) // used to save selected lat and long case map selection
-
+        settingViewModel = ViewModelProvider(requireActivity()).get(SettingViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -74,24 +80,21 @@ class MapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupMap()
-        setupSaveLocationButton()  // get city name and lat and long
-        // Add an initial marker at the default location (Giza coordinates)
-        addMarkerAtLocation(GeoPoint(29.9792, 31.1342))
+        setupSaveLocationButton()
+        setupSearchCity()
+        addMarkerAtLocation(GeoPoint(29.9792, 31.1342)) // Add initial marker at Giza
 
-        // observe on calleer
-        settingViewModel.mapCaller.observe(
-            viewLifecycleOwner,
-            androidx.lifecycle.Observer { caller ->  // observe who is calling the map to take an action
-                this.caller = caller
-            })
-
+        // Observe caller for actions
+        settingViewModel.mapCaller.observe(viewLifecycleOwner) { caller ->
+            this.caller = caller
+        }
     }
 
     private fun setupMap() {
         binding.mapView.apply {
             setMultiTouchControls(true)
             controller.setZoom(15.0)
-            controller.setCenter(GeoPoint(29.9792, 31.1342))  // Default center at Giza
+            controller.setCenter(GeoPoint(29.9792, 31.1342)) // Default center at Giza
         }
 
         // Enable map rotation gestures
@@ -112,28 +115,36 @@ class MapFragment : Fragment() {
     private fun addMapTapListener() {
         val mapEventsReceiver = object : MapEventsReceiver {
             override fun singleTapConfirmedHelper(geoPoint: GeoPoint?): Boolean {
-                geoPoint?.let {
-                    addMarkerAtLocation(it)
-                    lat = it.latitude
-                    lon = it.longitude
-                    cityName = getCityName(it.latitude, it.longitude)
-
-                    cityName?.let { name ->
-                        Toast.makeText(requireContext(), "City: $name", Toast.LENGTH_SHORT).show()
-                    } ?: run {
-                        Toast.makeText(
-                            requireContext(),
-                            "City not found at this location.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-                return true
+                return handleSingleTap(geoPoint)
             }
 
             override fun longPressHelper(p: GeoPoint?): Boolean = false
         }
         binding.mapView.overlays.add(MapEventsOverlay(mapEventsReceiver))
+    }
+
+    private fun handleSingleTap(geoPoint: GeoPoint?): Boolean {
+        Log.d("MapFragment", "Map tapped at: $geoPoint")
+
+        geoPoint?.let {
+            addMarkerAtLocation(it)
+            lat = it.latitude
+            lon = it.longitude
+            cityName = getCityName(it.latitude, it.longitude)
+
+            if (cityName != null) {
+                Toast.makeText(requireContext(), "City: $cityName", Toast.LENGTH_SHORT).show()
+                binding.btnSaveLocation.visibility = View.VISIBLE
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "City not found at this location.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                binding.btnSaveLocation.visibility = View.GONE
+            }
+        }
+        return true
     }
 
     private fun addMarkerAtLocation(geoPoint: GeoPoint) {
@@ -161,7 +172,8 @@ class MapFragment : Fragment() {
                     "${it[0].countryName} / ${it[0].locality ?: it[0].adminArea}"
                 } else null
             }
-        } catch (e: Exception) {
+        } catch (e: IOException) {
+            Log.e("MapFragment", "Geocoder failed", e)
             null
         }
     }
@@ -171,21 +183,13 @@ class MapFragment : Fragment() {
         val view = layoutInflater.inflate(R.layout.bottom_sheet_layout, null)
         bottomSheetDialog.setContentView(view)
         view.findViewById<View>(R.id.btnSure).setOnClickListener {
-            // If the location is from map, navigate to the home screen
-
             if (caller == Constants.SETTINGSCREEN) {
-
                 navigateHome(lat, lon)
-
             } else if (caller == Constants.FAVORITESCREEN) {
-
-                lat?.let { it1 ->
-                    lon?.let { it2 ->
-                        cityName?.let { it3 ->
-                            saveLocationToFavorites(
-                                it1, it2,
-                                it3
-                            )
+                lat?.let { latValue ->
+                    lon?.let { lonValue ->
+                        cityName?.let { city ->
+                            saveLocationToFavorites(latValue, lonValue, city)
                             Toast.makeText(
                                 requireContext(),
                                 "Added To Favorite",
@@ -194,7 +198,6 @@ class MapFragment : Fragment() {
                         }
                     }
                 }
-
             }
             bottomSheetDialog.dismiss()
         }
@@ -230,4 +233,68 @@ class MapFragment : Fragment() {
         super.onDestroyView()
         binding.mapView.onDetach() // OSMDroid lifecycle management
     }
+
+    // Setup search functionality for cities
+    private fun setupSearchCity() {
+        cityAdapter = CityAdapter { selectedCity ->
+            // Update lat, lon, and cityName when a city is selected
+            lat = selectedCity.latitude
+            lon = selectedCity.longitude
+            cityName = selectedCity.cityName
+
+            // Add marker and animate to selected city
+            addMarkerAtLocation(GeoPoint(lat!!, lon!!))
+            binding.mapView.controller.animateTo(GeoPoint(lat!!, lon!!))
+            binding.recyclerViewCities.visibility = View.GONE // Hide RecyclerView when a city is selected
+        }
+
+        binding.recyclerViewCities.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = cityAdapter
+        }
+
+        binding.editTextSearchCity.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s.isNullOrEmpty()) {
+                    cityList.clear()
+                    binding.recyclerViewCities.visibility = View.GONE // Hide RecyclerView if input is empty
+                } else {
+                    searchLocation(s.toString())
+                    binding.recyclerViewCities.visibility = View.VISIBLE // Show RecyclerView when typing
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+
+    private fun searchLocation(cityName: String) {
+        nominatimApi.searchLocation(cityName).enqueue(object : Callback<List<NominatimResponse>> {
+            override fun onResponse(
+                call: Call<List<NominatimResponse>>,
+                response: Response<List<NominatimResponse>>
+            ) {
+                response.body()?.let { result ->
+                    Log.d("MapFragment", "Search results: $result") // Log results
+                    val cities = result.map { place ->
+                        Search(place.display_name, place.lat.toDouble(), place.lon.toDouble())
+                    }
+                    cityAdapter.submitList(cities) // Submit the new list to the adapter
+                } ?: run {
+                    Log.e("MapFragment", "No results found")
+                    Toast.makeText(requireContext(), "No results found", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<NominatimResponse>>, t: Throwable) {
+                Log.e("MapFragment", "Search failed: ${t.message}")
+                Toast.makeText(requireContext(), "Search failed", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+
 }

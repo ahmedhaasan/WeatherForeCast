@@ -15,8 +15,8 @@ interface ReposiatoryContract {
     /**
      *  applaiying flow and state Flow
      */
-    suspend fun getCurrentWeatherRemotely(lat :Double,lon:Double,lang:String,unit:String): Flow<WeatherResponse>?
-    suspend fun getFiveDayWeather(lat :Double , lon :Double ,lang: String, unit :String): Flow<FiveDayResponse>?
+    suspend fun getCurrentWeatherRemotely(lat :Double,lon:Double,lang:String,unit:String): Flow<WeatherResponse>
+    suspend fun getFiveDayWeather(lat :Double , lon :Double ,lang: String, unit :String): Flow<FiveDayResponse>
     suspend fun getCurrentLocalWeather(): Flow<CurrentWeatherEntity> // use flow when get data remotely
     suspend fun insertCurrentLocalWeather(c_weather:CurrentWeatherEntity):Long
 

@@ -48,7 +48,7 @@
                 android:id="@+id/weather_alarm_mainText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/weatherAlarm"
+                android:text="@string/weather_alarm"
                 android:textColor="@color/black"
                 android:textSize="30sp"
                 android:textStyle="bold|italic"
@@ -91,7 +91,7 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_alarm_status"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:text="Dismiss" />
+                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

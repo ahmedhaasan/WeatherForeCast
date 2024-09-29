@@ -1,8 +1,11 @@
 package com.example.weatherforecast.model.remote
 
 import com.example.weatherforecast.model.connection.RetrofitHelper
+import com.example.weatherforecast.model.connection.map.retrofit
 import com.example.weatherforecast.model.pojos.FiveDayResponse
 import com.example.weatherforecast.model.pojos.WeatherResponse
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.net.UnknownHostException
 
 // first function in the remote dataSource
@@ -13,11 +16,11 @@ class RemoteDataSourceImp : RemoteDataSourceContract {
         lon: Double,
         lang:String,
         unit: String
-    ): WeatherResponse? {
-        return try {
+    ): Flow<WeatherResponse> = flow{
+         try {
             val response = RetrofitHelper.service.getCurrentWeather(lat, lon,lang, unit)
             if (response.isSuccessful) {
-                response.body()
+                response.body()?.let { emit(it) }  // return flow
             } else {
                 null
             }
@@ -34,11 +37,11 @@ class RemoteDataSourceImp : RemoteDataSourceContract {
         lon: Double,
         lang:String,
         unit: String
-    ): FiveDayResponse? {
-        return try {
+    ): Flow<FiveDayResponse> = flow {
+         try {
             val response = RetrofitHelper.service.getFiveDayWeather(lat, lon,lang, unit)
             if (response.isSuccessful) {
-                response.body()
+                response.body()?.let { emit(it) }   // return flow
             } else {
                 null
             }

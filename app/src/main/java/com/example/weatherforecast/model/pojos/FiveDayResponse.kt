@@ -1,7 +1,5 @@
 package com.example.weatherforecast.model.pojos
 
-import City
-import WeatherItem
 
 
 data class FiveDayResponse(

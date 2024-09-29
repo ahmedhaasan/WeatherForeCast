@@ -2,6 +2,7 @@ package com.example.weatherforecast.model.view_models.home
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.weatherforecast.model.apistate.FavoriteRoomState
+import com.example.weatherforecast.model.pojos.DailyWeather
 import com.example.weatherforecast.model.pojos.Favorite
 import com.example.weatherforecast.model.reposiatory.ReposiatoryContract
 import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModel
@@ -37,7 +38,6 @@ class FavouritesViewModelTest {
     val favorite2 = Favorite(locationName = "Los Angeles", lat = 34.0522, lon = -118.2437)
     val favorite3 = Favorite(locationName = "Tokyo", lat = 35.6762, lon = 139.6503)
     val favorite4 = Favorite(locationName = "Paris", lat = 48.8566, lon = 2.3522)
-
 
     // now setUp the instances
     @Before
@@ -96,6 +96,7 @@ class FavouritesViewModelTest {
             fail("Expected a successful state but got something else")
         }
     }
+
 
 
 }

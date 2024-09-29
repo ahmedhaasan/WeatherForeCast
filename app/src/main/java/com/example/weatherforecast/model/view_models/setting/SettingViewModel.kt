@@ -49,10 +49,10 @@ class SettingViewModel(application: Application) : AndroidViewModel(application)
         // Load saved preferences initially
         _languageSetting.value = sharedPreferences.getString("LanguagePreference", "en")
         _unitSetting.value = sharedPreferences.getString("UnitPreference", "metric")
-        _windSetting.value = sharedPreferences.getString("WindPreference", "mile_hour")
-        _notificationSetting.value = sharedPreferences.getString("NotificationPreference", "enabled") // Default to enabled
+        _windSetting.value = sharedPreferences.getString("WindPreference", Constants.METER_SECOND)
+        _notificationSetting.value = sharedPreferences.getString("NotificationPreference", Constants.ENABLED) // Default to enabled
         _locationSetting.value = sharedPreferences.getString("LocationPreference", Constants.GPS) // Default to GPS
-        _locationFlag.value = sharedPreferences.getString(Constants.LOCATIONFLAG, "0") // Default to GPS
+        _locationFlag.value = sharedPreferences.getString(Constants.LOCATIONFLAG, "1") // Default to GPS
         _latitue.value = sharedPreferences.getString(Constants.LATITUTE,"31.2769423") // Default to GPS
         _longitute.value = sharedPreferences.getString(Constants.LONGITUTE, "29.9626961") // Default to GPS
         _mapCaller.value = sharedPreferences.getString(Constants.MapCaller,Constants.FAVORITESCREEN) // set default caller is setting

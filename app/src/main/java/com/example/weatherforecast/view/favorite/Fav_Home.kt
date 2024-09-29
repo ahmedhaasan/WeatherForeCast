@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecast.Constants
 import com.example.weatherforecast.R
@@ -31,6 +32,7 @@ import com.example.weatherforecast.model.view_models.favorite.FavoriteViewModelF
 import com.example.weatherforecast.setIcon
 import com.example.weatherforecast.view.homefragment.daily.DailyAdapter
 import com.example.weatherforecast.view.homefragment.hourly.HourlyAdapter
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
@@ -237,5 +239,18 @@ class Fav_Home : Fragment() {
             adapter = dailyAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
+
+
+    }
+    var fb: FloatingActionButton?=null
+    fun hideFB(view:FloatingActionButton){
+        fb=view
+        fb?.visibility=View.INVISIBLE
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        fb?.visibility=View.VISIBLE
     }
 }
+
