@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -477,10 +478,18 @@ class HomeFragment : Fragment(), NetworkChangeListener {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getSentMapLocation() {
-        lat = sharedPreferences.getString(Constants.LATITUTE, "0.0")!!.toDouble()
-        lon = sharedPreferences.getString(Constants.LONGITUTE, "0.0")?.toDouble()!!
-        fetchWeatherData()
 
+        val latitudeStr = sharedPreferences.getString(Constants.LATITUTE, "0.0")!!.toDouble()
+        val longitudeStr =sharedPreferences.getString(Constants.LONGITUTE, "0.0")?.toDouble()!!
+            if (latitudeStr != null && longitudeStr != null) {
+                 lat = latitudeStr
+                 lon = longitudeStr
+                // Use latitude and longitude
+            } else {
+                // Handle the case where latitude or longitude is null
+                Log.e("HomeFragment", "Latitude or Longitude is null")
+            }
+        fetchWeatherData()
 
     }
 

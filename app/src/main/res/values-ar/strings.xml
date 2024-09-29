@@ -79,5 +79,12 @@
     <string name="home">الرئيسيه</string>
     <string name="settings">الاعدادات</string>
     <string name="weatherStatus">حالة الطقس  </string>
+    <string name="deleteFavoriteDialog">حذف المفضل</string>
+    <string name="areYouSureDeleteLocation">هل أنت متأكد أنك تريد حذف الموقع؟</string>
+    <string name="alarm">تنبيه</string>
+    <string name="yes">نعم</string>
+    <string name="selectDate">اختر التاريخ</string>
+    <string name="selectAppoinmentTime">اختر وقت الموعد</string>
+
 
 </resources>

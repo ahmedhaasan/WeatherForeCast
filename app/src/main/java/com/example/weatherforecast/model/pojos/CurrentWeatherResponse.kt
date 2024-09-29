@@ -1,3 +1,4 @@
+package com.example.weatherforecast.model.pojos
 import com.google.gson.annotations.SerializedName
 
 
@@ -58,6 +59,22 @@ data class City(
     val coord: Coord,
     val country: String,
     val population: Int
+)
+
+
+data class NominatimResponse(
+    val display_name: String,
+    val lat: String,
+    val lon: String
+)
+
+data class Search(
+    val cityName: String,
+    val latitude: Double,
+    val longitude: Double){}
+
+data class NominatimResponseList(
+    val places: List<NominatimResponse>
 )
 
 // used in fiveDayResponse

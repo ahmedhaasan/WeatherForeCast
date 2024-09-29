@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.flowOf
  */
 class FakeRepository(
 ) : ReposiatoryContract {
+
     private val favorites: MutableList<Favorite> = mutableListOf()
     private lateinit var currentWeather: CurrentWeatherEntity
     private var hourlyWeather: MutableList<HourlyWeather> = mutableListOf()
