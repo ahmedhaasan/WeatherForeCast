@@ -101,7 +101,7 @@ class FakeRepository(
         lon: Double,
         lang: String,
         unit: String
-    ): Flow<WeatherResponse>? {
+    ): Flow<WeatherResponse> {
         TODO("Not yet implemented")
     }
 
@@ -110,7 +110,7 @@ class FakeRepository(
         lon: Double,
         lang: String,
         unit: String
-    ): Flow<FiveDayResponse>? {
+    ): Flow<FiveDayResponse> {
         TODO("Not yet implemented")
     }
 

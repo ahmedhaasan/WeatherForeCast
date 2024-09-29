@@ -67,12 +67,11 @@
     <string name="date">التاريخ</string>
     <string name="ZoneName">اسم المنطقة</string>
     <string name="cityName">اسم المدينة</string>
-    <string name="weatherAlarm">تنبيه الطقس</string>
     <string name="dismiss">تجاهل</string>
     <string name="save_alarm">حفظ</string>
     <string name="sure">تأكيد</string>
     <string name="cancel">إلغاء</string>
-    <string name="MapScreen">خريطة الشاشة</string>
+    <string name="map_screen">الخريطه </string>
     <string name="do_you_want_to_save">هل تريد حفظ هذا الموقع؟</string>
     <string name="alerts">التنبيهات</string>
     <string name="favorites">المفضله</string>
@@ -85,6 +84,16 @@
     <string name="yes">نعم</string>
     <string name="selectDate">اختر التاريخ</string>
     <string name="selectAppoinmentTime">اختر وقت الموعد</string>
+    <string name="search_city">ابحث في المدينه</string>
+    <string name="clear">مسح\n</string>
+    <string name="dissmis">تجاهل</string>
+    <string name="weather_status_today">حالةالطقس اليوم</string>
+    <string name="fabSb">" اضغط"</string>
+    <string name="weather_alarm">إنذار الطقس</string>
+
+
+
+
 
 
 </resources>

@@ -120,7 +120,8 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
             },  // when city is selected
             onItemSelected = { place ->
                 if (isConnected == true) {
-                    val fav_home = Fav_Home()
+                    val fav_home = Fav_Home()  // im calling this to hide the fab when show details of favorite
+                    fav_home.hideFB(fav_binding.favoriteFabButton)
                     // Create a Bundle and put the necessary data
                     val bundle = Bundle()
                     bundle.putDouble("lat", place.lat)
@@ -133,7 +134,6 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
                         .replace(R.id.homeFragmentContainer, fav_home)
                         .addToBackStack(null)
                         .commit()
-                    fav_binding.favoriteFabButton.visibility = View.GONE
 
                 } else {
                     showNetworkDialog(requireContext())
@@ -210,7 +210,7 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
     override fun onResume() {
         super.onResume()
         Log.d("FavoriteFragment", "onResume called, showing FAB")
-        fav_binding.favoriteFabButton.visibility = View.VISIBLE
+      //  fav_binding.favoriteFabButton.visibility = View.VISIBLE
 
     }
 
@@ -218,6 +218,7 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
     override fun onNetworkChanged(isConnected: Boolean) {
         this.isConnected = isConnected
     }
+
 
     fun showNetworkDialog(context: Context) {
         val builder = AlertDialog.Builder(context)

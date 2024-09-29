@@ -326,10 +326,10 @@ class HomeFragment : Fragment(), NetworkChangeListener {
             weather.clouds.toString() + " " + getString(R.string.unit_percent)
         // Observe windSetting LiveData
         settingViewModel.windSetting.observe(viewLifecycleOwner, Observer { status ->
-            if (status == getString(R.string.meter_second)) {
+            if (status == Constants.METER_SECOND) {
                 binding.wind.text =
                     decimalFormat.format(weather.windSpeed) + " " + getString(R.string.meter_second)
-            } else {
+            } else if(status == Constants.MILE_HOUR) {
                 binding.wind.text =
                     decimalFormat.format(weather.windSpeed) + " " + getString(R.string.mile_hour)
             }
@@ -476,6 +476,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
         })
     }
 
+    @SuppressLint("SuspiciousIndentation")
     @RequiresApi(Build.VERSION_CODES.O)
     fun getSentMapLocation() {
 

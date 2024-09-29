@@ -38,7 +38,7 @@
     <fragment
         android:id="@+id/mapFragment"
         android:name="com.example.weatherforecast.view.map.MapFragment"
-        android:label="@string/MapScreen"
+        android:label="@string/map_screen"
         tools:layout="@layout/fragment_map">
         <action
             android:id="@+id/action_mapFragment_to_homeFragment"

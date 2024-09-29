@@ -5,6 +5,7 @@ import com.example.weatherforecast.model.local.LocalDataSourceContract
 import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.pojos.CurrentWeatherEntity
 import com.example.weatherforecast.model.pojos.Favorite
+import com.example.weatherforecast.model.pojos.HourlyWeather
 import com.example.weatherforecast.model.remote.RemoteDataSourceContract
 import com.example.weatherforecast.model.reposiatory.fakedatasources.FakeLocalDataSource
 import com.example.weatherforecast.model.reposiatory.fakedatasources.FakeRemoteDataSource
@@ -69,10 +70,35 @@ class ReposiatoryImpTest {
         visibility = 10000
     )
 
+    // Create three HourlyWeather objects
+    val hourlyWeather1 = HourlyWeather(
+        id = 1,
+        day = 1695672000L,
+        icon = "sunny",
+        temperature = 25.0
+    )
+
+    val hourlyWeather2 = HourlyWeather(
+        id = 2,
+        day = 1695675600L,
+        icon = "cloudy",
+        temperature = 22.0
+    )
+
+    val hourlyWeather3 = HourlyWeather(
+        id = 3,
+        day = 1695679200L,
+        icon = "rainy",
+        temperature = 18.5
+    )
+
+    // Create a list of the HourlyWeather objects
+    val hourlyWeatherList = mutableListOf(hourlyWeather1, hourlyWeather2, hourlyWeather3)
+
 
     // create lists
-    val fakeFavoriteList = listOf(favorite1, favorite2, favorite3, favorite4)
-    val fakeAlarmList = listOf(alarm1, alarm2)
+    val fakeFavoriteList = mutableListOf(favorite1, favorite2, favorite3, favorite4)
+    val fakeAlarmList = mutableListOf(alarm1, alarm2)
 
 
     // setUP
@@ -86,9 +112,10 @@ class ReposiatoryImpTest {
     // test to get all favorites
     @Test
     fun getFavorites_listFavoriteParam_gotFlowFavorites() = runTest {
-        // when part
-        // Act
+
         // frist here collect the frist value and completes the flow
+
+        // when
         val favouritePlacesFlow = repo.getAllFavoriteLocations()
         val favouritePlaces = favouritePlacesFlow.first()
 
@@ -120,5 +147,24 @@ class ReposiatoryImpTest {
         Assert.assertEquals(weather,fakeCurrentWeather)
     }
 
+    @Test
+    fun getHourly_noInsert_GotFailed() = runTest {
+        // When: No data is inserted
+        val result = repo.getHourlyWeatherLocally().first() // without passing any data
+
+        // Then: Assert that the result is an empty list
+        Assert.assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun gotHourly_insert_assertEquallity() = runTest{
+        // when
+        repo.insertHourlyWeatherLocally(hourlyWeatherList)
+
+        val result = repo.getHourlyWeatherLocally().first()
+        // then
+        Assert.assertEquals(result,hourlyWeatherList)
+
+    }
 
 }

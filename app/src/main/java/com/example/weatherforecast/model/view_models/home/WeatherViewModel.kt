@@ -49,10 +49,10 @@ class WeatherViewModel(private val repo: ReposiatoryContract) : ViewModel() {
 
 
             repo.getCurrentWeatherRemotely(lat, lon, lang, unit)
-                ?.catch { e -> _currentWeatherState.value = WeatherApiState.Failure(e) }
+                .catch { e -> _currentWeatherState.value = WeatherApiState.Failure(e) }
                 // Take the CurrentWeather From The Response
-                ?.map { weatherResponse -> mapWeatherResponseToEntity(weatherResponse) }
-                ?.collect { weather ->
+                .map { weatherResponse -> mapWeatherResponseToEntity(weatherResponse) }
+                .collect { weather ->
                     _currentWeatherState.value = WeatherApiState.Success(weather)
                     repo.insertCurrentLocalWeather(weather) // the insert the new one
                 }
@@ -68,15 +68,14 @@ class WeatherViewModel(private val repo: ReposiatoryContract) : ViewModel() {
                 // Clear the DB before adding new data
                 repo.deleteHourlyWeather()
                 repo.getFiveDayWeather(lat, lon, lang, unit)
-                    ?.catch { error -> _hourlyWeatherState.value = HourlyApiState.Failure(error) }
-                    ?.map { fiveDaily -> // map the five Daily into Hourly
+                    .catch { error -> _hourlyWeatherState.value = HourlyApiState.Failure(error) }
+                    .map { fiveDaily -> // map the five Daily into Hourly
                         mapHourlyWeatherForTwoDays(fiveDaily)
-                    }?.collect { hourly ->
+                    }.collect { hourly ->
                         _hourlyWeatherState.value = HourlyApiState.Success(hourly)
                         repo.insertHourlyWeatherLocally(hourly) // then add the new one
                     }
             } catch (e: Exception) {
-                Log.i(Constants.ERROR, "Error fetching hourly weather: ${e.message}")
                 e.printStackTrace()
             }
         }
@@ -91,18 +90,14 @@ class WeatherViewModel(private val repo: ReposiatoryContract) : ViewModel() {
             try {
                 // Clear the DB before adding new data
                 val deletion = repo.deleteDailyWeatehr()
-                Log.i("Deletion","items deleted : $deletion ")
                 repo.getFiveDayWeather(lat, lon, lang, unit)
-                    ?.catch { error -> _dailyWeatherState.value = DailyApiState.Failure(error) }
-                    ?.map { fiveDaily -> mapDailyWeather(fiveDaily) }
-                    ?.collect { daily ->
+                    .catch { error -> _dailyWeatherState.value = DailyApiState.Failure(error) }
+                    .map { fiveDaily -> mapDailyWeather(fiveDaily) }
+                    .collect { daily ->
                         _dailyWeatherState.value = DailyApiState.Success(daily)
-                       val insertion=  repo.insertDailyWeatherLocally(daily) // then add the new one
-                        Log.i("Deletion","items inserted : $insertion ")
-
+                        val insertion=  repo.insertDailyWeatherLocally(daily) // then add the new one
                     }
             } catch (e: Exception) {
-                Log.i(Constants.ERROR, "Error fetching daily weather: ${e.message}")
                 e.printStackTrace()
             }
         }
