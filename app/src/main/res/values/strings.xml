@@ -90,4 +90,8 @@
     <string name="fabSb">" click"</string>
     <string name="dissmis">Dismiss</string>
     <string name="weather_status_today">Weather Status Tody</string>
+    <string name="undo">Undo</string>
+    <string name="network_equired">Network Required</string>
+    <string name="connect_to_network">Connect to a network to see favorite weather details</string>
+
 </resources>

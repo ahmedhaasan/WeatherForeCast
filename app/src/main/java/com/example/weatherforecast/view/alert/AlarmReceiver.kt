@@ -49,7 +49,7 @@ class AlarmReceiver : BroadcastReceiver(), NetworkChangeListener {
 
         CoroutineScope(Dispatchers.IO).launch {
             val dao = WeatherDataBase.getInstance(context).getWeatherDao()
-            val rowsDeleted = dao.deleteAlarm(alarm) // Use a valid ID
+            val rowsDeleted = dao.deleteAlarm(alarm)
             Log.d("TestDelete", "Rows deleted: $rowsDeleted")
 
 

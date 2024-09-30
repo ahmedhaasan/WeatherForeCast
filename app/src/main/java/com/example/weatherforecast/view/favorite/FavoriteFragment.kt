@@ -49,6 +49,7 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
     lateinit var favoriteAdapter: FavoriteAdapter
     var isConnected: Boolean? = null
     lateinit var settingViewModel: SettingViewModel
+
     private lateinit var networkChangeReceiver: NetworkChangeReceiver
 
     private var isFabVisible = false
@@ -98,17 +99,17 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
             onItemDeleted = { place ->
                 // Create an AlertDialog to confirm deletion
                 AlertDialog.Builder(requireContext()).apply {
-                    setTitle("Delete Favorite")
-                    setMessage("Are you sure you want to delete the location ${place.locationName}?")
+                    setTitle(getString(R.string.deleteFavoriteDialog))
+                    setMessage("${getString(R.string.areYouSureDeleteLocation)}${place.locationName}?")
                     setPositiveButton("Yes") { _, _ ->
                         // If user confirms, delete the location
                         favoriteViewModel.deleteFavoriteLocation(place)
                         Snackbar.make(
                             requireView(),
-                            "Deleted Location ${place.locationName}",
+                            "${getString(R.string.deleteFavoriteDialog)}${place.locationName}",
                             Snackbar.LENGTH_LONG
                         ).apply {
-                            setAction("Undo") {
+                            setAction(getString(R.string.undo)) {
                                 favoriteViewModel.insertFavoriteLocation(place)
                             }
                             show()
@@ -222,16 +223,16 @@ class FavoriteFragment : Fragment(), NetworkChangeListener {
 
     fun showNetworkDialog(context: Context) {
         val builder = AlertDialog.Builder(context)
-        builder.setTitle("Network Required")
-        builder.setMessage("Connect to a network to see favorite weather details.")
+        builder.setTitle(getString(R.string.network_equired))
+        builder.setMessage(getString(R.string.connect_to_network))
 
         // Add buttons
-        builder.setPositiveButton("Connect to Network") { dialog, _ ->
+        builder.setPositiveButton(R.string.network_equired) { dialog, _ ->
             // Open network settings
             context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
             dialog.dismiss()
         }
-        builder.setNegativeButton("Cancel") { dialog, _ ->
+        builder.setNegativeButton(R.string.cancel) { dialog, _ ->
             // Dismiss the dialog
             dialog.dismiss()
         }
