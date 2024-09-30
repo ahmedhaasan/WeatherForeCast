@@ -3,9 +3,9 @@ package com.example.weatherforecast.model.pojos
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "currentWeather")
+@Entity(tableName = "currentWeather", primaryKeys = ["lat","lon"])
 data class CurrentWeatherEntity(
-    @PrimaryKey(autoGenerate = true) var id :Int = 0,
+
     val city: String,
     val temperature: Double,
     val weatherStatus :String,

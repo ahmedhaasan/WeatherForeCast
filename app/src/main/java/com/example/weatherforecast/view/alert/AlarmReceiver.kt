@@ -4,32 +4,30 @@ import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.media.MediaPlayer
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NotificationManagerCompat
 import com.example.weatherforecast.Constants
+import com.example.weatherforecast.LocaleHelper.setLocale
 import com.example.weatherforecast.R
 import com.example.weatherforecast.model.checknetwork.NetworkChangeListener
 import com.example.weatherforecast.model.database.WeatherDataBase
-import com.example.weatherforecast.model.local.LocalDataSourceImp
 import com.example.weatherforecast.model.pojos.AlarmEntity
 import com.example.weatherforecast.model.remote.RemoteDataSourceImp
-import com.example.weatherforecast.model.reposiatory.ReposiatoryImp
+import com.example.weatherforecast.model.view_models.setting.SettingViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -37,7 +35,14 @@ class AlarmReceiver : BroadcastReceiver(), NetworkChangeListener {
 
     var connected = true
     override fun onReceive(context: Context, intent: Intent?) {
+       /*  val sharedPreferences: SharedPreferences =
+            context.getSharedPreferences("WeatherAppPrefs", Context.MODE_PRIVATE)
+        val languagetatus= sharedPreferences.getString("LanguagePreference", "en")
 
+        if (languagetatus=="en")
+            setLocale(context,"en")
+        else
+            setLocale(context,"ar")*/
         val alarm = intent?.getSerializableExtra(Constants.WEATHER_ALARM) as? AlarmEntity
         if (alarm == null) {
             Log.e("AlarmReceiver", "AlarmEntity is null")
