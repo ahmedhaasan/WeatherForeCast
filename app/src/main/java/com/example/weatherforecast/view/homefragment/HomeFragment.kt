@@ -149,6 +149,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                 if (locationStatus == Constants.MAP) {
                     // listen for any change Gps or Map location
                     getSentMapLocation()
+                    fetchWeatherData()
                 } else
                     getFreshLocation()
             } else {
@@ -385,13 +386,13 @@ class HomeFragment : Fragment(), NetworkChangeListener {
                     .show()
                 snackbarShown = true
             }
-
-            viewModel.getCurrentWeatherLocally()
-            viewModel.getHourlyWeatherLocally()
-            viewModel.getDailyWeatehrLocally()
             observDaily()
             observHourly()
             observeCurrently()
+            viewModel.getCurrentWeatherLocally()
+            viewModel.getHourlyWeatherLocally()
+            viewModel.getDailyWeatehrLocally()
+
 
 
         }
@@ -447,6 +448,7 @@ class HomeFragment : Fragment(), NetworkChangeListener {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onNetworkChanged(isConnected: Boolean) {
         connected = isConnected
+        fetchWeatherData()
         if (view != null) { // Check if the view is available
             if (connected && !snackbarOnlineShown) {
                 Snackbar.make(requireView(), "You are now online", Snackbar.LENGTH_SHORT).show()
@@ -485,12 +487,12 @@ class HomeFragment : Fragment(), NetworkChangeListener {
             if (latitudeStr != null && longitudeStr != null) {
                  lat = latitudeStr
                  lon = longitudeStr
+
                 // Use latitude and longitude
             } else {
                 // Handle the case where latitude or longitude is null
                 Log.e("HomeFragment", "Latitude or Longitude is null")
             }
-        fetchWeatherData()
 
     }
 

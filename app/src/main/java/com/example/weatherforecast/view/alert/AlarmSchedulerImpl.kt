@@ -65,7 +65,7 @@ class AlarmSchedulerImpl private constructor(private val application: Applicatio
             alarmItem.time,
             PendingIntent.getBroadcast(
                 application,
-                alarmItem.time.toInt(),
+                alarmItem.time.toInt(), // request code
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )

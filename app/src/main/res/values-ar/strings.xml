@@ -57,7 +57,7 @@
     <string name="humadity">الرطوبة</string>
     <string name="wind">الرياح</string>
     <string name="visability">الرؤية</string>
-    <string name="weatherState">حالة الطقس</string>
+    <string name="weatherState"> الطقس</string>
     <string name="unit_miles_per_hour">ميل/ساعة</string>
     <string name="allow">السماح</string>
     <string name="ask_for_permission">لا يمكننا تحديد الموقع حالياً. يرجى السماح بتحديد الموقع.</string>
@@ -77,7 +77,7 @@
     <string name="favorites">المفضله</string>
     <string name="home">الرئيسيه</string>
     <string name="settings">الاعدادات</string>
-    <string name="weatherStatus">حالة الطقس  </string>
+    <string name="weatherStatus"> حالةالطقس </string>
     <string name="deleteFavoriteDialog">حذف المفضل</string>
     <string name="areYouSureDeleteLocation">هل أنت متأكد أنك تريد حذف الموقع؟</string>
     <string name="alarm">تنبيه</string>
@@ -90,6 +90,13 @@
     <string name="weather_status_today">حالةالطقس اليوم</string>
     <string name="fabSb">" اضغط"</string>
     <string name="weather_alarm">إنذار الطقس</string>
+    <string name="undo">الرجوع عن المسح</string>
+    <string name="network_equired">لابد من تواجد اتصال بالانترنت</string>
+    <string name="connect_to_network">اتصل بالانترنت لتري تفاصيل الطقس المفضله</string>
+
+
+
+
 
 
 

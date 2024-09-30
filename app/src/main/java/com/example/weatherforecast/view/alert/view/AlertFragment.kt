@@ -60,10 +60,11 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
 
 
     lateinit var settingViewModel: SettingViewModel
+    lateinit var alarmViewModel: AlarmViewModel
+
     lateinit var binding: FragmentAlertBinding
     private lateinit var dialogAlertBinding: AlertDialogBinding
     private lateinit var alarmAdapter: AlarmAdapter  // alert adapter
-    lateinit var alarmViewModel: AlarmViewModel
 
     private var currentLatitude: Double = 0.0
     private var currentLongitude: Double = 0.0
@@ -75,6 +76,7 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
     lateinit var alarmScheduler: AlarmScheduler
 
     var isNotificationEnabled = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -94,8 +96,8 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
 
         NotificationManager.createNotificationChannel(requireContext())  // notification Channerl
         // Initialize the alert adapter
-
         alarmScheduler = AlarmSchedulerImpl.getInstance(requireActivity().application)
+
         alarmAdapter = AlarmAdapter() { alarm ->
 
             deleteTheAlarm(alarm)
@@ -127,6 +129,7 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
                 this.isNotificationEnabled = value  // check if the notification is enabled or not
 
             })
+
         setListeners() // listen when the add button is pressed
 
         alarmViewModel.getAllAlarmsLocally()  // observe on data befor access it
@@ -210,6 +213,7 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
 
 
     private fun showWeatherAlertDialog() {
+
         val currentTimeInMillis = System.currentTimeMillis()
 
         val dialog = Dialog(requireContext())
@@ -229,7 +233,7 @@ class AlertFragment : Fragment(), EasyPermissions.PermissionCallbacks { // impor
 
         dialogAlertBinding.btnSaveDialog.setOnClickListener {
 
-            val time = dateTimeStringToMillis(
+            val time = dateTimeStringToMillis(  // take the user time he put
                 dialogAlertBinding.tvFromDateDialog.text.toString(),
                 dialogAlertBinding.tvFromTimeDialog.text.toString()
             )

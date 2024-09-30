@@ -47,14 +47,12 @@ class FavoriteViewModel(val repo: ReposiatoryContract) : ViewModel() {
 
     fun getCurrentWeatherRemotly(lat: Double, lon: Double, lang: String, unit: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repo.deleteCurrentLocalWeather()  // delete the current weather frist
             repo.getCurrentWeatherRemotely(lat, lon, lang, unit)
                 ?.catch { e -> _currentWeatherState.value = WeatherApiState.Failure(e) }
                 // Take the CurrentWeather From The Response
                 ?.map { weatherResponse -> mapWeatherResponseToEntity(weatherResponse) }
                 ?.collect { weather ->
                     _currentWeatherState.value = WeatherApiState.Success(weather)
-                    repo.insertCurrentLocalWeather(weather) // the insert the new one
                 }
         }
     }
@@ -66,14 +64,12 @@ class FavoriteViewModel(val repo: ReposiatoryContract) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Clear the DB before adding new data
-                repo.deleteHourlyWeather()
                 repo.getFiveDayWeather(lat, lon, lang, unit)
                     ?.catch { error -> _hourlyWeatherState.value = HourlyApiState.Failure(error) }
                     ?.map { fiveDaily -> // map the five Daily into Hourly
                         mapHourlyWeatherForTwoDays(fiveDaily)
                     }?.collect { hourly ->
                         _hourlyWeatherState.value = HourlyApiState.Success(hourly)
-                        repo.insertHourlyWeatherLocally(hourly) // then add the new one
                     }
             } catch (e: Exception) {
                 Log.i(Constants.ERROR, "Error fetching hourly weather: ${e.message}")
@@ -90,7 +86,6 @@ class FavoriteViewModel(val repo: ReposiatoryContract) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Clear the DB before adding new data
-                repo.deleteDailyWeatehr()
                 repo.getFiveDayWeather(lat, lon, lang, unit)
                     ?.catch { error -> _dailyWeatherState.value = DailyApiState.Failure(error) }
                     ?.map { fiveDaily -> mapDailyWeather(fiveDaily) }
